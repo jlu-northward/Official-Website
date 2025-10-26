@@ -1,53 +1,28 @@
-# Terms of Service
+# 向北App 用户协议
 
-**Effective date:** February 1, 2025
+**northward.zone**（以下简称“我们”）依据本协议为用户（以下简称“你”）提供向北App服务。本协议对你和我们均具有法律约束力。
 
-## Acceptance
+---
 
-By using this service, you agree to these terms.
+## 一、本服务的功能
 
-## Account Rules
+你可以使用本服务进行社区分享、交流。
 
-- Provide accurate information
-- Keep your account secure
-- One account per person
-- We may terminate accounts that violate terms
+---
 
-## Billing
+## 二、责任范围及限制
 
-- Prices in USD
-- Auto-renewal enabled
-- Cancel anytime
-- No partial refunds
+你使用本服务得到的结果仅供参考，实际情况以官方为准。
 
-## Usage Rules
+---
 
-Do not:
+## 三、隐私保护
 
-- Break laws
-- Infringe copyrights
-- Share harmful content
-- Hack or disrupt service
+我们重视对你隐私的保护，你的个人隐私信息将根据《隐私政策》受到保护与规范，详情请参阅《隐私政策》。
 
-## Content Policy
+---
 
-No uploading of:
+## 四、其他条款
 
-- Illegal materials
-- Harmful content
-- Spam
-- Malware
-
-## Legal Notes
-
-- We own app content
-- You own your content
-- Service provided "as is"
-- No uptime guarantee
-
-## Contact
-
-- Email: legal@example.com
-- Address: 123 Tech Street, Suite 100
-- Phone: (555) 123-4567
-
+4.1 本协议所有条款的标题仅为阅读方便，本身并无实际涵义，不能作为本协议涵义解释的依据。  
+4.2 本协议条款无论因何种原因部分无效或不可执行，其余条款仍有效，对双方具有约束力。
