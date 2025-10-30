@@ -51,7 +51,7 @@ const Footer = () => {
 								))}
 							</div>
 							<div className="text-sm text-neutral-500 dark:text-neutral-400">
-								&copy; {new Date().getFullYear()} All rights reserved.
+								向北App &copy; {new Date().getFullYear()} All rights reserved.
 							</div>
 						</div>
 
