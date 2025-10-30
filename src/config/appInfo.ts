@@ -8,7 +8,7 @@ export const appInfo = {
 		src: "logo.png",
 	},
 	storeLinks: {
-		apple: "#",
-		google: "#",
+		apple: "https://testflight.apple.com/join/qkjvSmEU",
+		google: "/api/android-download",
 	} as StoreLinks,
 };

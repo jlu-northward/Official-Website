@@ -1,13 +1,12 @@
 import type { ScreenshotsProps } from "config";
 import { areImagesEqual } from "config";
 import { AnimatePresence, motion } from "framer-motion";
-import { memo, useState } from "react";
-import DeviceToggle from "../ui/DeviceToggle";
+import { memo } from "react";
 
 const Screenshots = ({ images }: ScreenshotsProps) => {
-	const [activeDevice, setActiveDevice] = useState<"iphone" | "ipad">("iphone");
+	const activeDevice: "iphone" = "iphone";
 	const currentImages = images[activeDevice];
-	const isIphone = activeDevice === "iphone";
+	const isIphone = true;
 
 	const handleAnimationEvent = (action: "add" | "remove") => {
 		const container = document.querySelector(".screenshots-container");
@@ -20,7 +19,6 @@ const Screenshots = ({ images }: ScreenshotsProps) => {
 				<h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
 					截图
 				</h2>
-				<DeviceToggle activeDevice={activeDevice} onToggle={setActiveDevice} />
 			</div>
 			<div className={`relative overflow-hidden min-h-[${isIphone ? "400px" : "300px"}]`}>
 				<AnimatePresence mode="wait">
