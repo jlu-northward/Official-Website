@@ -9,6 +9,6 @@ export const appInfo = {
 	},
 	storeLinks: {
 		apple: "https://testflight.apple.com/join/qkjvSmEU",
-		google: "https://7rvcum8ituspxttc.public.blob.vercel-storage.com/android-builds/%E5%90%91%E5%8C%97-release.apk ",
+		google: "https://7rvcum8ituspxttc.public.blob.vercel-storage.com/android-builds/%E5%90%91%E5%8C%97-release.apk",
 	} as StoreLinks,
 };
