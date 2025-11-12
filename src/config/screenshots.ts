@@ -2,6 +2,7 @@ import type { DeviceScreenshots } from "./types";
 
 export const screenshots: DeviceScreenshots = {
 	iphone: [
+		"screenshots/iphone/666.webp",
 		"screenshots/iphone/1.webp",
 		"screenshots/iphone/2.webp",
 		"screenshots/iphone/3.webp",
