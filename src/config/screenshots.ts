@@ -5,6 +5,7 @@ export const screenshots: DeviceScreenshots = {
 		"screenshots/iphone/1.webp",
 		"screenshots/iphone/2.webp",
 		"screenshots/iphone/3.webp",
+		"screenshots/iphone/4.webp",
 	],
 	ipad: [
 		"screenshots/ipad/1.png",
