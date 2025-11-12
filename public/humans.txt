@@ -1,9 +1,6 @@
 /* TEAM */
 
-Developer: Bohdan
-Contact: hello@bohd4n.dev
-GitHub: github.com/bohd4nx
-Location: Ukraine
+
 
 /* THANKS */
 

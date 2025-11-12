@@ -8,7 +8,7 @@ export const appInfo = {
 		src: "logo.png",
 	},
 	storeLinks: {
-		apple: "https://testflight.apple.com/join/qkjvSmEU",
+		apple: "https://apps.apple.com/cn/app/%E5%90%91%E5%8C%97app/id6753915149",
 		google: "https://7rvcum8ituspxttc.public.blob.vercel-storage.com/android-builds/%E5%90%91%E5%8C%97-release.apk",
 	} as StoreLinks,
 };

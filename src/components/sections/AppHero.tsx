@@ -5,8 +5,8 @@ import { FaApple, FaGooglePlay } from "react-icons/fa";
 const AppHero = ({ title, description, storeLinks, logo }: AppHeroProps) => (
 	<div className="mb-16 flex flex-col items-center md:items-start md:flex-row gap-8">
 		<div className="flex-shrink-0 md:self-center">
-			<div className="rounded-2xl border border-gray-200/50 dark:border-white/10 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-white/[0.02] dark:to-white/[0.05] p-6 w-[192px] h-[192px] flex items-center justify-center shadow-sm">
-				<img src={logo.src} alt="App Icon" className="h-40 w-40 rounded-2xl object-cover" />
+			<div className="rounded-lg border border-gray-200/50 dark:border-white/10 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-white/[0.02] dark:to-white/[0.05] p-3 w-[152px] h-[152px] flex items-center justify-center shadow-sm">
+				<img src={logo.src} alt="App Icon" className="h-34 w-34 rounded-lg object-cover" />
 			</div>
 		</div>
 
