@@ -64,6 +64,7 @@ export interface StoreButtonProps {
 	href: string;
 	label: string;
 	storeName: string;
+	trackingPath?: string;
 }
 
 export interface AppHeroProps {

@@ -1,0 +1,44 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { appInfo } from "../config/appInfo";
+
+const targetUrl = appInfo.storeLinks.google;
+const title = `${appInfo.title} - Android 下载`;
+---
+
+<Layout title={title} description={appInfo.description} showFooter={false}>
+  <section class="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center">
+    <div class="max-w-md space-y-4">
+      <h1 class="text-3xl font-semibold text-gray-900 dark:text-white">正在跳转到 Android 下载...</h1>
+      <p class="text-base text-gray-600 dark:text-gray-300">
+        如果没有自动跳转，请
+        <a class="text-blue-600 dark:text-blue-400 underline transition hover:text-blue-500 dark:hover:text-blue-300" href={targetUrl} rel="noreferrer" target="_blank">
+          点击这里直接获取最新 APK
+        </a>
+        。
+      </p>
+      <div class="flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <a
+          class="inline-flex items-center justify-center rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/[0.04] px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white shadow-sm transition hover:bg-gray-50 dark:hover:bg-white/[0.08]"
+          href={targetUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          立即下载 Android 版本
+        </a>
+        <a
+          class="inline-flex items-center justify-center rounded-xl border border-transparent bg-gray-900 text-white dark:bg-white/10 dark:text-white px-6 py-3 text-sm font-semibold shadow-sm transition hover:bg-gray-800 dark:hover:bg-white/20"
+          href="/"
+        >
+          返回首页
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline define:vars={{ targetUrl }}>
+    setTimeout(() => {
+      window.location.href = targetUrl;
+    }, 400);
+  </script>
+</Layout>

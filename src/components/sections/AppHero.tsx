@@ -17,22 +17,26 @@ const AppHero = ({ title, description, storeLinks, logo }: AppHeroProps) => (
 			</div>
 
 			<div className="flex flex-wrap gap-4 justify-center md:justify-start">
-				<StoreButton store="apple" href={storeLinks.apple} label="苹果版下载" storeName="iOS" />
-				<StoreButton store="google" href={storeLinks.google} label="安卓版下载" storeName="Android" />
+				<StoreButton store="apple" href={storeLinks.apple} trackingPath="/download-ios" label="苹果版下载" storeName="iOS" />
+				<StoreButton store="google" href={storeLinks.google} trackingPath="/download-android" label="安卓版下载" storeName="Android" />
 				{/* <StoreButton store="google" href={storeLinks.google2} label="安卓版备用下载" storeName="Android" /> */}
 			</div>
 		</div>
 	</div>
 );
 
-const StoreButton = memo(({ store, href, label, storeName }: StoreButtonProps) => {
+const StoreButton = memo(({ store, href, label, storeName, trackingPath }: StoreButtonProps) => {
 	const Icon = store === "apple" ? FaApple : FaGooglePlay;
+	const eventName = store === "apple" ? "download-ios" : "download-android";
+	const downloadHref = trackingPath ?? href;
 
 	return (
 		<a
-			href={href}
+			href={downloadHref}
 			target="_blank"
 			rel="noopener noreferrer"
+			data-umami-event={eventName}
+			data-store-url={href}
 			className="group flex items-center gap-3 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/[0.04] px-5 py-3 transition-all duration-300 hover:bg-gray-50 dark:hover:bg-white/[0.08] hover:border-gray-400 dark:hover:border-white/20 shadow-sm"
 		>
 			<div className="flex items-center justify-center w-7 h-7">
