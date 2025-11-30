@@ -19,7 +19,7 @@ const AppHero = ({ title, description, storeLinks, logo }: AppHeroProps) => (
 			<div className="flex flex-wrap gap-4 justify-center md:justify-start">
 				<StoreButton store="apple" href={storeLinks.apple} trackingPath="/download-ios" label="苹果版下载" storeName="iOS" />
 				<StoreButton store="google" href={storeLinks.google} trackingPath="/download-android" label="安卓版下载" storeName="Android" />
-				{/* <StoreButton store="google" href={storeLinks.google2} label="安卓版备用下载" storeName="Android" /> */}
+				<StoreButton store="google" href={storeLinks.google2} label="安卓版备用下载" storeName="Android" />
 			</div>
 		</div>
 	</div>

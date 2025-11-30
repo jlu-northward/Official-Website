@@ -17,7 +17,7 @@ const Screenshots = ({ images }: ScreenshotsProps) => {
 		<div className="mb-16">
 			<div className="mb-6 flex items-center justify-between">
 				<h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-					截图
+					详情
 				</h2>
 			</div>
 			<div className={`relative overflow-hidden min-h-[${isIphone ? "400px" : "300px"}]`}>
