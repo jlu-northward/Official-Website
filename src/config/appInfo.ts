@@ -10,6 +10,6 @@ export const appInfo = {
 	storeLinks: {
 		apple: "https://apps.apple.com/cn/app/%E5%90%91%E5%8C%97app/id6753915149",
 		google: "https://northward.nohup.life/northward-release.apk",
-		google2: "https://pan.baidu.com/s/1WYHvW8C9DLDHUEibjkAVRg?pwd=cvhu", // 提取码: cvhu
+		google2: "https://pan.baidu.com/s/1sVCGZSVdDA9h0xQz2YxpiQ?pwd=e4hm", // 提取码: e4hm
 	} as StoreLinks,
 };
