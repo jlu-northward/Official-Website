@@ -18,7 +18,7 @@ export interface FAQ {
 
 export interface StoreLinks {
 	apple: string;
-	google: string;
+	google: string | (() => string);
 	google2: string;
 }
 
