@@ -3,7 +3,7 @@ import type { StoreLinks } from "./types";
 export const appInfo = {
 	title: "向北",
 	description:
-		"分享你的校园生活",
+		"你的吉大校园日记",
 	logo: {
 		src: "logo.png",
 	},
