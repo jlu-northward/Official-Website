@@ -1,4 +1,4 @@
-import type { AppHeroProps, StoreButtonProps } from "config";
+import type { AppHeroProps } from "config";
 import { memo } from "react";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
 
@@ -17,39 +17,55 @@ const AppHero = ({ title, description, storeLinks, logo }: AppHeroProps) => (
 			</div>
 
 			<div className="flex flex-wrap gap-4 justify-center md:justify-start">
-				<StoreButton store="apple" href={storeLinks.apple} trackingPath="/download-ios" label="苹果版下载" storeName="iOS" />
-				<StoreButton store="google" href={typeof storeLinks.google === "function" ? storeLinks.google() : storeLinks.google} trackingPath="/download-android" label="安卓版下载" storeName="Android" />
-				<StoreButton store="google" href={storeLinks.google2} label="安卓版备用下载" storeName="Android" />
+				<a
+					href="/download-ios"
+					target="_blank"
+					rel="noopener noreferrer"
+					data-umami-event="download-ios"
+					className="group flex items-center gap-3 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/[0.04] px-5 py-3 transition-all duration-300 hover:bg-gray-50 dark:hover:bg-white/[0.08] hover:border-gray-400 dark:hover:border-white/20 shadow-sm"
+				>
+					<div className="flex items-center justify-center w-7 h-7">
+						<FaApple className="text-gray-600 dark:text-gray-300 transition-transform duration-300 group-hover:scale-110 group-hover:text-gray-800 dark:group-hover:text-white w-[22px] h-[22px]" />
+					</div>
+					<span className="text-left">
+						<div className="text-[11px] font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">苹果版下载</div>
+						<div className="text-[13px] font-semibold tracking-wide text-gray-900 dark:text-white/90 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">iOS</div>
+					</span>
+				</a>
+
+				<a
+					href="/download-android"
+					target="_blank"
+					rel="noopener noreferrer"
+					data-umami-event="download-android"
+					className="group flex items-center gap-3 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/[0.04] px-5 py-3 transition-all duration-300 hover:bg-gray-50 dark:hover:bg-white/[0.08] hover:border-gray-400 dark:hover:border-white/20 shadow-sm"
+				>
+					<div className="flex items-center justify-center w-7 h-7">
+						<FaGooglePlay className="text-gray-600 dark:text-gray-300 transition-transform duration-300 group-hover:scale-110 group-hover:text-gray-800 dark:group-hover:text-white w-5 h-5" />
+					</div>
+					<span className="text-left">
+						<div className="text-[11px] font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">安卓版下载</div>
+						<div className="text-[13px] font-semibold tracking-wide text-gray-900 dark:text-white/90 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Android</div>
+					</span>
+				</a>
+
+				<a
+					href={storeLinks.google2}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="group flex items-center gap-3 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/[0.04] px-5 py-3 transition-all duration-300 hover:bg-gray-50 dark:hover:bg-white/[0.08] hover:border-gray-400 dark:hover:border-white/20 shadow-sm"
+				>
+					<div className="flex items-center justify-center w-7 h-7">
+						<FaGooglePlay className="text-gray-600 dark:text-gray-300 transition-transform duration-300 group-hover:scale-110 group-hover:text-gray-800 dark:group-hover:text-white w-5 h-5" />
+					</div>
+					<span className="text-left">
+						<div className="text-[11px] font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">安卓版备用下载</div>
+						<div className="text-[13px] font-semibold tracking-wide text-gray-900 dark:text-white/90 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Android</div>
+					</span>
+				</a>
 			</div>
 		</div>
 	</div>
 );
-
-const StoreButton = memo(({ store, href, label, storeName, trackingPath }: StoreButtonProps) => {
-	const Icon = store === "apple" ? FaApple : FaGooglePlay;
-	const eventName = store === "apple" ? "download-ios" : "download-android";
-	const downloadHref = trackingPath ?? href;
-
-	return (
-		<a
-			href={downloadHref}
-			target="_blank"
-			rel="noopener noreferrer"
-			data-umami-event={eventName}
-			data-store-url={href}
-			className="group flex items-center gap-3 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/[0.04] px-5 py-3 transition-all duration-300 hover:bg-gray-50 dark:hover:bg-white/[0.08] hover:border-gray-400 dark:hover:border-white/20 shadow-sm"
-		>
-			<div className="flex items-center justify-center w-7 h-7">
-				<Icon className={`text-gray-600 dark:text-gray-300 transition-transform duration-300 group-hover:scale-110 group-hover:text-gray-800 dark:group-hover:text-white ${store === "apple" ? "w-[22px] h-[22px]" : "w-5 h-5"}`} />
-			</div>
-			<span className="text-left">
-				<div className="text-[11px] font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">{label}</div>
-				<div className="text-[13px] font-semibold tracking-wide text-gray-900 dark:text-white/90 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">{storeName}</div>
-			</span>
-		</a>
-	);
-});
-
-StoreButton.displayName = "StoreButton";
 
 export default memo(AppHero);

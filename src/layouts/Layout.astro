@@ -1,6 +1,7 @@
 ---
 import Footer from "@components/sections/Footer";
 import PageAnimation from "@components/ui/PageAnimation";
+import WeChatGuide from "@components/ui/WeChatGuide";
 
 interface Props {
   title: string;
@@ -17,30 +18,30 @@ const { title, description, showFooter = true } = Astro.props;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content={Astro.generator}>
-    
+
     <link rel="icon" type="image/webp" href="/favicon-512.svg">
-    
+
     <title>{title}</title>
     {description && <meta name="description" content={description}>}
-    
+
     <meta property="og:title" content={title}>
     {description && <meta property="og:description" content={description}>}
     <meta property="og:image" content={new URL('/favicon-512.svg', Astro.url).href}>
-    
+
     <script async src="https://uma.nohup.life/allfx" data-website-id="8372d9c0-6720-4357-879e-755bc3befc1a"></script>
 
     <script is:inline>
       const theme = localStorage.getItem('theme') || 'system';
       const root = document.documentElement;
       root.classList.remove('light', 'dark');
-      
+
       if (theme === 'system') {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         root.classList.add(prefersDark ? 'dark' : 'light');
       } else {
         root.classList.add(theme);
       }
-      
+
       !localStorage.getItem('theme') && localStorage.setItem('theme', 'system');
     </script>
   </head>
@@ -58,6 +59,7 @@ const { title, description, showFooter = true } = Astro.props;
     </div>
     <div class="mx-auto min-h-screen max-w-[800px]">
       <PageAnimation client:load>
+        <WeChatGuide client:load />
         <main><slot /></main>
         {showFooter && <Footer client:load />}
       </PageAnimation>
