@@ -2,11 +2,11 @@ import type { FeaturesProps } from "config";
 import { memo } from "react";
 
 const Features = ({ items }: FeaturesProps) => (
-	<div className="mb-16">
+	<div className="mb-8">
 		<h2 className="mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-			功能
+			主要功能
 		</h2>
-		<div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+		<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 			{items.map(({ icon: Icon, title, description }) => (
 				<div
 					key={title}

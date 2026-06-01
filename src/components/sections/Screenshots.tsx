@@ -15,12 +15,7 @@ const Screenshots = ({ images }: ScreenshotsProps) => {
 
 	return (
 		<div className="mb-16">
-			<div className="mb-6 flex items-center justify-between">
-				<h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-					详情
-				</h2>
-			</div>
-			<div className={`relative overflow-hidden min-h-[${isIphone ? "400px" : "300px"}]`}>
+			<div className={`relative overflow-hidden min-h-[${isIphone ? "600px" : "300px"}]`}>
 				<AnimatePresence mode="wait">
 					<motion.div
 						key={activeDevice}
@@ -45,9 +40,11 @@ const Screenshots = ({ images }: ScreenshotsProps) => {
 									<img
 										src={image}
 										alt={`Screenshot ${index + 1}`}
-										className={`rounded-xl border border-gray-300 dark:border-white/10 object-cover shadow-lg ${isIphone ? "aspect-[9/16] w-[260px]" : "aspect-[4/3] w-[360px]"
-											}`}
+										width={1080}
+										height={2285}
+										className="block w-[240px] md:w-[260px] h-auto rounded-xl border border-gray-300 dark:border-white/10 object-contain shadow-lg"
 										loading="lazy"
+										decoding="async"
 									/>
 								</motion.button>
 							))}

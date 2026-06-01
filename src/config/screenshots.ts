@@ -2,11 +2,11 @@ import type { DeviceScreenshots } from "./types";
 
 export const screenshots: DeviceScreenshots = {
 	iphone: [
-		"screenshots/iphone/666.webp",
-		"screenshots/iphone/1.webp",
-		"screenshots/iphone/2.webp",
-		"screenshots/iphone/3.webp",
-		"screenshots/iphone/4.webp",
+		"screenshots/android/home_new.webp",
+		"screenshots/android/hot.webp",
+		"screenshots/android/schedule.webp",
+		"screenshots/android/rate.webp",
+		"screenshots/android/square.webp",
 	],
 	ipad: [
 		"screenshots/ipad/1.png",
