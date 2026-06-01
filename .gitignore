@@ -6,3 +6,5 @@ node_modules/
 .env.production
 .DS_Store
 .idea/
+# 微信开放平台 / 站点验证文件（一次性，不入版本控制）
+/6801302787f888a5e6cb0e46fa2f263d.txt
