@@ -46,6 +46,7 @@ const { title, description, showFooter = true } = Astro.props;
     </script>
   </head>
   <body class="transition-colors duration-300 bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
+    <WeChatGuide client:load />
     <div id="top-tip" class="w-full">
       <div class="animate-gradient bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-sky-500 text-white shadow-md">
         <div class="mx-auto max-w-[1000px] px-4 py-2">
@@ -59,7 +60,6 @@ const { title, description, showFooter = true } = Astro.props;
     </div>
     <div class="mx-auto min-h-screen max-w-[800px]">
       <PageAnimation client:load>
-        <WeChatGuide client:load />
         <main><slot /></main>
         {showFooter && <Footer client:load />}
       </PageAnimation>

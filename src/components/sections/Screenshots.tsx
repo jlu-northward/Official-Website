@@ -43,8 +43,7 @@ const Screenshots = ({ images }: ScreenshotsProps) => {
 										width={1080}
 										height={2285}
 										className="block w-[240px] md:w-[260px] h-auto rounded-xl border border-gray-300 dark:border-white/10 object-contain shadow-lg"
-										loading="lazy"
-										decoding="async"
+										loading="eager"
 									/>
 								</motion.button>
 							))}

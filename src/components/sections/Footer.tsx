@@ -27,8 +27,7 @@ const Footer = () => {
 								width={80}
 								height={80}
 								className="rounded-lg border border-neutral-200/50 dark:border-white/10 bg-white p-1 shadow-sm"
-								loading="lazy"
-								decoding="async"
+								loading="eager"
 							/>
 							<div className="text-xs text-neutral-500 dark:text-neutral-400">
 								扫码关注「大鹅」公众号

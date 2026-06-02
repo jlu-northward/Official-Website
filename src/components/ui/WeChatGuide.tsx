@@ -1,15 +1,14 @@
 import { memo, useEffect, useState } from "react";
 
 const WeChatGuide = memo(() => {
-	const [visible, setVisible] = useState(false);
-	// 同步检测，避免 useEffect 延迟
 	const [isWeChat] = useState(() => {
 		if (typeof window === "undefined") return false;
 		return /micromessenger/i.test(window.navigator.userAgent);
 	});
+	// 直接用 isWeChat 初始化，省去 useEffect 延迟一帧
+	const [visible, setVisible] = useState(isWeChat);
 
 	useEffect(() => {
-		if (isWeChat) setVisible(true);
 		if (!isWeChat) return;
 
 		// 拦截所有下载按钮的点击
@@ -28,15 +27,11 @@ const WeChatGuide = memo(() => {
 	}, [isWeChat]);
 
 	useEffect(() => {
-		if (visible) {
-			document.body.style.overflow = "hidden";
-		} else {
-			document.body.style.overflow = "";
-		}
+		document.body.style.overflow = visible ? "hidden" : "";
 		return () => { document.body.style.overflow = ""; };
 	}, [visible]);
 
-	if (!isWeChat) return null;
+	if (!isWeChat || !visible) return null;
 
 	return (
 		<div
