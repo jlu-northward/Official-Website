@@ -1,11 +1,9 @@
 import { siteConfig } from "config";
-import { memo, useState } from "react";
-import { FiFileText, FiShield, FiX } from "react-icons/fi";
+import { memo } from "react";
+import { FiFileText, FiShield } from "react-icons/fi";
 import ThemeToggle from "../ui/ThemeToggle";
 
 const Footer = () => {
-	const [qrEnlarged, setQrEnlarged] = useState(false);
-
 	return (
 		<footer className="py-8 border-t border-neutral-200/70 dark:border-neutral-700/70 bg-neutral-50/50 dark:bg-black/50 backdrop-blur-sm transition-all duration-300">
 			<div className="container mx-auto px-4">
@@ -23,54 +21,20 @@ const Footer = () => {
 							</p>
 						</div>
 						<div className="flex flex-col items-center gap-2">
-							<button
-								type="button"
-								onClick={() => setQrEnlarged(true)}
-								className="rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
-								aria-label="放大查看公众号二维码"
-							>
+							<a href="/media/公众号.jpg" target="_blank" rel="noopener noreferrer">
 								<img
 									src="/media/公众号.jpg"
 									alt="向北App 微信公众号二维码"
 									width={80}
 									height={80}
-									className="rounded-lg border border-neutral-200/50 dark:border-white/10 bg-white p-1 shadow-sm transition-opacity hover:opacity-80"
+									className="rounded-lg border border-neutral-200/50 dark:border-white/10 bg-white p-1 shadow-sm"
 									loading="eager"
 								/>
-							</button>
+							</a>
 							<div className="text-xs text-neutral-500 dark:text-neutral-400">
 								扫码关注「大鹅」公众号
 							</div>
 						</div>
-
-						{qrEnlarged && (
-							<div
-								className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-								onClick={() => setQrEnlarged(false)}
-							>
-								<div
-									className="relative rounded-2xl bg-white p-4 shadow-2xl"
-									onClick={(e) => e.stopPropagation()}
-								>
-									<button
-										type="button"
-										onClick={() => setQrEnlarged(false)}
-										className="absolute -right-3 -top-3 flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800 text-white shadow-lg hover:bg-neutral-700"
-										aria-label="关闭"
-									>
-										<FiX size={14} />
-									</button>
-									<img
-										src="/media/公众号.jpg"
-										alt="向北App 微信公众号二维码"
-										width={240}
-										height={240}
-										className="block rounded-lg"
-									/>
-									<p className="mt-3 text-center text-sm text-neutral-500">扫码关注「大鹅」公众号</p>
-								</div>
-							</div>
-						)}
 					</div>
 
 					<div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-4 pt-6 border-t border-neutral-200/30 dark:border-neutral-800/30">
