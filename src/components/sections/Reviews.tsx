@@ -1,4 +1,5 @@
 import type { Review, ReviewsProps } from "config";
+import { springGentle, springSnappy, staggerDelay } from "config/motion";
 import { motion } from "framer-motion";
 import { memo } from "react";
 import RatingStars from "../ui/RatingStars";
@@ -6,9 +7,10 @@ import RatingStars from "../ui/RatingStars";
 const Reviews = ({ items }: ReviewsProps) => (
 	<div className="mb-16">
 		<motion.h2
-			initial={{ opacity: 0, y: 10 }}
+			initial={{ opacity: 0, y: 12 }}
 			whileInView={{ opacity: 1, y: 0 }}
 			viewport={{ once: true }}
+			transition={springGentle}
 			className="mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
 		>
 			User Reviews
@@ -21,18 +23,22 @@ const Reviews = ({ items }: ReviewsProps) => (
 					initial={{ opacity: 0, y: 20 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
-					transition={{ delay: index * 0.1 }}
-					className="rounded-2xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/[0.03] p-6 shadow-sm"
+					transition={{
+						...springGentle,
+						delay: staggerDelay(index, 0.08, 0.4),
+					}}
+					whileHover={{ y: -4, transition: springSnappy }}
+					className="rounded-2xl border border-gray-300 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-md dark:border-white/10 dark:bg-white/[0.03]"
 				>
 					<div className="mb-4 flex items-center gap-4">
 						{review.avatar ? (
 							<img
 								src={review.avatar}
 								alt={`${review.author} avatar`}
-								className="h-12 w-12 rounded-full object-cover border border-gray-300 dark:border-white/10"
+								className="h-12 w-12 rounded-full border border-gray-300 object-cover dark:border-white/10"
 							/>
 						) : (
-							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-white/[0.08] text-gray-800 dark:text-white/90">
+							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-800 dark:bg-white/[0.08] dark:text-white/90">
 								{review.author[0]}
 							</div>
 						)}

@@ -1,5 +1,6 @@
 import type { LightboxProps } from "config";
 import { areImagesEqual } from "config";
+import { fadeTransition, springGentle } from "config/motion";
 import { AnimatePresence, motion } from "framer-motion";
 import { memo, useCallback, useEffect, useState } from "react";
 import { FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
@@ -29,21 +30,23 @@ const Lightbox = ({ images }: LightboxProps) => {
 
 	useEffect(() => {
 		if (isOpen) {
-			document.documentElement.style.overflow = 'hidden';
-			document.documentElement.style.paddingRight = '0px';
+			document.documentElement.style.overflow = "hidden";
+			document.documentElement.style.paddingRight = "0px";
 		} else {
-			document.documentElement.style.overflow = '';
-			document.documentElement.style.paddingRight = '';
+			document.documentElement.style.overflow = "";
+			document.documentElement.style.paddingRight = "";
 		}
 
 		return () => {
-			document.documentElement.style.overflow = '';
-			document.documentElement.style.paddingRight = '';
+			document.documentElement.style.overflow = "";
+			document.documentElement.style.paddingRight = "";
 		};
 	}, [isOpen]);
 
 	const handlePrevious = useCallback(() => {
-		setCurrentIndex((prev) => (prev - 1 + currentImages.length) % currentImages.length);
+		setCurrentIndex(
+			(prev) => (prev - 1 + currentImages.length) % currentImages.length,
+		);
 	}, [currentImages.length]);
 
 	const handleNext = useCallback(() => {
@@ -69,13 +72,14 @@ const Lightbox = ({ images }: LightboxProps) => {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
-				className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70 backdrop-blur-md"
+				transition={fadeTransition}
+				className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-md dark:bg-black/70"
 				onClick={() => setIsOpen(false)}
 			>
 				<button
 					type="button"
 					onClick={() => setIsOpen(false)}
-					className="absolute right-4 top-4 p-3 text-gray-800 hover:text-gray-900 dark:text-white/90 dark:hover:text-white transition-colors rounded-full bg-white/80 dark:bg-black/60 hover:bg-white/90 dark:hover:bg-black/80 backdrop-blur-sm border border-gray-200/50 dark:border-white/10 shadow-lg"
+					className="absolute right-4 top-4 rounded-full border border-gray-200/50 bg-white/80 p-3 text-gray-800 shadow-lg outline-none backdrop-blur-sm focus-visible:ring-4 focus-visible:ring-sky-500/30 dark:border-white/10 dark:bg-black/60 dark:text-white/90"
 					aria-label="Close lightbox"
 				>
 					<FiX size={20} />
@@ -87,23 +91,30 @@ const Lightbox = ({ images }: LightboxProps) => {
 						e.stopPropagation();
 						handlePrevious();
 					}}
-					className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-gray-800 hover:text-gray-900 dark:text-white/90 dark:hover:text-white transition-colors rounded-full bg-white/80 dark:bg-black/60 hover:bg-white/90 dark:hover:bg-black/80 backdrop-blur-sm border border-gray-200/50 dark:border-white/10 shadow-lg"
+					className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-gray-200/50 bg-white/80 p-3 text-gray-800 shadow-lg outline-none backdrop-blur-sm focus-visible:ring-4 focus-visible:ring-sky-500/30 dark:border-white/10 dark:bg-black/60 dark:text-white/90"
 					aria-label="Previous image"
 				>
 					<FiChevronLeft size={20} />
 				</button>
 
-				<img
-					src={currentImages[currentIndex]}
-					alt={`Screenshot ${currentIndex + 1}`}
-					className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl"
-					onClick={(e) => e.stopPropagation()}
-					onKeyDown={(e) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.stopPropagation();
-						}
-					}}
-				/>
+				<AnimatePresence mode="wait">
+					<motion.img
+						key={currentImages[currentIndex]}
+						src={currentImages[currentIndex]}
+						alt={`Screenshot ${currentIndex + 1}`}
+						initial={{ opacity: 0, scale: 0.96, y: 10 }}
+						animate={{ opacity: 1, scale: 1, y: 0 }}
+						exit={{ opacity: 0, scale: 0.98, y: -6 }}
+						transition={springGentle}
+						className="max-h-[90vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
+						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => {
+							if (e.key === "Enter" || e.key === " ") {
+								e.stopPropagation();
+							}
+						}}
+					/>
+				</AnimatePresence>
 
 				<button
 					type="button"
@@ -111,7 +122,7 @@ const Lightbox = ({ images }: LightboxProps) => {
 						e.stopPropagation();
 						handleNext();
 					}}
-					className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-gray-800 hover:text-gray-900 dark:text-white/90 dark:hover:text-white transition-colors rounded-full bg-white/80 dark:bg-black/60 hover:bg-white/90 dark:hover:bg-black/80 backdrop-blur-sm border border-gray-200/50 dark:border-white/10 shadow-lg"
+					className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-gray-200/50 bg-white/80 p-3 text-gray-800 shadow-lg outline-none backdrop-blur-sm focus-visible:ring-4 focus-visible:ring-sky-500/30 dark:border-white/10 dark:bg-black/60 dark:text-white/90"
 					aria-label="Next image"
 				>
 					<FiChevronRight size={20} />
@@ -129,7 +140,7 @@ const Lightbox = ({ images }: LightboxProps) => {
 							className={`h-2 w-2 rounded-full transition-colors ${
 								index === currentIndex
 									? "bg-gray-800 dark:bg-white"
-									: "bg-gray-500 dark:bg-white/60 hover:bg-gray-700 dark:hover:bg-white/80"
+									: "bg-gray-500 dark:bg-white/60"
 							}`}
 							aria-label={`Go to image ${index + 1}`}
 						/>

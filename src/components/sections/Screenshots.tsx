@@ -1,5 +1,11 @@
 import type { ScreenshotsProps } from "config";
 import { areImagesEqual } from "config";
+import {
+	appleEase,
+	springGentle,
+	springSnappy,
+	staggerDelay,
+} from "config/motion";
 import { AnimatePresence, motion } from "framer-motion";
 import { memo } from "react";
 
@@ -15,15 +21,17 @@ const Screenshots = ({ images }: ScreenshotsProps) => {
 
 	return (
 		<div className="mb-16">
-			<div className={`relative overflow-hidden min-h-[${isIphone ? "600px" : "300px"}]`}>
+			<div
+				className={`relative overflow-hidden min-h-[${isIphone ? "600px" : "300px"}]`}
+			>
 				<AnimatePresence mode="wait">
 					<motion.div
 						key={activeDevice}
 						initial={{ opacity: 0, x: 20 }}
 						animate={{ opacity: 1, x: 0 }}
 						exit={{ opacity: 0, x: -20 }}
-						transition={{ duration: 0.3 }}
-						className="screenshots-container scrollbar-thin scrollbar-track-gray-200 dark:scrollbar-track-white/5 scrollbar-thumb-gray-400 dark:scrollbar-thumb-white/10 hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-white/20"
+						transition={{ duration: 0.35, ease: appleEase }}
+						className="screenshots-container scrollbar-thin scrollbar-track-gray-200 dark:scrollbar-track-white/5 scrollbar-thumb-gray-400 dark:scrollbar-thumb-white/10"
 						onAnimationComplete={() => handleAnimationEvent("add")}
 						onAnimationStart={() => handleAnimationEvent("remove")}
 					>
@@ -32,8 +40,17 @@ const Screenshots = ({ images }: ScreenshotsProps) => {
 								<motion.button
 									key={image}
 									initial={{ opacity: 0, y: 20 }}
-									animate={{ opacity: 1, y: 0, transition: { delay: index * 0.1 } }}
+									animate={{
+										opacity: 1,
+										y: 0,
+										transition: {
+											...springGentle,
+											delay: staggerDelay(index, 0.08, 0.4),
+										},
+									}}
 									exit={{ opacity: 0, y: 20 }}
+									whileHover={{ y: -6, scale: 1.02, transition: springSnappy }}
+									whileTap={{ scale: 0.97, transition: springSnappy }}
 									onClick={() => window.openLightbox?.(index, activeDevice)}
 									className="relative flex-shrink-0 overflow-hidden rounded-xl focus:outline-none"
 								>
@@ -42,7 +59,7 @@ const Screenshots = ({ images }: ScreenshotsProps) => {
 										alt={`Screenshot ${index + 1}`}
 										width={1080}
 										height={2285}
-										className="block w-[240px] md:w-[260px] h-auto rounded-xl border border-gray-300 dark:border-white/10 object-contain shadow-lg"
+										className="block h-auto w-[240px] rounded-xl border border-gray-300 object-contain shadow-lg md:w-[260px] dark:border-white/10"
 										loading="eager"
 									/>
 								</motion.button>

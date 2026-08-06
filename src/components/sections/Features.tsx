@@ -10,10 +10,10 @@ const Features = ({ items }: FeaturesProps) => (
 			{items.map(({ icon: Icon, title, description }) => (
 				<div
 					key={title}
-					className="rounded-2xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/[0.03] p-6 shadow-sm"
+					className="rounded-2xl border border-gray-300 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.03]"
 				>
 					<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/[0.04]">
-						<Icon className="h-6 w-6 text-gray-700 dark:text-white opacity-90" />
+						<Icon className="h-6 w-6 text-gray-700 opacity-90 dark:text-white" />
 					</div>
 					<h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
 						{title}
