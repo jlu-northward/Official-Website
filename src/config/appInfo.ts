@@ -2,10 +2,9 @@ import type { StoreLinks } from "./types";
 
 export const appInfo = {
 	title: "向北",
-	description:
-		"吉大人都在用的校园论坛App",
+	description: "吉大人都在用的校园论坛App",
 	logo: {
-		src: "logo.png",
+		src: "brand/logo.png",
 	},
 	storeLinks: {
 		apple: "https://apps.apple.com/cn/app/%E5%90%91%E5%8C%97app/id6753915149",

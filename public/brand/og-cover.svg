@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">向北 App</title>
+  <desc id="desc">吉大人自己的校园社区，青春一直向北。</desc>
+  <defs>
+    <radialGradient id="sky" cx="0" cy="0" r="1" gradientTransform="translate(880 80) rotate(130) scale(760 620)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DD3FC" stop-opacity=".72"/>
+      <stop offset=".45" stop-color="#818CF8" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#F5F5F7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glass" x1="810" y1="98" x2="1060" y2="574" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity=".92"/>
+      <stop offset="1" stop-color="#E0F2FE" stop-opacity=".62"/>
+    </linearGradient>
+    <filter id="shadow" x="740" y="40" width="420" height="620" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="30" stdDeviation="32" flood-color="#0F172A" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="#F5F5F7"/>
+  <rect width="1200" height="630" fill="url(#sky)"/>
+  <g opacity=".16" stroke="#0284C7">
+    <path d="M0 90H1200M0 154H1200M0 218H1200M0 282H1200M0 346H1200M0 410H1200M0 474H1200M0 538H1200"/>
+    <path d="M80 0V630M144 0V630M208 0V630M272 0V630M336 0V630M400 0V630M464 0V630M528 0V630M592 0V630M656 0V630M720 0V630M784 0V630M848 0V630M912 0V630M976 0V630M1040 0V630M1104 0V630"/>
+  </g>
+  <g transform="translate(88 84)">
+    <rect width="72" height="72" rx="19" fill="#0A0A0B"/>
+    <path d="M24 52V20h7.2l12.7 18.5V20H50v32h-6.7L30.2 33.1V52H24Z" fill="white"/>
+    <text x="0" y="144" fill="#0A0A0B" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',Arial,sans-serif" font-size="82" font-weight="650" letter-spacing="-6">青春，</text>
+    <text x="0" y="234" fill="#0A0A0B" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',Arial,sans-serif" font-size="82" font-weight="650" letter-spacing="-6">一直向北。</text>
+    <text x="4" y="304" fill="#52525B" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',Arial,sans-serif" font-size="27" font-weight="450">吉大人自己的校园社区</text>
+    <g transform="translate(4 348)">
+      <rect width="210" height="54" rx="27" fill="#0A0A0B"/>
+      <text x="105" y="35" text-anchor="middle" fill="white" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',Arial,sans-serif" font-size="18" font-weight="600">下载向北 App</text>
+    </g>
+  </g>
+  <g filter="url(#shadow)" transform="translate(820 78) rotate(5 135 245)">
+    <rect width="270" height="500" rx="54" fill="#111113"/>
+    <rect x="7" y="7" width="256" height="486" rx="48" fill="url(#glass)"/>
+    <rect x="92" y="17" width="86" height="22" rx="11" fill="#111113"/>
+    <circle cx="135" cy="190" r="74" fill="#FFFFFF" fill-opacity=".74"/>
+    <path d="M98 225v-70h16l27 40v-40h14v70h-15l-28-42v42H98Z" fill="#0EA5E9"/>
+    <rect x="42" y="301" width="186" height="20" rx="10" fill="#0F172A" fill-opacity=".12"/>
+    <rect x="42" y="337" width="144" height="14" rx="7" fill="#0F172A" fill-opacity=".08"/>
+    <rect x="42" y="365" width="174" height="14" rx="7" fill="#0F172A" fill-opacity=".08"/>
+    <rect x="42" y="420" width="186" height="48" rx="24" fill="#0EA5E9"/>
+  </g>
+</svg>

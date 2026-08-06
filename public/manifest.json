@@ -1,23 +1,23 @@
 {
-  "name": "Your App Name",
-  "short_name": "YourApp",
-  "description": "Here you can write a brief description of your application. Tell users about its main features and benefits in 1-2 sentences.",
+  "name": "向北 App",
+  "short_name": "向北",
+  "description": "吉大人自己的校园社区。认识校园，表达自己，找到同路的人。",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#3b82f6",
+  "background_color": "#f5f5f7",
+  "theme_color": "#f5f5f7",
   "orientation": "portrait-primary",
   "scope": "/",
-  "lang": "en",
-  "categories": ["productivity", "utilities"],
+  "lang": "zh-CN",
+  "categories": ["social", "education", "lifestyle"],
   "icons": [
     {
-      "src": "/favicon-192.svg",
+      "src": "/brand/favicon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml"
     },
     {
-      "src": "/favicon-512.svg",
+      "src": "/brand/favicon-512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml"
     }
