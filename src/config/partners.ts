@@ -6,5 +6,5 @@ import type { Partner } from "./types";
 // - 推荐 8–16 条，过密会牺牲可读性，过疏则首屏略空
 export const partners: Partner[] = [
 	{ name: "向北", src: "/partners/northward.png" },
-	{ name: "吉井解忧", src: "/partners/jijingjieyou.jpg" },
+	{ name: "吉井解学", src: "/partners/jijingjieyou.jpg" },
 ];
