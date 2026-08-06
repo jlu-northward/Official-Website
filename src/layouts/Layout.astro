@@ -1,108 +1,421 @@
 ---
 import Footer from "@components/sections/Footer";
-import PageAnimation from "@components/ui/PageAnimation";
 import WeChatGuide from "@components/ui/WeChatGuide";
 
 interface Props {
-  title: string;
-  description?: string;
-  showFooter?: boolean;
+	title: string;
+	description?: string;
+	showFooter?: boolean;
 }
 
 const { title, description, showFooter = true } = Astro.props;
+const siteUrl = Astro.site ?? new URL("https://northward.nohup.life");
+const canonical = new URL(Astro.url.pathname, siteUrl);
+const shareImage = new URL("/brand/og-cover.png", siteUrl);
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content={Astro.generator}>
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
+		/>
+		<meta name="generator" content={Astro.generator} />
+		<meta
+			name="theme-color"
+			content="#f5f5f7"
+			media="(prefers-color-scheme: light)"
+		/>
+		<meta
+			name="theme-color"
+			content="#09090b"
+			media="(prefers-color-scheme: dark)"
+		/>
 
-    <link rel="icon" type="image/webp" href="/favicon-512.svg">
+		<link rel="icon" type="image/svg+xml" href="/brand/favicon-512.svg" />
+		<link rel="manifest" href="/manifest.json" />
+		<link rel="canonical" href={canonical.href} />
 
-    <title>{title}</title>
-    {description && <meta name="description" content={description}>}
+		<title>{title}</title>
+		{description && <meta name="description" content={description} />}
 
-    <meta property="og:title" content={title}>
-    {description && <meta property="og:description" content={description}>}
-    <meta property="og:image" content={new URL('/favicon-512.svg', Astro.url).href}>
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="zh_CN" />
+		<meta property="og:site_name" content="向北 App" />
+		<meta property="og:title" content={title} />
+		{description && <meta property="og:description" content={description} />}
+		<meta property="og:url" content={canonical.href} />
+		<meta property="og:image" content={shareImage.href} />
+		<meta property="og:image:type" content="image/png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		{description && <meta name="twitter:description" content={description} />}
+		<meta name="twitter:image" content={shareImage.href} />
 
-    <script async src="https://uma.nohup.life/allfx" data-website-id="8372d9c0-6720-4357-879e-755bc3befc1a"></script>
+		<script
+			async
+			src="https://uma.nohup.life/allfx"
+			data-website-id="8372d9c0-6720-4357-879e-755bc3befc1a"></script>
 
-    <script is:inline>
-      const theme = localStorage.getItem('theme') || 'system';
-      const root = document.documentElement;
-      root.classList.remove('light', 'dark');
+		<script is:inline>
+			const theme = localStorage.getItem("theme") || "system";
+			const root = document.documentElement;
+			root.classList.remove("light", "dark");
 
-      if (theme === 'system') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        root.classList.add(prefersDark ? 'dark' : 'light');
-      } else {
-        root.classList.add(theme);
-      }
+			if (theme === "system") {
+				const prefersDark = window.matchMedia(
+					"(prefers-color-scheme: dark)",
+				).matches;
+				root.classList.add(prefersDark ? "dark" : "light");
+			} else {
+				root.classList.add(theme);
+			}
 
-      !localStorage.getItem('theme') && localStorage.setItem('theme', 'system');
-    </script>
-  </head>
-  <body class="transition-colors duration-300 bg-gray-50 text-gray-900 dark:bg-black dark:text-white">
-    <WeChatGuide client:load />
-    <div id="top-tip" class="w-full">
-      <div class="animate-gradient bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-sky-500 text-white shadow-md">
-        <div class="mx-auto max-w-[1000px] px-4 py-2">
-          <div class="flex items-center justify-center gap-2 text-sm font-semibold tracking-wide">
-            <span class="inline-block h-2 w-2 rounded-full bg-white/90 shadow-[0_0_10px_rgba(255,255,255,0.9)]"></span>
-            <span>即刻出发，青春向北！</span>
-            <span class="hidden sm:inline-block">✨</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="mx-auto min-h-screen max-w-[800px]">
-      <PageAnimation client:load>
-        <main><slot /></main>
-        {showFooter && <Footer client:load />}
-      </PageAnimation>
-    </div>
-  </body>
+			if (!localStorage.getItem("theme"))
+				localStorage.setItem("theme", "system");
+		</script>
+	</head>
+	<body
+		class="bg-[#f5f5f7] text-neutral-950 antialiased selection:bg-sky-200 selection:text-sky-950 dark:bg-[#09090b] dark:text-white dark:selection:bg-sky-700 dark:selection:text-white"
+	>
+		<WeChatGuide client:load />
+		<slot />
+		{
+			showFooter && (
+				<div class="relative z-10">
+					<Footer client:load />
+				</div>
+			)
+		}
+	</body>
 </html>
 
-
 <style is:global>
-  * { transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
-  html.light { color-scheme: light; }
-  html.dark { color-scheme: dark; }
+	:root {
+		font-family:
+			-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+			"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue",
+			Arial, sans-serif;
+		font-synthesis: none;
+		text-rendering: optimizeLegibility;
+		color-scheme: light;
+	}
 
-  .screenshots-scroll {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: rgb(255 255 255 / 0.1) transparent;
-  }
-  
-  .light .screenshots-scroll { scrollbar-color: rgb(0 0 0 / 0.2) transparent; }
-  
-  .screenshots-scroll::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  
-  .screenshots-scroll::-webkit-scrollbar-track { background: transparent; }
-  
-  .screenshots-scroll::-webkit-scrollbar-thumb {
-    background-color: rgb(255 255 255 / 0.1);
-    border-radius: 3px;
-  }
-  
-  .light .screenshots-scroll::-webkit-scrollbar-thumb { background-color: rgb(0 0 0 / 0.2); }
-  
-  @keyframes gradient-x {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient-x 8s ease infinite;
-  }
+	html {
+		scroll-behavior: smooth;
+		scroll-padding-top: 5.5rem;
+	}
+
+	html.dark {
+		color-scheme: dark;
+	}
+
+	body {
+		min-width: 320px;
+		margin: 0;
+		overflow-x: clip;
+		transition:
+			background-color 240ms ease,
+			color 240ms ease;
+	}
+
+	a,
+	button {
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	/* ===== Apple 风格全局动效令牌 ===== */
+	:root {
+		--ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
+		--ease-apple-out: cubic-bezier(0.22, 1, 0.36, 1);
+		--ease-apple-in: cubic-bezier(0.64, 0, 0.78, 0);
+		--dur-fast: 180ms;
+		--dur-base: 350ms;
+		--dur-slow: 550ms;
+	}
+
+	/*
+	 * 按压即时反馈：使用独立的 scale 属性而非 transform，
+	 * 可与 Tailwind translate 及 framer-motion 内联 transform 叠加，
+	 * 实现全站统一的 pointer-down 收缩反馈（100ms 内响应）。
+	 */
+	@media (prefers-reduced-motion: no-preference) {
+		a,
+		button,
+		summary,
+		[role="button"] {
+			transition: scale var(--dur-fast) var(--ease-apple-out);
+		}
+		a:active,
+		button:active,
+		summary:active,
+		[role="button"]:active {
+			scale: 0.97;
+		}
+	}
+
+	/* 卡片悬停浮起（配合阴影过渡，位移 4px，克制而精致） */
+	.card-lift {
+		transition:
+			transform var(--dur-base) var(--ease-apple),
+			box-shadow var(--dur-base) var(--ease-apple),
+			border-color var(--dur-base) var(--ease-apple);
+	}
+	@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+		.card-lift:hover {
+			transform: translateY(-4px);
+		}
+	}
+
+	/* 入场动画：柔和淡入 + 16px 上移，用于静态页面的内容呈现 */
+	@keyframes apple-fade-up {
+		from {
+			opacity: 0;
+			transform: translateY(16px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	.animate-fade-up {
+		animation: apple-fade-up var(--dur-slow) var(--ease-apple-out) both;
+	}
+	.animate-fade-up-1 {
+		animation-delay: 70ms;
+	}
+	.animate-fade-up-2 {
+		animation-delay: 140ms;
+	}
+	.animate-fade-up-3 {
+		animation-delay: 210ms;
+	}
+
+	.text-balance {
+		text-wrap: balance;
+	}
+
+	.north-grid {
+		background-image:
+			linear-gradient(to right, rgba(14, 165, 233, 0.08) 1px, transparent 1px),
+			linear-gradient(to bottom, rgba(14, 165, 233, 0.08) 1px, transparent 1px);
+		background-size: 64px 64px;
+		mask-image: linear-gradient(to bottom, black, transparent 88%);
+	}
+
+	.liquid-glass {
+		--glass-x: 50%;
+		--glass-y: 50%;
+		--glass-base: rgba(255, 255, 255, 0.64);
+		--glass-light: rgba(255, 255, 255, 0.7);
+		--glass-edge: rgba(255, 255, 255, 0.9);
+		--glass-blur: 26px;
+		--glass-saturation: 180%;
+		position: relative;
+		isolation: isolate;
+		background-color: var(--glass-base);
+		background-image:
+			radial-gradient(
+				circle 190px at var(--glass-x) var(--glass-y),
+				var(--glass-light),
+				transparent 68%
+			),
+			linear-gradient(
+				135deg,
+				rgba(255, 255, 255, 0.34),
+				rgba(255, 255, 255, 0.05) 48%,
+				rgba(125, 211, 252, 0.08)
+			),
+			radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.5), transparent 38%);
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.78),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.22),
+			0 18px 55px rgba(15, 23, 42, 0.085);
+		backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+		-webkit-backdrop-filter: blur(var(--glass-blur))
+			saturate(var(--glass-saturation));
+	}
+
+	.liquid-glass::before,
+	.liquid-glass::after {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		content: "";
+		pointer-events: none;
+	}
+
+	.liquid-glass::before {
+		z-index: -1;
+		background:
+			radial-gradient(
+				circle 170px at var(--glass-x) var(--glass-y),
+				var(--glass-light),
+				transparent 66%
+			),
+			linear-gradient(
+				115deg,
+				transparent 22%,
+				rgba(255, 255, 255, 0.2) 42%,
+				transparent 62%
+			);
+		opacity: 0.62;
+		transition: opacity 220ms ease;
+	}
+
+	.liquid-glass::after {
+		z-index: 5;
+		padding: 1px;
+		background: linear-gradient(
+			135deg,
+			var(--glass-edge),
+			rgba(255, 255, 255, 0.12) 42%,
+			rgba(56, 189, 248, 0.2) 72%,
+			rgba(255, 255, 255, 0.5)
+		);
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
+	}
+
+	.liquid-glass--thin {
+		--glass-base: rgba(255, 255, 255, 0.76);
+		--glass-light: rgba(255, 255, 255, 0.56);
+		--glass-blur: 18px;
+		--glass-saturation: 165%;
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.8),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+			0 10px 30px rgba(15, 23, 42, 0.065);
+	}
+
+	.liquid-glass--deep {
+		--glass-base: rgba(255, 255, 255, 0.46);
+		--glass-blur: 36px;
+		--glass-saturation: 190%;
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.86),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.16),
+			0 30px 90px rgba(14, 165, 233, 0.105),
+			0 12px 35px rgba(15, 23, 42, 0.075);
+	}
+
+	.liquid-glass--dark {
+		--glass-base: rgba(9, 9, 11, 0.88);
+		--glass-light: rgba(125, 211, 252, 0.12);
+		--glass-edge: rgba(255, 255, 255, 0.18);
+		color: white;
+		background-image:
+			radial-gradient(
+				circle 210px at var(--glass-x) var(--glass-y),
+				var(--glass-light),
+				transparent 68%
+			),
+			linear-gradient(
+				135deg,
+				rgba(255, 255, 255, 0.1),
+				rgba(255, 255, 255, 0.015) 52%,
+				rgba(14, 165, 233, 0.07)
+			);
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.14),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.035),
+			0 30px 100px rgba(15, 23, 42, 0.24);
+	}
+
+	.liquid-glass--interactive {
+		transition:
+			background-color 180ms ease,
+			border-color 220ms ease,
+			box-shadow 220ms ease;
+	}
+	.liquid-glass--interactive::before {
+		opacity: 0.3;
+	}
+
+	.dark .liquid-glass {
+		--glass-base: rgba(24, 24, 27, 0.62);
+		--glass-light: rgba(125, 211, 252, 0.14);
+		--glass-edge: rgba(255, 255, 255, 0.24);
+		background-image:
+			radial-gradient(
+				circle 190px at var(--glass-x) var(--glass-y),
+				var(--glass-light),
+				transparent 68%
+			),
+			linear-gradient(
+				135deg,
+				rgba(255, 255, 255, 0.085),
+				rgba(255, 255, 255, 0.02) 54%,
+				rgba(14, 165, 233, 0.05)
+			),
+			radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.07), transparent 38%);
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.14),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.035),
+			0 20px 65px rgba(0, 0, 0, 0.2);
+	}
+
+	.dark .liquid-glass--thin {
+		--glass-base: rgba(24, 24, 27, 0.74);
+	}
+	.dark .liquid-glass--deep {
+		--glass-base: rgba(9, 9, 11, 0.5);
+	}
+	.dark .liquid-glass--dark {
+		--glass-base: rgba(9, 9, 11, 0.82);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			scroll-behavior: auto !important;
+			transition-duration: 0.01ms !important;
+		}
+	}
+
+	@media (prefers-reduced-transparency: reduce) {
+		.liquid-glass,
+		header nav {
+			background: #ffffff !important;
+			background-image: none !important;
+			backdrop-filter: none !important;
+			-webkit-backdrop-filter: none !important;
+		}
+		.dark .liquid-glass,
+		.dark header nav {
+			background: #18181b !important;
+		}
+		.liquid-glass::before,
+		.liquid-glass::after {
+			display: none !important;
+		}
+		.ambient-glow {
+			display: none !important;
+		}
+	}
+
+	@media (prefers-contrast: more) {
+		.liquid-glass,
+		header nav {
+			border-color: currentColor !important;
+			background-color: rgba(255, 255, 255, 0.96) !important;
+		}
+		.dark .liquid-glass,
+		.dark header nav {
+			background-color: rgba(9, 9, 11, 0.96) !important;
+		}
+	}
 </style>

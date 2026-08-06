@@ -32,6 +32,12 @@ export interface AppLogo {
 	src: string;
 }
 
+export interface Partner {
+	name: string;
+	src: string;
+	href?: string;
+}
+
 export interface Review {
 	author: string;
 	rating: number;
@@ -49,6 +55,7 @@ export interface AppData {
 	socialLinks: SocialLink[];
 	logo: AppLogo;
 	reviews: Review[];
+	partners: Partner[];
 }
 
 export interface WithImages {

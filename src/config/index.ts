@@ -1,6 +1,7 @@
 import { appInfo } from "./appInfo";
 import { faq } from "./faq";
 import { features } from "./features";
+import { partners } from "./partners";
 import { reviews } from "./reviews";
 import { screenshots } from "./screenshots";
 import { socialLinks } from "./socialLinks";
@@ -13,6 +14,7 @@ export const siteConfig: AppData = {
 	screenshots,
 	socialLinks,
 	reviews,
+	partners,
 };
 
 // Re-export types for easier imports

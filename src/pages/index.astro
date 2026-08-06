@@ -1,35 +1,26 @@
 ---
-import About from "@components/sections/About";
-import AppHero from "@components/sections/AppHero";
-import FAQ from "@components/sections/FAQ";
-import Features from "@components/sections/Features";
-import Reviews from "@components/sections/Reviews";
-import Screenshots from "@components/sections/Screenshots";
-import Lightbox from "@components/ui/Lightbox";
+import LandingPage from "@components/sections/LandingPage";
+import AmbientGlow from "@components/ui/AmbientGlow";
 import Layout from "@layouts/Layout.astro";
 import { siteConfig } from "../config";
 
-const { title, description, screenshots, features, faqs, storeLinks, logo, reviews } = siteConfig;
+const { title, description, features, storeLinks, logo, partners } = siteConfig;
 ---
 
-<Layout title={title} description={description}>
-  <main class="min-h-screen max-w-5xl mx-auto px-4 py-8">
-    <AppHero {title} {description} {storeLinks} {logo} />
-    <div class="mb-16"><Screenshots images={screenshots} client:load /></div>
-    <Features items={features} />
-    <!-- <Reviews items={reviews} client:visible /> -->
-    <!-- <FAQ items={faqs} client:visible /> -->
-    <About />
-  </main>
+<Layout
+	title={`${title}｜吉大人自己的校园社区`}
+	description={`${description}。认识校园，表达自己，找到同路的人。`}
+>
+	<AmbientGlow client:load />
+	<div class="relative z-10">
+		<LandingPage
+			{title}
+			{description}
+			{features}
+			{storeLinks}
+			{logo}
+			{partners}
+			client:load
+		/>
+	</div>
 </Layout>
-
-<Lightbox images={screenshots} client:load />
-
-<style is:global>
-  .screenshots-scroll {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    &::-webkit-scrollbar { display: none; }
-  }
-</style>
