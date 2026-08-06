@@ -4,6 +4,20 @@ module.exports = {
 	darkMode: ["selector", '[class~="dark"]'],
 	theme: {
 		extend: {
+			fontFamily: {
+				sans: [
+					"-apple-system",
+					"BlinkMacSystemFont",
+					'"SF Pro Text"',
+					'"SF Pro Display"',
+					'"PingFang SC"',
+					'"Hiragino Sans GB"',
+					'"Microsoft YaHei"',
+					'"Helvetica Neue"',
+					"Arial",
+					"sans-serif",
+				],
+			},
 			screens: {
 				light: { raw: "(prefers-color-scheme: light)" },
 			},
