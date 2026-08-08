@@ -2,13 +2,17 @@ import { AnimatePresence, motion } from "framer-motion";
 import { memo, useEffect, useState } from "react";
 import { fadeTransition, popIn, springSnappy } from "config/motion";
 
-const WeChatGuide = memo(() => {
+interface WeChatGuideProps {
+	openOnLoad?: boolean;
+}
+
+const WeChatGuide = memo(({ openOnLoad = true }: WeChatGuideProps) => {
 	const [isWeChat] = useState(() => {
 		if (typeof window === "undefined") return false;
 		return /micromessenger/i.test(window.navigator.userAgent);
 	});
 	// 直接用 isWeChat 初始化，省去 useEffect 延迟一帧
-	const [visible, setVisible] = useState(isWeChat);
+	const [visible, setVisible] = useState(isWeChat && openOnLoad);
 
 	useEffect(() => {
 		if (!isWeChat) return;
