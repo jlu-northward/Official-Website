@@ -37,6 +37,8 @@ const productScenes = [
 		description:
 			"匿名表达、热点讨论、关注与私信，都在一个足够轻松的校园社区里发生。",
 		image: "/screenshots/home.webp",
+		imageWidth: 1170,
+		imageHeight: 2532,
 		accent: "from-sky-400/35 via-blue-500/10 to-transparent",
 		meta: "此刻，校园正在发生",
 	},
@@ -46,17 +48,21 @@ const productScenes = [
 		description:
 			"从课程体验到食堂新品，从社团活动到校园日常，重要和有趣的事都不会错过。",
 		image: "/screenshots/hot.webp",
+		imageWidth: 1170,
+		imageHeight: 2532,
 		accent: "from-violet-400/30 via-indigo-500/10 to-transparent",
 		meta: "热榜持续更新",
 	},
 	{
 		eyebrow: "吉大课表",
-		title: "把日程放好，把时间还给生活。",
+		title: "课表放得下，生活才装得满。",
 		description:
-			"课程安排清晰呈现，随时查看下一节课，也为社团、运动和朋友留出空间。",
+			"支持自由编辑、课表导入和 iOS 桌面小组件，纯净无广告，让课表随手可用、清爽好看。",
 		image: "/screenshots/schedule.webp",
+		imageWidth: 1080,
+		imageHeight: 2275,
 		accent: "from-cyan-300/35 via-sky-500/10 to-transparent",
-		meta: "今天，从容一点",
+		meta: "自由编辑 · 一键导入 · 纯净无广告",
 	},
 	{
 		eyebrow: "向北评分榜",
@@ -64,17 +70,20 @@ const productScenes = [
 		description:
 			"课程、活动与校园体验来自同学们的真实分享，少一点试错，多一点确定。",
 		image: "/screenshots/rate.webp",
+		imageWidth: 1170,
+		imageHeight: 2532,
 		accent: "from-amber-300/35 via-orange-400/10 to-transparent",
 		meta: "来自同学的真实评价",
 	},
 	{
-		eyebrow: "校园服务",
+		eyebrow: "工具箱",
 		title: "常用入口，一处就能找到。",
-		description:
-			"从社团服务到课表与家教，把分散的信息整理好，需要的时候触手可及。",
+		description: "把常用工具收进一个地方，需要时一眼就能找到。",
 		image: "/screenshots/square.webp",
+		imageWidth: 1170,
+		imageHeight: 2532,
 		accent: "from-fuchsia-300/30 via-purple-400/10 to-transparent",
-		meta: "更多校园服务持续加入",
+		meta: "更多实用工具持续加入",
 	},
 ];
 
@@ -163,23 +172,27 @@ const DownloadButton = ({
 const Phone = ({
 	src,
 	alt,
+	width,
+	height,
 	className = "",
 	priority = false,
 }: {
 	src: string;
 	alt: string;
+	width: number;
+	height: number;
 	className?: string;
 	priority?: boolean;
 }) => (
 	<div className={className}>
-		<div className="relative overflow-hidden rounded-[2.1rem] border-[3px] border-neutral-950 bg-neutral-950 shadow-[0_24px_60px_rgba(15,23,42,0.16)] dark:border-neutral-800">
+		<div className="relative overflow-hidden rounded-[2.1rem] border border-neutral-800 bg-gradient-to-b from-neutral-700 via-neutral-950 to-black p-[1.2%] shadow-[0_24px_60px_rgba(15,23,42,0.16)] dark:border-neutral-700">
 			<img
 				src={src}
 				alt={alt}
-				width={1080}
-				height={2285}
+				width={width}
+				height={height}
 				loading={priority ? "eager" : "lazy"}
-				className="block h-auto w-full rounded-[1.82rem]"
+				className="block h-auto w-full rounded-[1.9rem]"
 			/>
 		</div>
 	</div>
@@ -210,8 +223,13 @@ const ProductGallery = ({ reduceMotion }: { reduceMotion: boolean | null }) => (
 						className={`pointer-events-none absolute inset-x-[-15%] top-[-8%] h-[58%] rounded-full bg-gradient-to-b ${scene.accent} blur-[58px]`}
 						aria-hidden="true"
 					/>
-					<div className="relative mx-auto w-[74%] max-w-[245px]">
-						<Phone src={scene.image} alt={`向北 App ${scene.eyebrow}界面`} />
+					<div className="relative mx-auto w-[88%] max-w-[270px]">
+						<Phone
+							src={scene.image}
+							alt={`向北 App ${scene.eyebrow}界面`}
+							width={scene.imageWidth}
+							height={scene.imageHeight}
+						/>
 					</div>
 					<div className="relative mt-8 border-t border-black/[0.08] pt-6 dark:border-white/[0.1]">
 						<div className="flex items-center justify-between gap-4">
@@ -425,11 +443,11 @@ const LandingPage = ({
 								initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 28 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ ...springGentle, delay: reduceMotion ? 0 : 0.05 }}
-								className="text-balance text-[clamp(2.75rem,9vw,7.4rem)] font-semibold leading-[0.92] tracking-[-0.06em] text-neutral-950 sm:leading-[0.88] sm:tracking-[-0.075em] dark:text-white"
+								className="text-balance text-[clamp(2.5rem,6vw,5rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-neutral-950 sm:leading-[0.94] sm:tracking-[-0.055em] dark:text-white"
 							>
-								青春，
+								在向北，
 								<br />
-								一直向北。
+								记录JLUer的一万种生活
 							</motion.h1>
 							<motion.p
 								initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 24 }}
@@ -437,7 +455,7 @@ const LandingPage = ({
 								transition={{ ...springGentle, delay: reduceMotion ? 0 : 0.14 }}
 								className="mx-auto mt-5 max-w-xl text-balance text-base leading-7 text-neutral-600 sm:mt-7 sm:text-lg sm:leading-8 lg:mx-0 dark:text-neutral-300"
 							>
-								{description}。认识校园，表达自己，找到同路的人。
+								认识校园，表达自己，找到同路的人。有问题来求助，有生活来分享，有体验来点评，汇聚万千吉大声音
 							</motion.p>
 							<motion.div
 								initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
@@ -494,12 +512,16 @@ const LandingPage = ({
 								<Phone
 									src="/screenshots/home.webp"
 									alt="向北 App 校园广场界面"
+									width={1170}
+									height={2532}
 									priority
 									className="absolute left-[13%] top-[3%] z-20 w-[47%] rotate-[-5deg]"
 								/>
 								<Phone
 									src="/screenshots/square.webp"
 									alt="向北 App 校园社区界面"
+									width={1170}
+									height={2532}
 									priority
 									className="absolute right-[8%] top-[15%] z-10 w-[43%] rotate-[7deg] opacity-95"
 								/>
@@ -511,7 +533,7 @@ const LandingPage = ({
 										Northward
 									</span>
 									<span className="mt-1 block text-sm font-semibold tracking-[-0.02em]">
-										吉大人自己的校园社区
+										吉大人都在用的校园论坛App
 									</span>
 								</span>
 							</figcaption>
@@ -523,11 +545,11 @@ const LandingPage = ({
 
 				<section id="product" className="scroll-mt-24 px-5 py-16 sm:py-24">
 					<div className="mx-auto max-w-6xl">
-					<motion.div
-						{...reveal}
-						viewport={{ once: true, amount: 0.35 }}
-						transition={spring}
-						className="mx-auto mb-12 max-w-3xl text-center sm:mb-16 sm:mb-24"
+						<motion.div
+							{...reveal}
+							viewport={{ once: true, amount: 0.35 }}
+							transition={spring}
+							className="mx-auto mb-12 max-w-3xl text-center sm:mb-16 sm:mb-24"
 						>
 							<p className="text-sm font-semibold text-sky-600 dark:text-sky-300">
 								打开一次，
@@ -552,9 +574,9 @@ const LandingPage = ({
 							<p className="text-sm font-semibold text-sky-600 dark:text-sky-300">
 								一个 App，装下校园生活
 							</p>
-					<h2 className="mt-4 text-balance text-3xl font-semibold leading-[1.1] tracking-[-0.04em] text-neutral-950 sm:text-6xl sm:leading-[1.05] sm:tracking-[-0.05em] dark:text-white">
-							功能很多，使用很轻。
-						</h2>
+							<h2 className="mt-4 text-balance text-3xl font-semibold leading-[1.1] tracking-[-0.04em] text-neutral-950 sm:text-6xl sm:leading-[1.05] sm:tracking-[-0.05em] dark:text-white">
+								功能很多，使用很轻。
+							</h2>
 						</motion.div>
 						<div className="mt-12 grid border-y border-black/[0.08] sm:mt-16 sm:grid-cols-2 lg:grid-cols-4 dark:border-white/[0.1]">
 							{features.map((feature, index) => {
@@ -586,14 +608,14 @@ const LandingPage = ({
 					</div>
 				</section>
 
-			<section
-				ref={storyRef}
-				id="story"
-				className="scroll-mt-24 py-16 sm:py-24"
-			>
-				<motion.div
-					style={{ y: storyContentY }}
-					className="relative mx-auto max-w-none transform-gpu overflow-hidden bg-neutral-950 px-5 py-16 text-white will-change-transform sm:py-24 sm:py-28"
+				<section
+					ref={storyRef}
+					id="story"
+					className="scroll-mt-24 py-16 sm:py-24"
+				>
+					<motion.div
+						style={{ y: storyContentY }}
+						className="relative mx-auto max-w-none transform-gpu overflow-hidden bg-neutral-950 px-5 py-16 text-white will-change-transform sm:py-24 sm:py-28"
 					>
 						<motion.div
 							style={{ y: storyGlowY }}
@@ -605,10 +627,10 @@ const LandingPage = ({
 								<p className="text-sm font-semibold text-sky-300">
 									名字来自《先生向北》
 								</p>
-						<h2 className="mt-5 max-w-3xl text-balance text-3xl font-semibold leading-[1.08] tracking-[-0.045em] sm:text-6xl sm:leading-[1.03] sm:tracking-[-0.055em]">
-								所谓向北，是一群吉大人对校园的认真想象。
-							</h2>
-							<p className="mt-6 max-w-2xl text-base leading-7 text-neutral-300 sm:mt-7 sm:text-lg sm:leading-8">
+								<h2 className="mt-5 max-w-3xl text-balance text-3xl font-semibold leading-[1.08] tracking-[-0.045em] sm:text-6xl sm:leading-[1.03] sm:tracking-[-0.055em]">
+									所谓向北，是一群吉大人对校园的认真想象。
+								</h2>
+								<p className="mt-6 max-w-2xl text-base leading-7 text-neutral-300 sm:mt-7 sm:text-lg sm:leading-8">
 									「向北」由吉林大学开放原子开源社团推出。我们来自不同年级与专业，因为热爱技术、开源与校园生活走到一起。
 								</p>
 								<a
@@ -644,15 +666,15 @@ const LandingPage = ({
 					</motion.div>
 				</section>
 
-			<section
-				id="download"
-				className="scroll-mt-24 px-5 pb-20 pt-16 sm:pb-28 sm:pt-24 lg:pb-36 lg:pt-28"
-			>
-				<motion.div
-					{...reveal}
-					viewport={{ once: true, amount: 0.3 }}
-					transition={spring}
-					className="mx-auto max-w-4xl border-t border-black/[0.08] px-6 py-12 text-center sm:px-10 sm:py-16 lg:py-24 dark:border-white/[0.1]"
+				<section
+					id="download"
+					className="scroll-mt-24 px-5 pb-20 pt-16 sm:pb-28 sm:pt-24 lg:pb-36 lg:pt-28"
+				>
+					<motion.div
+						{...reveal}
+						viewport={{ once: true, amount: 0.3 }}
+						transition={spring}
+						className="mx-auto max-w-4xl border-t border-black/[0.08] px-6 py-12 text-center sm:px-10 sm:py-16 lg:py-24 dark:border-white/[0.1]"
 					>
 						<img
 							src={`/${logo.src}`}
