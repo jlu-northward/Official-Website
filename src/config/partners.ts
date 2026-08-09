@@ -5,7 +5,7 @@ import type { Partner } from "./types";
 // - 暂时没有 logo 的条目可以暂时不列，凑齐再批量填入
 // - 推荐 8–16 条，过密会牺牲可读性，过疏则首屏略空
 export const partners: Partner[] = [
-	{ name: "开放原子社团", src: "/partners/open-atom.jpg" },
+	{ name: "吉林大学开放原子开源社团", src: "/partners/open-atom.jpg" },
 	{ name: "向北", src: "/partners/northward.png" },
 	// { name: "吉井解学", src: "/partners/jijingjieyou.jpg" },
 ];
