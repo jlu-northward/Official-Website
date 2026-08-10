@@ -447,7 +447,7 @@ const LandingPage = ({
 							>
 								在向北，
 								<br />
-								记录JLUer的一万种生活
+								记录 JLUer 的一万种生活
 							</motion.h1>
 							<motion.p
 								initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 24 }}
@@ -510,20 +510,28 @@ const LandingPage = ({
 									aria-hidden="true"
 								/>
 								<Phone
-									src="/screenshots/home.webp"
-									alt="向北 App 校园广场界面"
+									src="/screenshots/hero/left.webp"
+									alt="向北 App 左侧校园广场界面"
 									width={1170}
 									height={2532}
 									priority
-									className="absolute left-[13%] top-[3%] z-20 w-[47%] rotate-[-5deg]"
+									className="absolute left-[4%] top-[15%] z-10 w-[38%] rotate-[-9deg]"
 								/>
 								<Phone
-									src="/screenshots/square.webp"
-									alt="向北 App 校园社区界面"
+									src="/screenshots/hero/center.webp"
+									alt="向北 App 中间实时热点界面"
 									width={1170}
 									height={2532}
 									priority
-									className="absolute right-[8%] top-[15%] z-10 w-[43%] rotate-[7deg] opacity-95"
+									className="absolute left-1/2 top-[2%] z-30 w-[44%] -translate-x-1/2"
+								/>
+								<Phone
+									src="/screenshots/hero/right.webp"
+									alt="向北 App 右侧工具箱界面"
+									width={1170}
+									height={2532}
+									priority
+									className="absolute right-[2%] top-[14%] z-20 w-[38%] rotate-[9deg]"
 								/>
 							</div>
 							<figcaption className="relative mx-auto mt-4 flex max-w-md items-center justify-center gap-3 border-t border-black/[0.08] pt-5 lg:justify-start dark:border-white/[0.1]">
