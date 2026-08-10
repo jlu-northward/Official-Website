@@ -17,15 +17,15 @@ npm run preview    # 预览构建产物
 
 文案、下载链接、截图列表都在 `src/config/` 下，修改后无需改组件代码：
 
-| 文件 | 用途 |
-| --- | --- |
-| `src/config/appInfo.ts` | 标题、描述、商店链接 |
+| 文件                        | 用途                                       |
+| --------------------------- | ------------------------------------------ |
+| `src/config/appInfo.ts`     | 标题、描述、商店链接                       |
 | `src/config/screenshots.ts` | 详情区横向滚动截图（iPhone/iPad 两条数组） |
-| `src/config/features.ts` | 功能特性卡片 |
-| `src/config/faq.ts` | FAQ 列表 |
-| `src/config/reviews.ts` | 用户评价 |
-| `src/config/socialLinks.ts` | 社交链接 |
-| `src/config/partners.ts` | 首页 Hero 下方「合作社团」轮播带 |
+| `src/config/features.ts`    | 功能特性卡片                               |
+| `src/config/faq.ts`         | FAQ 列表                                   |
+| `src/config/reviews.ts`     | 用户评价                                   |
+| `src/config/socialLinks.ts` | 社交链接                                   |
+| `src/config/partners.ts`    | 首页 Hero 下方「合作社团」轮播带           |
 
 ## 静态资源
 
@@ -36,22 +36,32 @@ public/
 ├── brand/        favicon-192.svg / favicon-512.svg / logo.png / og-cover.png / og-cover.svg
 ├── qrcode/       wechat-official.jpg（微信公众号二维码）
 ├── partners/     合作社团 logo
-└── screenshots/  home / hot / schedule / rate / square（5 张主截图）+ ipad/（3 张）
+└── screenshots/
+    ├── hero/      left / center / right（3 张首页首屏专用截图）
+    ├── ipad/      3 张 iPad 详情截图
+    └── home / hot / schedule / rate / square（5 张主截图）
 ```
 
 ## 更换截图
 
-5 张主截图位于 `public/screenshots/`，按功能命名：`home` `hot` `schedule` `rate` `square`。**同名覆盖即生效，无需改代码**（HMR 自动刷新）。
+首页首屏的 3 张截图位于 `public/screenshots/hero/`，分别为
+`left.webp`、`center.webp`、`right.webp`。它们只用于首屏三台手机，
+**同名覆盖即生效，不会影响下方功能卡片和横向滚动截图**。
+
+5 张主截图位于 `public/screenshots/`，按功能命名：`home`、`hot`、
+`schedule`、`rate`、`square`。
 
 **引用位置：**
 
-- **Hero 大图**（首页顶部两张倾斜手机）：`home.webp` + `square.webp`，在 [LandingPage.tsx](src/components/sections/LandingPage.tsx) 搜索 `/screenshots/` 改 `<Phone src>`
+- **Hero 大图**（首页顶部三台手机）：`hero/left.webp`、`hero/center.webp`、`hero/right.webp`，在 [LandingPage.tsx](src/components/sections/LandingPage.tsx) 搜索 `/screenshots/hero/` 查看对应位置
 - **功能卡片**（5 张特性卡片）：[LandingPage.tsx](src/components/sections/LandingPage.tsx) 的 `productScenes` 数组 `image` 字段
 - **详情区横滚带**：[src/config/screenshots.ts](src/config/screenshots.ts) 的 `iphone` / `ipad` 数组（按数组顺序展示）
 
-> 💡 当前 `iphone` 数组复用顶层 5 张 `.webp`，与功能卡片共用——改一张图会同时影响两处。要让详情区用不同图，丢新文件到 `public/screenshots/` 另起名字（如 `home-detail.webp`），再去 `screenshots.ts` 改路径。
+> 💡 Hero 的 3 张图已经完全独立。当前 `iphone` 数组仍复用顶层 5 张
+> `.webp`，与功能卡片共用；修改顶层图片会同时影响这两处。
 
-**截图规格：** 宽 1080 px、高 ≤ 2275 px、所有图尺寸一致；WebP 75–80 质量，单张 < 150 KB；无状态栏/水印/设备边框，无拉伸变形。
+**截图规格：** 同一组图片保持相同尺寸和宽高比；推荐宽度 1080–1170 px，
+使用 WebP 75–80 质量，并避免状态栏、水印、设备边框和拉伸变形。
 
 ## 更换公众号二维码
 
@@ -60,6 +70,7 @@ public/
 ## 更换品牌资源
 
 `public/brand/` 下的 favicon / OG 封面 / logo **同名覆盖即生效**。如换文件名或格式：
+
 - `favicon-512.svg` → [Layout.astro](src/layouts/Layout.astro) 的 `<link rel="icon">` + [public/manifest.json](public/manifest.json) 的 `icons`
 - `og-cover.png` → [Layout.astro](src/layouts/Layout.astro) 的 `shareImage`
 
