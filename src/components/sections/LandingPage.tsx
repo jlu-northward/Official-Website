@@ -449,7 +449,7 @@ const LandingPage = ({
 								initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 28 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ ...springGentle, delay: reduceMotion ? 0 : 0.05 }}
-								className="inline-block text-balance text-left text-[clamp(2.5rem,6vw,5rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-neutral-950 sm:leading-[0.94] sm:tracking-[-0.055em] lg:block dark:text-white"
+								className="inline-block text-balance text-left text-[clamp(2.5rem,6vw,5rem)] font-semibold leading-[1.08] tracking-[-0.045em] text-neutral-950 sm:leading-[1.05] sm:tracking-[-0.055em] lg:block dark:text-white"
 							>
 								吉大这么大，
 								<br />
@@ -463,6 +463,7 @@ const LandingPage = ({
 							>
 								认识校园，表达自己，找到同路的人。有问题来求助，有生活来分享，有体验来点评，汇聚万千吉大声音
 							</motion.p>
+							<CommentBarrage variant="mobile" />
 							<motion.div
 								initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}

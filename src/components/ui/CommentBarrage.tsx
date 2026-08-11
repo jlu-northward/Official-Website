@@ -18,7 +18,11 @@ const rowMotion = [
 	{ top: "87%", duration: 76 },
 ] as const;
 
-const CommentBarrage = () => {
+interface CommentBarrageProps {
+	variant?: "background" | "mobile";
+}
+
+const CommentBarrage = ({ variant = "background" }: CommentBarrageProps) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [isActive, setIsActive] = useState(false);
 
@@ -44,10 +48,53 @@ const CommentBarrage = () => {
 		};
 	}, []);
 
+	if (variant === "mobile") {
+		const comments = barrageRows[3];
+
+		return (
+			<div
+				ref={containerRef}
+				className="pointer-events-none relative left-1/2 mt-7 h-6 w-screen -translate-x-1/2 overflow-hidden sm:hidden"
+				aria-hidden="true"
+			>
+				<div className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+					<div
+						style={
+							{
+								"--barrage-duration": "56s",
+								animationPlayState: isActive ? "running" : "paused",
+							} as CSSProperties
+						}
+						className="barrage-track flex w-max min-w-max transform-gpu will-change-transform"
+					>
+						{[0, 1].map((copy) => (
+							<div
+								key={copy}
+								className="flex min-w-[100vw] shrink-0 items-center gap-5 pr-5 text-xs leading-6 text-neutral-500 dark:text-neutral-400"
+							>
+								{comments.map(([username, content]) => (
+									<span
+										key={`${copy}-${username}-${content}`}
+										className="shrink-0 whitespace-nowrap"
+									>
+										<span className="mr-1.5 font-medium text-neutral-600 dark:text-neutral-300">
+											@{username}
+										</span>
+										{content}
+									</span>
+								))}
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div
 			ref={containerRef}
-			className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+			className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden sm:block"
 			aria-hidden="true"
 		>
 			<div className="absolute inset-0 opacity-30 [mask-image:linear-gradient(to_bottom,transparent_2%,black_13%,black_88%,transparent_100%)] sm:opacity-[0.38] dark:opacity-25 sm:dark:opacity-30">
