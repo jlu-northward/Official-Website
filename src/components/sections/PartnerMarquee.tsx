@@ -1,4 +1,4 @@
-import { motion, useAnimationFrame, useReducedMotion } from "framer-motion";
+import { useAnimationFrame, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import type { Partner } from "config";
 
@@ -49,6 +49,7 @@ const PartnerMarquee = ({ items }: PartnerMarqueeProps) => {
 	const [isPaused, setIsPaused] = useState(false);
 	const trackRef = useRef<HTMLDivElement>(null);
 	const sectionRef = useRef<HTMLElement>(null);
+	const isInView = useInView(sectionRef, { margin: "120px" });
 	const xRef = useRef(0);
 	const lastTimeRef = useRef<number | null>(null);
 	// px / second — comfortable reading speed
@@ -93,7 +94,7 @@ const PartnerMarquee = ({ items }: PartnerMarqueeProps) => {
 	}, [items, copies]);
 
 	useAnimationFrame((time) => {
-		if (reduceMotion || isPaused) {
+		if (reduceMotion || isPaused || !isInView) {
 			lastTimeRef.current = time;
 			return;
 		}
@@ -136,7 +137,7 @@ const PartnerMarquee = ({ items }: PartnerMarqueeProps) => {
 				aria-hidden="true"
 			/>
 
-			<motion.div
+			<div
 				role="list"
 				aria-label="合作校园组织列表"
 				ref={trackRef}
@@ -155,7 +156,7 @@ const PartnerMarquee = ({ items }: PartnerMarqueeProps) => {
 						<PartnerItem {...item} />
 					</div>
 				))}
-			</motion.div>
+			</div>
 		</section>
 	);
 };
