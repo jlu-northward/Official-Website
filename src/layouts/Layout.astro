@@ -66,7 +66,11 @@ const usesDefaultShareImage = !shareImage;
 		{description && <meta property="og:description" content={description} />}
 		<meta property="og:url" content={canonicalUrl.href} />
 		<meta property="og:image" content={shareImageUrl.href} />
-		{usesDefaultShareImage && <meta property="og:image:type" content="image/png" />}
+		{
+			usesDefaultShareImage && (
+				<meta property="og:image:type" content="image/png" />
+			)
+		}
 		{usesDefaultShareImage && <meta property="og:image:width" content="1200" />}
 		{usesDefaultShareImage && <meta property="og:image:height" content="630" />}
 		<meta name="twitter:card" content="summary_large_image" />
@@ -204,6 +208,18 @@ const usesDefaultShareImage = !shareImage;
 			opacity: 1;
 			transform: translateY(0);
 		}
+	}
+
+	@keyframes barrage-scroll {
+		from {
+			transform: translate3d(0, 0, 0);
+		}
+		to {
+			transform: translate3d(-50%, 0, 0);
+		}
+	}
+	.barrage-track {
+		animation: barrage-scroll var(--barrage-duration) linear infinite;
 	}
 	.animate-fade-up {
 		animation: apple-fade-up var(--dur-slow) var(--ease-apple-out) both;
@@ -406,6 +422,10 @@ const usesDefaultShareImage = !shareImage;
 			animation-iteration-count: 1 !important;
 			scroll-behavior: auto !important;
 			transition-duration: 0.01ms !important;
+		}
+		.barrage-track {
+			animation: none !important;
+			transform: translate3d(-12%, 0, 0);
 		}
 	}
 

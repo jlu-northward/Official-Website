@@ -16,6 +16,7 @@ import {
 	FiUsers,
 } from "react-icons/fi";
 import PartnerMarquee from "@components/sections/PartnerMarquee";
+import CommentBarrage from "@components/ui/CommentBarrage";
 import type { AppHeroProps, Feature, Partner } from "config";
 import {
 	revealFadeUp,
@@ -421,7 +422,7 @@ const LandingPage = ({
 				<section
 					ref={heroRef}
 					id="top"
-					className="relative min-h-[100svh] px-5 pb-20 pt-28 sm:pt-36 lg:min-h-[820px] lg:pb-20 lg:pt-40"
+					className="relative isolate min-h-[100svh] px-5 pb-20 pt-28 sm:pt-36 lg:min-h-[820px] lg:pb-20 lg:pt-40"
 				>
 					<div
 						className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[780px] overflow-hidden"
@@ -433,8 +434,9 @@ const LandingPage = ({
 						/>
 						<div className="north-grid absolute inset-0 opacity-[0.28] dark:opacity-[0.16]" />
 					</div>
+					<CommentBarrage />
 
-					<div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+					<div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
 						<motion.div
 							style={{ y: heroCopyY, opacity: heroCopyOpacity }}
 							className="relative z-10 transform-gpu text-center will-change-transform lg:text-left"
@@ -443,11 +445,11 @@ const LandingPage = ({
 								initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 28 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ ...springGentle, delay: reduceMotion ? 0 : 0.05 }}
-								className="text-balance text-[clamp(2.5rem,6vw,5rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-neutral-950 sm:leading-[0.94] sm:tracking-[-0.055em] dark:text-white"
+								className="inline-block text-balance text-left text-[clamp(2.5rem,6vw,5rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-neutral-950 sm:leading-[0.94] sm:tracking-[-0.055em] lg:block dark:text-white"
 							>
-								在向北，
+								吉大这么大，
 								<br />
-								记录 JLUer 的一万种生活
+								来向北看看
 							</motion.h1>
 							<motion.p
 								initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 24 }}
