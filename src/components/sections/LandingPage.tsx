@@ -177,6 +177,7 @@ const Phone = ({
 	height,
 	className = "",
 	priority = false,
+	eager = false,
 }: {
 	src: string;
 	alt: string;
@@ -184,6 +185,7 @@ const Phone = ({
 	height: number;
 	className?: string;
 	priority?: boolean;
+	eager?: boolean;
 }) => (
 	<div className={className}>
 		<div className="relative overflow-hidden rounded-[2.1rem] border border-neutral-800 bg-gradient-to-b from-neutral-700 via-neutral-950 to-black p-[1.2%] shadow-[0_24px_60px_rgba(15,23,42,0.16)] dark:border-neutral-700">
@@ -192,7 +194,9 @@ const Phone = ({
 				alt={alt}
 				width={width}
 				height={height}
-				loading={priority ? "eager" : "lazy"}
+				loading={priority || eager ? "eager" : "lazy"}
+				fetchPriority={priority ? "high" : eager ? "low" : "auto"}
+				decoding="async"
 				className="block h-auto w-full rounded-[1.9rem]"
 			/>
 		</div>
@@ -512,15 +516,15 @@ const LandingPage = ({
 									aria-hidden="true"
 								/>
 								<Phone
-									src="/screenshots/hero/left.webp"
+									src="/screenshots/home.webp"
 									alt="向北 App 左侧校园广场界面"
 									width={1170}
 									height={2532}
-									priority
+									eager
 									className="absolute left-[4%] top-[15%] z-10 w-[38%] rotate-[-9deg]"
 								/>
 								<Phone
-									src="/screenshots/hero/center.webp"
+									src="/screenshots/hot.webp"
 									alt="向北 App 中间实时热点界面"
 									width={1170}
 									height={2532}
@@ -528,11 +532,11 @@ const LandingPage = ({
 									className="absolute left-1/2 top-[2%] z-30 w-[44%] -translate-x-1/2"
 								/>
 								<Phone
-									src="/screenshots/hero/right.webp"
+									src="/screenshots/square.webp"
 									alt="向北 App 右侧工具箱界面"
 									width={1170}
 									height={2532}
-									priority
+									eager
 									className="absolute right-[2%] top-[14%] z-20 w-[38%] rotate-[9deg]"
 								/>
 							</div>
