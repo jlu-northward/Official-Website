@@ -18,11 +18,7 @@ const rowMotion = [
 	{ top: "87%", duration: 76 },
 ] as const;
 
-interface CommentBarrageProps {
-	variant?: "background" | "mobile";
-}
-
-const CommentBarrage = ({ variant = "background" }: CommentBarrageProps) => {
+const CommentBarrage = () => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [isActive, setIsActive] = useState(false);
 
@@ -48,63 +44,18 @@ const CommentBarrage = ({ variant = "background" }: CommentBarrageProps) => {
 		};
 	}, []);
 
-	if (variant === "mobile") {
-		const comments = barrageRows[3];
-
-		return (
-			<div
-				ref={containerRef}
-				className="pointer-events-none relative left-1/2 mt-7 h-6 w-screen -translate-x-1/2 overflow-hidden sm:hidden"
-				aria-hidden="true"
-			>
-				<div className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
-					<div
-						style={
-							{
-								"--barrage-duration": "56s",
-								animationPlayState: isActive ? "running" : "paused",
-							} as CSSProperties
-						}
-						className="barrage-track flex w-max min-w-max transform-gpu will-change-transform"
-					>
-						{[0, 1].map((copy) => (
-							<div
-								key={copy}
-								className="flex min-w-[100vw] shrink-0 items-center gap-5 pr-5 text-xs leading-6 text-neutral-500 dark:text-neutral-400"
-							>
-								{comments.map(([username, content]) => (
-									<span
-										key={`${copy}-${username}-${content}`}
-										className="shrink-0 whitespace-nowrap"
-									>
-										<span className="mr-1.5 font-medium text-neutral-600 dark:text-neutral-300">
-											@{username}
-										</span>
-										{content}
-									</span>
-								))}
-							</div>
-						))}
-					</div>
-				</div>
-			</div>
-		);
-	}
-
 	return (
 		<div
 			ref={containerRef}
-			className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden sm:block"
+			className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[100svh] overflow-hidden sm:inset-0 sm:h-auto"
 			aria-hidden="true"
 		>
-			<div className="absolute inset-0 opacity-30 [mask-image:linear-gradient(to_bottom,transparent_2%,black_13%,black_88%,transparent_100%)] sm:opacity-[0.38] dark:opacity-25 sm:dark:opacity-30">
-				<div className="absolute inset-0 [mask-image:radial-gradient(ellipse_65%_30%_at_50%_27%,transparent_0%,transparent_70%,black_100%)] lg:[mask-image:radial-gradient(ellipse_30%_40%_at_27%_53%,transparent_0%,transparent_70%,black_100%)]">
+			<div className="absolute inset-0 opacity-[0.34] [mask-image:linear-gradient(to_bottom,transparent_2%,black_10%,black_92%,transparent_100%)] sm:opacity-[0.38] dark:opacity-30">
+				<div className="absolute inset-0 [mask-image:radial-gradient(ellipse_58%_27%_at_50%_31%,transparent_0%,transparent_66%,black_100%)] sm:[mask-image:radial-gradient(ellipse_65%_30%_at_50%_27%,transparent_0%,transparent_70%,black_100%)] lg:[mask-image:radial-gradient(ellipse_30%_40%_at_27%_53%,transparent_0%,transparent_70%,black_100%)]">
 					{barrageRows.map((comments, rowIndex) => (
 						<div
 							key={rowMotion[rowIndex].top}
-							className={`absolute inset-x-0 overflow-visible ${
-								rowIndex === 1 || rowIndex === 4 ? "hidden sm:block" : "block"
-							}`}
+							className="absolute inset-x-0 overflow-visible"
 							style={{ top: rowMotion[rowIndex].top }}
 						>
 							<div
@@ -124,7 +75,7 @@ const CommentBarrage = ({ variant = "background" }: CommentBarrageProps) => {
 										{comments.map(([username, content], commentIndex) => (
 											<div
 												key={`${copy}-${username}-${content}`}
-												className="flex h-10 shrink-0 items-center gap-2 rounded-full border border-black/[0.055] bg-white/90 px-3.5 py-1.5 text-[11px] font-medium text-neutral-600 shadow-[0_8px_28px_rgba(15,23,42,0.055)] sm:h-11 sm:gap-2.5 sm:px-4 sm:text-xs dark:border-white/[0.07] dark:bg-neutral-900/85 dark:text-neutral-300 dark:shadow-[0_8px_28px_rgba(0,0,0,0.12)]"
+												className="flex h-9 shrink-0 items-center gap-2 rounded-full border border-black/[0.055] bg-white/80 px-3 py-1.5 text-[10px] font-medium text-neutral-600 shadow-[0_8px_28px_rgba(15,23,42,0.055)] sm:h-11 sm:gap-2.5 sm:bg-white/90 sm:px-4 sm:text-xs dark:border-white/[0.08] dark:bg-neutral-900/75 dark:text-neutral-300 dark:shadow-[0_8px_28px_rgba(0,0,0,0.12)] sm:dark:bg-neutral-900/85"
 											>
 												<span
 													className={`shrink-0 text-[10px] font-semibold sm:text-[11px] ${

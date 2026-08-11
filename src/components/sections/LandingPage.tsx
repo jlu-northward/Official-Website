@@ -463,7 +463,6 @@ const LandingPage = ({
 							>
 								认识校园，表达自己，找到同路的人。有问题来求助，有生活来分享，有体验来点评，汇聚万千吉大声音
 							</motion.p>
-							<CommentBarrage variant="mobile" />
 							<motion.div
 								initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
@@ -517,7 +516,7 @@ const LandingPage = ({
 									aria-hidden="true"
 								/>
 								<Phone
-									src="/screenshots/home.webp"
+									src="/screenshots/hero/left.webp"
 									alt="向北 App 左侧校园广场界面"
 									width={1170}
 									height={2532}
@@ -525,7 +524,7 @@ const LandingPage = ({
 									className="absolute left-[4%] top-[15%] z-10 w-[38%] rotate-[-9deg]"
 								/>
 								<Phone
-									src="/screenshots/hot.webp"
+									src="/screenshots/hero/center.webp"
 									alt="向北 App 中间实时热点界面"
 									width={1170}
 									height={2532}
@@ -533,7 +532,7 @@ const LandingPage = ({
 									className="absolute left-1/2 top-[2%] z-30 w-[44%] -translate-x-1/2"
 								/>
 								<Phone
-									src="/screenshots/square.webp"
+									src="/screenshots/hero/right.webp"
 									alt="向北 App 右侧工具箱界面"
 									width={1170}
 									height={2532}
