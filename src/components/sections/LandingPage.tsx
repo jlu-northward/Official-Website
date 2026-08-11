@@ -381,6 +381,7 @@ const LandingPage = ({
 					/>
 					<a
 						href="#top"
+						data-easter-egg-logo
 						className="flex items-center gap-2 rounded-full px-2 py-1.5 outline-none focus-visible:ring-4 focus-visible:ring-sky-500/25"
 						aria-label="向北首页"
 					>
@@ -696,7 +697,7 @@ const LandingPage = ({
 							className="mx-auto h-20 w-20 rounded-[1.45rem] shadow-[0_20px_50px_rgba(15,23,42,0.16)] sm:h-24 sm:w-24 sm:rounded-[1.8rem]"
 						/>
 						<h2 className="mt-7 text-balance text-3xl font-semibold leading-[1.08] tracking-[-0.045em] text-neutral-950 sm:mt-8 sm:text-6xl sm:leading-[1.04] sm:tracking-[-0.055em] dark:text-white">
-							现在，出发向北。
+							真诚、友善、团结的社区
 						</h2>
 						<p className="mx-auto mt-4 max-w-xl text-base leading-7 text-neutral-600 sm:mt-5 sm:text-lg sm:leading-8 dark:text-neutral-300">
 							下载向北，和吉大校园重新认识一次。

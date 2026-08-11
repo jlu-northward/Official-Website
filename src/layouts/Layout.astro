@@ -1,5 +1,6 @@
 ---
 import Footer from "@components/sections/Footer";
+import EasterEggToast from "@components/ui/EasterEggToast";
 import WeChatGuide from "@components/ui/WeChatGuide";
 
 interface Props {
@@ -110,6 +111,7 @@ const usesDefaultShareImage = !shareImage;
 		class="bg-[#f5f5f7] text-neutral-950 antialiased selection:bg-sky-200 selection:text-sky-950 dark:bg-[#09090b] dark:text-white dark:selection:bg-sky-700 dark:selection:text-white"
 	>
 		<WeChatGuide openOnLoad={wechatGuideOpenOnLoad} client:load />
+		<EasterEggToast client:load />
 		<slot />
 		{
 			showFooter && (

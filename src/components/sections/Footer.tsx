@@ -18,6 +18,7 @@ const Footer = () => {
 					<div>
 						<a
 							href="/"
+							data-easter-egg-logo
 							className="inline-flex items-center gap-3.5 rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-sky-500/25"
 						>
 							<img
