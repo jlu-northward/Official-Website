@@ -32,6 +32,11 @@ export interface AppLogo {
 	src: string;
 }
 
+export interface IcpRecord {
+	number: string;
+	url: string;
+}
+
 export interface Partner {
 	name: string;
 	src: string;
@@ -54,6 +59,7 @@ export interface AppData {
 	storeLinks: StoreLinks;
 	socialLinks: SocialLink[];
 	logo: AppLogo;
+	icp: IcpRecord;
 	reviews: Review[];
 	partners: Partner[];
 }

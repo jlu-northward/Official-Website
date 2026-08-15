@@ -6,6 +6,10 @@ export const appInfo = {
 	logo: {
 		src: "brand/logo.png",
 	},
+	icp: {
+		number: "吉ICP备2025033339号-3",
+		url: "https://beian.miit.gov.cn/",
+	},
 	storeLinks: {
 		apple: "https://apps.apple.com/cn/app/%E5%90%91%E5%8C%97app/id6753915149",
 		google: () => {

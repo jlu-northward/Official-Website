@@ -60,7 +60,19 @@ const Footer = () => {
 				</div>
 
 				<div className="mt-10 flex flex-col gap-5 border-t border-black/[0.06] pt-6 text-xs text-neutral-500 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.07] dark:text-neutral-400">
-					<span>向北App © {new Date().getFullYear()} All rights reserved.</span>
+					<div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+						<span>
+							向北App © {new Date().getFullYear()} All rights reserved.
+						</span>
+						<a
+							href={siteConfig.icp.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="rounded-md outline-none transition-colors duration-300 hover:text-neutral-800 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:text-neutral-200"
+						>
+							{siteConfig.icp.number}
+						</a>
+					</div>
 					<div className="flex flex-wrap items-center gap-5">
 						<a
 							href="/privacy"
