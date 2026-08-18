@@ -21,29 +21,64 @@ interface ApiResponse<T> {
 	data: T | null;
 }
 
+interface PublicComment {
+	comment_id: number;
+	content: string | null;
+	image_url: string[] | null;
+	reply_to_id: number | null;
+	reply_name: string | null;
+	createTime: string | null;
+	like_count: number | null;
+	position: number | null;
+	authorName: string | null;
+	authorAvatar: string | null;
+	reply_content?: Array<{
+		type?: number;
+		content?: string;
+		text?: string;
+	}>;
+}
+
+interface Page<T> {
+	records: T[];
+	total: number;
+	current: number;
+	size: number;
+}
+
 Astro.response.headers.set("Cache-Control", "no-store");
 
 const rawPostId = Astro.params.id ?? "";
 const validPostId = /^\d+$/.test(rawPostId) && Number(rawPostId) > 0;
 let post: PublicPost | null = null;
+let commentPage: Page<PublicComment> | null = null;
 
-if (validPostId) {
+const backendBaseUrl =
+	import.meta.env.BACKEND_BASE_URL ?? "https://api.northward.zone";
+const backendOrigin = backendBaseUrl.endsWith("/")
+	? backendBaseUrl
+	: `${backendBaseUrl}/`;
+
+async function fetchApi<T>(path: string): Promise<T | null> {
 	try {
-		const backendBaseUrl = import.meta.env.BACKEND_BASE_URL ?? "https://api.northward.zone";
-		const endpoint = new URL(
-			`/api/public/posts/${rawPostId}`,
-			backendBaseUrl.endsWith("/") ? backendBaseUrl : `${backendBaseUrl}/`,
-		);
-		const response = await fetch(endpoint, {
+		const response = await fetch(new URL(path, backendOrigin), {
 			headers: { Accept: "application/json" },
 			cache: "no-store",
 		});
-		if (response.ok) {
-			const body = (await response.json()) as ApiResponse<PublicPost>;
-			if (body.success) post = body.data;
-		}
+		if (!response.ok) return null;
+		const body = (await response.json()) as ApiResponse<T>;
+		return body.success ? body.data : null;
 	} catch {
-		post = null;
+		return null;
+	}
+}
+
+if (validPostId) {
+	post = await fetchApi<PublicPost>(`/api/public/posts/${rawPostId}`);
+	if (post) {
+		commentPage = await fetchApi<Page<PublicComment>>(
+			`/api/public/posts/${rawPostId}/comments`,
+		);
 	}
 }
 
@@ -54,14 +89,42 @@ const description = post
 	? (post.content || post.title).replace(/\s+/g, " ").trim().slice(0, 100)
 	: "这篇帖子暂时无法查看，下载向北 App 发现更多校园讨论。";
 const canonical = `https://northward.zone/post/${rawPostId}`;
-const publishedAt = post
-	? new Intl.DateTimeFormat("zh-CN", {
-			month: "long",
-			day: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-	  }).format(new Date(post.createTime))
-	: "";
+const formatDate = (value: string | null | undefined) => {
+	if (!value) return "";
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return "";
+	return new Intl.DateTimeFormat("zh-CN", {
+		month: "long",
+		day: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	}).format(date);
+};
+const publishedAt = post ? formatDate(post.createTime) : "";
+const commentFloors: PublicComment[][] = [];
+const commentsByPosition = new Map<number, PublicComment[]>();
+for (const comment of commentPage?.records ?? []) {
+	const position = comment.position ?? comment.comment_id;
+	let floor = commentsByPosition.get(position);
+	if (!floor) {
+		floor = [];
+		commentsByPosition.set(position, floor);
+		commentFloors.push(floor);
+	}
+	floor.push(comment);
+}
+const commentText = (comment: PublicComment) => {
+	const content = comment.content?.trim();
+	if (content) return content;
+	return (comment.reply_content ?? [])
+		.filter((part) => part.type === 0)
+		.map(
+			(part) =>
+				part.content ?? part.text ?? (part as { infor?: string }).infor ?? "",
+		)
+		.join("")
+		.trim();
+};
 ---
 
 <Layout
@@ -69,20 +132,25 @@ const publishedAt = post
 	{description}
 	{canonical}
 	shareImage={post?.coverImage ?? undefined}
+	shareImageAlt={post ? `${post.title}的帖子封面` : "向北 App"}
+	ogType={post ? "article" : "website"}
+	publishedTime={post?.createTime}
 	robots="noindex,nofollow"
 	analytics={false}
 	wechatGuideOpenOnLoad={false}
 	showFooter={false}
 >
 	<main class="mx-auto min-h-screen max-w-2xl bg-white pb-36 dark:bg-[#09090b]">
-		<header class="flex items-center gap-3 px-5 py-4">
+		<header
+			class="flex items-center gap-3 border-b border-neutral-100 px-5 py-4 dark:border-neutral-900"
+		>
 			<img
 				src="/brand/logo.png"
 				alt=""
 				class="h-9 w-9 rounded-[0.7rem] shadow-sm"
 			/>
 			<div>
-				<p class="text-[15px] font-semibold tracking-[-0.02em]">向北</p>
+				<p class="text-[15px] font-semibold tracking-normal">向北</p>
 				<p class="text-xs text-neutral-500 dark:text-neutral-400">
 					吉大人自己的校园社区
 				</p>
@@ -120,7 +188,7 @@ const publishedAt = post
 							<span class="font-medium">{post.authorName || "匿名用户"}</span>
 						</div>
 
-						<h1 class="mt-6 text-2xl font-semibold leading-tight tracking-[-0.035em] sm:text-3xl">
+						<h1 class="mt-6 text-2xl font-semibold leading-tight tracking-normal sm:text-3xl">
 							{post.title}
 						</h1>
 						{post.content && (
@@ -134,10 +202,104 @@ const publishedAt = post
 							<span>评论 {post.commentCount ?? 0}</span>
 						</div>
 					</div>
+
+					<section class="border-t border-neutral-200 px-5 py-7 sm:px-7 dark:border-neutral-800">
+						<div class="flex items-baseline justify-between gap-4">
+							<h2 class="text-lg font-semibold tracking-normal">评论</h2>
+							<span class="text-sm text-neutral-500 dark:text-neutral-400">
+								{commentPage?.total ?? post.commentCount ?? 0} 楼
+							</span>
+						</div>
+
+						{commentFloors.length > 0 ? (
+							<ol class="mt-3 divide-y divide-neutral-200 dark:divide-neutral-800">
+								{commentFloors.map((floor) => {
+									const first = floor[0];
+									if (!first) return null;
+									return (
+										<li class="py-5">
+											<div class="flex items-start gap-3">
+												{first.authorAvatar ? (
+													<img
+														src={first.authorAvatar}
+														alt=""
+														class="h-10 w-10 shrink-0 rounded-full object-cover"
+													/>
+												) : (
+													<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-sm font-medium dark:bg-neutral-800">
+														北
+													</div>
+												)}
+												<div class="min-w-0 flex-1">
+													<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+														<span class="font-medium">
+															{first.authorName || "匿名用户"}
+														</span>
+														<span class="text-xs text-neutral-500 dark:text-neutral-400">
+															#{first.position ?? "-"} ·{" "}
+															{formatDate(first.createTime)}
+														</span>
+													</div>
+													{commentText(first) && (
+														<p class="mt-2 whitespace-pre-wrap break-words text-[15px] leading-7 text-neutral-800 dark:text-neutral-200">
+															{commentText(first)}
+														</p>
+													)}
+													{first.image_url && first.image_url.length > 0 && (
+														<div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+															{first.image_url.slice(0, 3).map((image) => (
+																<img
+																	src={image}
+																	alt="评论图片"
+																	class="aspect-square w-full rounded-lg bg-neutral-100 object-cover dark:bg-neutral-900"
+																/>
+															))}
+														</div>
+													)}
+												</div>
+											</div>
+
+											{floor.length > 1 && (
+												<div class="ml-[3.25rem] mt-4 space-y-4 border-l-2 border-neutral-200 pl-4 dark:border-neutral-800">
+													{floor.slice(1).map((reply) => (
+														<div>
+															<p class="text-sm font-medium">
+																{reply.authorName || "匿名用户"}
+																{reply.reply_name && (
+																	<span class="font-normal text-neutral-500 dark:text-neutral-400">
+																		{" "}
+																		回复 {reply.reply_name}
+																	</span>
+																)}
+															</p>
+															{commentText(reply) && (
+																<p class="mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-neutral-700 dark:text-neutral-300">
+																	{commentText(reply)}
+																</p>
+															)}
+														</div>
+													))}
+												</div>
+											)}
+										</li>
+									);
+								})}
+							</ol>
+						) : (
+							<p class="mt-5 py-6 text-center text-sm text-neutral-500 dark:text-neutral-400">
+								还没有公开评论
+							</p>
+						)}
+						{commentPage && commentPage.total > commentFloors.length && (
+							<p class="border-t border-neutral-200 pt-4 text-center text-xs text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
+								本页展示前 {commentPage.size} 楼，更多讨论请在 App 内查看
+							</p>
+						)}
+					</section>
 				</article>
 			) : (
 				<section class="px-6 py-24 text-center">
-					<h1 class="text-2xl font-semibold tracking-[-0.03em]">
+					<h1 class="text-2xl font-semibold tracking-normal">
 						帖子暂时无法查看
 					</h1>
 					<p class="mt-3 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
@@ -148,7 +310,9 @@ const publishedAt = post
 		}
 	</main>
 
-	<div class="fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+	<div
+		class="fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3"
+	>
 		<div class="mx-auto max-w-2xl">
 			<a
 				id="download-app"
