@@ -2,8 +2,7 @@
 import Layout from "@layouts/Layout.astro";
 import { appInfo } from "../config/appInfo";
 
-const googleLink = appInfo.storeLinks.google;
-const targetUrl = typeof googleLink === "function" ? googleLink() : googleLink;
+const targetUrl = appInfo.storeLinks.google;
 const title = `${appInfo.title} - Android 下载`;
 ---
 
