@@ -1,0 +1,16 @@
+{
+	"redirects": [
+		{
+			"source": "/",
+			"has": [
+				{
+					"type": "query",
+					"key": "post",
+					"value": "(?<postId>\\d+)"
+				}
+			],
+			"destination": "/post/:postId",
+			"permanent": true
+		}
+	]
+}
