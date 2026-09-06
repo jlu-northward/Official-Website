@@ -9,6 +9,9 @@ interface Props {
 	showFooter?: boolean;
 	canonical?: string;
 	shareImage?: string;
+	shareImageAlt?: string;
+	ogType?: "website" | "article";
+	publishedTime?: string;
 	robots?: string;
 	analytics?: boolean;
 	wechatGuideOpenOnLoad?: boolean;
@@ -20,6 +23,9 @@ const {
 	showFooter = true,
 	canonical,
 	shareImage,
+	shareImageAlt,
+	ogType = "website",
+	publishedTime,
 	robots,
 	analytics = true,
 	wechatGuideOpenOnLoad = true,
@@ -30,6 +36,16 @@ const canonicalUrl = canonical
 	: new URL(Astro.url.pathname, siteUrl);
 const shareImageUrl = new URL(shareImage ?? "/brand/og-cover.png", siteUrl);
 const usesDefaultShareImage = !shareImage;
+const shareImageExtension = shareImageUrl.pathname
+	.split(".")
+	.pop()
+	?.toLowerCase();
+const shareImageType = {
+	jpg: "image/jpeg",
+	jpeg: "image/jpeg",
+	png: "image/png",
+	webp: "image/webp",
+}[shareImageExtension ?? ""];
 ---
 
 <!doctype html>
@@ -60,7 +76,7 @@ const usesDefaultShareImage = !shareImage;
 		<title>{title}</title>
 		{description && <meta name="description" content={description} />}
 
-		<meta property="og:type" content="website" />
+		<meta property="og:type" content={ogType} />
 		<meta property="og:locale" content="zh_CN" />
 		<meta property="og:site_name" content="向北 App" />
 		<meta property="og:title" content={title} />
@@ -68,16 +84,33 @@ const usesDefaultShareImage = !shareImage;
 		<meta property="og:url" content={canonicalUrl.href} />
 		<meta property="og:image" content={shareImageUrl.href} />
 		{
-			usesDefaultShareImage && (
+			shareImageUrl.protocol === "https:" && (
+				<meta property="og:image:secure_url" content={shareImageUrl.href} />
+			)
+		}
+		{
+			shareImageType && (
+				<meta property="og:image:type" content={shareImageType} />
+			)
+		}
+		{shareImageAlt && <meta property="og:image:alt" content={shareImageAlt} />}
+		{
+			usesDefaultShareImage && !shareImageType && (
 				<meta property="og:image:type" content="image/png" />
 			)
 		}
 		{usesDefaultShareImage && <meta property="og:image:width" content="1200" />}
 		{usesDefaultShareImage && <meta property="og:image:height" content="630" />}
+		{
+			ogType === "article" && publishedTime && (
+				<meta property="article:published_time" content={publishedTime} />
+			)
+		}
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
 		{description && <meta name="twitter:description" content={description} />}
 		<meta name="twitter:image" content={shareImageUrl.href} />
+		{shareImageAlt && <meta name="twitter:image:alt" content={shareImageAlt} />}
 
 		{
 			analytics && (
