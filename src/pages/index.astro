@@ -5,10 +5,6 @@ import Layout from "@layouts/Layout.astro";
 import { siteConfig } from "../config";
 
 const { title, description, features, storeLinks, logo, partners } = siteConfig;
-const sharedPostId = Astro.url.searchParams.get("post") ?? "";
-if (/^\d+$/.test(sharedPostId) && Number(sharedPostId) > 0) {
-	return Astro.redirect(`/post/${sharedPostId}`);
-}
 ---
 
 <Layout
