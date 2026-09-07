@@ -316,7 +316,7 @@ const commentText = (comment: PublicComment) => {
 		<div class="mx-auto max-w-2xl">
 			<a
 				id="download-app"
-				href="/#download"
+				href={`northward://app/?postId=${rawPostId}`}
 				class="flex min-h-14 items-center justify-center rounded-full bg-neutral-950 px-6 text-base font-semibold text-white shadow-[0_16px_38px_rgba(15,23,42,0.24)] outline-none focus-visible:ring-4 focus-visible:ring-sky-500/30 active:scale-[0.97] dark:bg-white dark:text-neutral-950"
 			>
 				下载向北 App，查看更多讨论
@@ -328,11 +328,22 @@ const commentText = (comment: PublicComment) => {
 		const downloadLink = document.querySelector("#download-app");
 		if (downloadLink instanceof HTMLAnchorElement) {
 			const userAgent = navigator.userAgent.toLowerCase();
-			if (/iphone|ipad|ipod/.test(userAgent)) {
-				downloadLink.href = "/download-ios";
-			} else if (/android/.test(userAgent)) {
-				downloadLink.href = "/download-android";
-			}
+			const fallbackHref = /iphone|ipad|ipod/.test(userAgent)
+				? "/download-ios"
+				: /android/.test(userAgent)
+					? "/download-android"
+					: "/#download";
+			downloadLink.addEventListener("click", (event) => {
+				event.preventDefault();
+				let leftPage = false;
+				const markLeft = () => { leftPage = true; };
+				document.addEventListener("visibilitychange", markLeft, { once: true });
+				window.addEventListener("pagehide", markLeft, { once: true });
+				window.location.href = downloadLink.href;
+				window.setTimeout(() => {
+					if (!leftPage) window.location.href = fallbackHref;
+				}, 900);
+			});
 		}
 	</script>
 </Layout>
