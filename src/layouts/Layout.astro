@@ -34,7 +34,7 @@ const siteUrl = Astro.site ?? new URL("https://northward.zone");
 const canonicalUrl = canonical
 	? new URL(canonical, siteUrl)
 	: new URL(Astro.url.pathname, siteUrl);
-const shareImageUrl = new URL(shareImage ?? "/brand/og-cover.png", siteUrl);
+const shareImageUrl = new URL(shareImage ?? "/brand/og-cover-v2.png", siteUrl);
 const usesDefaultShareImage = !shareImage;
 const shareImageExtension = shareImageUrl.pathname
 	.split(".")
