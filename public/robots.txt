@@ -2,11 +2,10 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://landing.bohd4n.dev/sitemap.xml
+Sitemap: https://northward.zone/sitemap-index.xml
 
 # Block access to admin areas (if any)
 Disallow: /admin/
-Disallow: /_astro/
 
 # Allow search engines to crawl CSS and JS files
 Allow: /*.css$

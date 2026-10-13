@@ -2,6 +2,7 @@
 import Footer from "@components/sections/Footer";
 import EasterEggToast from "@components/ui/EasterEggToast";
 import WeChatGuide from "@components/ui/WeChatGuide";
+import { baiduSiteVerification } from "../config/siteVerification";
 
 interface Props {
 	title: string;
@@ -57,6 +58,11 @@ const shareImageType = {
 			content="width=device-width, initial-scale=1, viewport-fit=cover"
 		/>
 		<meta name="generator" content={Astro.generator} />
+		{
+			Astro.url.pathname === "/" && (
+				<meta name="baidu-site-verification" content={baiduSiteVerification} />
+			)
+		}
 		<meta
 			name="theme-color"
 			content="#f5f5f7"
