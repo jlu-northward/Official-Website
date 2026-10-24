@@ -13,6 +13,36 @@ npm run preview    # 预览构建产物
 
 更多命令约定（提交规范、代码风格、PR 流程）见 [AGENTS.md](./AGENTS.md)。
 
+## 校园工具箱 `/tools`
+
+新页面使用 React + shadcn/ui + 现有 Tailwind CSS 3；`src/pages/tools.astro` 仅挂载页面和轻量 HTML 布局，沿用官网构建及 Vercel 发布。首页导航与页脚提供入口，`/tools#gpa` 可直达绩点计算。
+
+手机端直接展示工具切换、搜索、分类与分组列表；桌面端保留介绍区和网站卡片。绩点计算及其弹窗组件仅在首次打开计算工具时下载，切回导航后仍保留录入状态。导航正文随 HTML 输出，无需等待 JavaScript 即可查看和打开链接。
+
+- `src/features/tools/`：React 导航、搜索、分类与绩点计算界面。
+- `src/config/tools.ts`：与 App 工具箱一致的 21 个导航链接及页面配置。课表、空教室查询与 App 内部邀请统计不在此页面实现。
+- `src/features/tools/gpa.ts`：独立计算与录入校验逻辑，参考 [JLU-Toolkit](https://github.com/vinoxuan/JLU-Toolkit/blob/main/jlu_gpa_calculator.html) 的 `jida` 模式。每门课的学分绩点积先保留两位小数，再求学分加权平均，最终显示五位小数；未及格课程的学分仍计入总学分。
+- `src/components/ui/` 下的小写文件：通过 Tailwind 3 兼容的 `shadcn@2.3.0` CLI 生成的组件；别名及组件配置在 `components.json`。
+- `src/styles/react-pages.css`：仅作用于新布局的主题 token，避免影响现有首页。
+
+计算器支持增删、编辑、示例、清空确认和当前浏览器本地保存；未完成或不合法的课程会阻止结果展示，完整空白行自动忽略。课程不会上传到服务器，保存失败时仍可计算并显示提示。重修、免修等课程是否计入，请自行按适用要求选择。
+
+运行 `npm run test:tools` 检查分数分段、学分加权、舍入及异常数据（需要支持原生 TypeScript 类型擦除的 Node.js 22.18+）。UI 验收覆盖 320px/390px 手机、平板和桌面宽度、明暗主题、关键词与分类组合、课程编辑/刷新恢复/清空、对话框和键盘操作。
+
+### Nginx 静态部署的压缩
+
+若将静态构建结果部署到自有 Nginx，Astro/Vite 的代码压缩不等于 HTTP 传输压缩。2026-10-24 检查线上 `/tools/` 时，HTML 响应有 `Content-Encoding: gzip`，但 `application/javascript` 和 `text/css` 仍以原始大小传输。Nginx 仅设置 `gzip on` 时默认只处理 HTML，需要另外设置 `gzip_types`。
+
+本工作区的运维配置位于兄弟仓库 `northward-ops/nginx/nginx.conf`，其中已显式开启 JS/CSS 等文本资源的 gzip。更新服务器 `/opt/northward/ops` 的配置后，执行 `sudo /opt/northward/ops/scripts/install.sh --nginx` 才会应用；普通后端发布只更新 API 站点配置，官网 `npm run build` 也不会修改全局 Nginx。具体流程见运维仓库 README 的“Nginx 配置的两条路径”。
+
+安装脚本会先备份，再执行 `nginx -t`，通过后 reload。用带 `Accept-Encoding` 的 GET 检查实际构建生成的 JS/CSS URL，例如：
+
+```bash
+curl --compressed -sS -D - -o /dev/null https://northward.zone/_astro/实际构建文件.js
+```
+
+JS/CSS 应返回 `Content-Encoding: gzip` 和 `Vary: Accept-Encoding`，`/_astro/` 的现有长期缓存应继续保留。HTML 的 `Cache-Control: no-cache` 允许缓存后重新验证，适合发布更新，不应把页面也设为不可变缓存。压缩配置完成后另用手机和 App 冷启动验证，服务器附近的请求耗时无法代表移动网络体验。参见 [Nginx gzip 文档](https://nginx.org/en/docs/http/ngx_http_gzip_module.html)。
+
 ## 配置入口
 
 文案、下载链接、截图列表都在 `src/config/` 下，修改后无需改组件代码：

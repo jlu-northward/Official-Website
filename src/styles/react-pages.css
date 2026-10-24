@@ -1,0 +1,91 @@
+/* Keep shadcn tokens local to React pages so the existing website keeps its theme. */
+.tools-page {
+	--background: 48 20% 97%;
+	--foreground: 165 22% 14%;
+	--card: 0 0% 100%;
+	--card-foreground: 165 22% 14%;
+	--popover: 0 0% 100%;
+	--popover-foreground: 165 22% 14%;
+	--primary: 164 51% 27%;
+	--primary-foreground: 0 0% 100%;
+	--secondary: 155 20% 93%;
+	--secondary-foreground: 164 40% 25%;
+	--muted: 45 12% 93%;
+	--muted-foreground: 160 5% 44%;
+	--accent: 155 20% 94%;
+	--accent-foreground: 164 40% 25%;
+	--destructive: 0 65% 47%;
+	--destructive-foreground: 0 0% 100%;
+	--border: 150 9% 87%;
+	--input: 150 9% 84%;
+	--ring: 164 51% 35%;
+	--radius: 0.75rem;
+	color: hsl(var(--foreground));
+	background: hsl(var(--background));
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+		"Microsoft YaHei", sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+.dark .tools-page {
+	--background: 164 15% 8%;
+	--foreground: 145 15% 92%;
+	--card: 164 12% 11%;
+	--card-foreground: 145 15% 92%;
+	--popover: 164 12% 13%;
+	--popover-foreground: 145 15% 92%;
+	--primary: 155 38% 65%;
+	--primary-foreground: 165 25% 12%;
+	--secondary: 164 18% 18%;
+	--secondary-foreground: 155 35% 78%;
+	--muted: 164 10% 16%;
+	--muted-foreground: 155 7% 63%;
+	--accent: 164 13% 18%;
+	--accent-foreground: 155 35% 78%;
+	--destructive: 0 65% 65%;
+	--destructive-foreground: 0 0% 100%;
+	--border: 164 10% 22%;
+	--input: 164 10% 28%;
+	--ring: 155 38% 65%;
+}
+
+:where(.tools-page *, .tools-page *::before, .tools-page *::after) {
+	border-color: hsl(var(--border));
+}
+
+.tools-page ::selection {
+	background: hsl(var(--primary) / 0.18);
+}
+
+.tools-page input[type="number"] {
+	-moz-appearance: textfield;
+}
+
+.tools-page input::-webkit-inner-spin-button,
+.tools-page input::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.tools-category-scroll {
+	scrollbar-width: none;
+}
+
+.tools-category-scroll::-webkit-scrollbar {
+	display: none;
+}
+
+.tools-dot-grid {
+	background-image: radial-gradient(currentColor 0.75px, transparent 0.75px);
+	background-size: 16px 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.tools-page *,
+	.tools-page *::before,
+	.tools-page *::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}

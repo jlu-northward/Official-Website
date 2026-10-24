@@ -1,0 +1,671 @@
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import {
+	FiArrowUpRight,
+	FiBookOpen,
+	FiCheck,
+	FiChevronRight,
+	FiHelpCircle,
+	FiInfo,
+	FiPlus,
+	FiShield,
+	FiTrash2,
+} from "react-icons/fi";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { toolsContent } from "@/config/tools";
+import {
+	calculateGpa,
+	emptyCourses,
+	inspectCourse,
+	isCourseDrafts,
+	JLU_GRADE_SCALE,
+	type CourseDraft,
+} from "./gpa";
+
+function CalculationRules() {
+	return (
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button
+					variant="ghost"
+					className="h-9 gap-1.5 px-2 text-xs text-muted-foreground"
+				>
+					<FiHelpCircle className="h-3.5 w-3.5" />
+					计算规则
+				</Button>
+			</DialogTrigger>
+			<DialogContent className="max-h-[85svh] max-w-lg overflow-y-auto rounded-2xl p-6">
+				<DialogHeader>
+					<DialogTitle>吉大绩点计算规则</DialogTitle>
+					<DialogDescription className="pt-1 text-xs leading-6">
+						采用 JLU-Toolkit 的“吉大模式”，成绩按以下区间换算为单科绩点。
+					</DialogDescription>
+				</DialogHeader>
+				<div className="overflow-hidden rounded-xl border">
+					<table className="w-full text-left text-sm">
+						<thead className="bg-muted">
+							<tr>
+								<th scope="col" className="px-4 py-2.5 font-medium">
+									百分制成绩
+								</th>
+								<th scope="col" className="px-4 py-2.5 text-right font-medium">
+									单科绩点
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{JLU_GRADE_SCALE.map((range, index) => (
+								<tr key={range.minimum} className="border-t">
+									<td className="px-4 py-2 font-mono text-xs text-muted-foreground">
+										{index === 0
+											? "90 ≤ 成绩 ≤ 100"
+											: `${range.minimum} ≤ 成绩 < ${JLU_GRADE_SCALE[index - 1].minimum}`}
+									</td>
+									<td className="px-4 py-2 text-right font-mono text-xs font-medium text-primary">
+										{range.points.toFixed(1)}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+				<div className="rounded-xl bg-secondary/60 p-4 text-xs leading-6">
+					<p className="font-medium text-primary">
+						GPA = Σ（学分 × 单科绩点）÷ Σ 学分
+					</p>
+					<p className="mt-1 text-muted-foreground">
+						与参考实现一致：每门课的加权值先保留两位小数，最终 GPA
+						保留五位小数。未及格课程以 0 绩点参与计算，学分仍计入总学分。允许 0
+						学分课程，但总学分须大于 0。
+					</p>
+				</div>
+				<p className="text-[11px] leading-5 text-muted-foreground">
+					仅作为成绩估算工具，课程计入范围请按你的实际要求选择，最终以学校认定为准。
+				</p>
+				<a
+					href={toolsContent.gpaReference}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="inline-flex items-center gap-1 text-xs text-primary underline underline-offset-4"
+				>
+					查看计算方式参考 · JLU-Toolkit
+					<FiArrowUpRight />
+				</a>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+const exampleCourses = (): CourseDraft[] => [
+	{ id: "example-math", name: "高等数学", score: "92", credits: "4" },
+	{ id: "example-english", name: "大学英语", score: "85", credits: "3" },
+	{ id: "example-physics", name: "大学物理", score: "78", credits: "2" },
+];
+
+const formatNumber = (value: number) => Number(value.toFixed(3)).toString();
+
+export default function GpaCalculator({ active }: { active: boolean }) {
+	const [courses, setCourses] = useState<CourseDraft[]>(emptyCourses);
+	const [loaded, setLoaded] = useState(false);
+	const [storageStatus, setStorageStatus] = useState("loading");
+	const [storageNotice, setStorageNotice] = useState("");
+	const [pending, setPending] = useState<"clear" | "example" | null>(null);
+	const [touched, setTouched] = useState<Set<string>>(() => new Set());
+	const focusAfterAdd = useRef<string | null>(null);
+	const courseList = useRef<HTMLDivElement>(null);
+	const confirmationTrigger = useRef<HTMLButtonElement | null>(null);
+
+	useEffect(() => {
+		try {
+			const saved = localStorage.getItem(toolsContent.storageKey);
+			if (saved !== null) {
+				const parsed: unknown = JSON.parse(saved);
+				if (isCourseDrafts(parsed)) setCourses(parsed);
+				else
+					setStorageNotice(
+						"本地记录格式有误，已打开空白清单。你可以正常重新录入。",
+					);
+			}
+		} catch {
+			setStorageNotice("暂时无法读取本地记录，你仍可以正常使用计算工具。");
+		}
+		setLoaded(true);
+	}, []);
+
+	useEffect(() => {
+		if (!loaded) return;
+		try {
+			localStorage.setItem(toolsContent.storageKey, JSON.stringify(courses));
+			setStorageStatus("saved");
+		} catch {
+			setStorageStatus("unavailable");
+		}
+	}, [courses, loaded]);
+
+	useEffect(() => {
+		if (!focusAfterAdd.current) return;
+		document.getElementById(`name-${focusAfterAdd.current}`)?.focus();
+		focusAfterAdd.current = null;
+	}, [courses]);
+
+	const result = calculateGpa(courses);
+	const hasData = courses.some((course) => !inspectCourse(course).empty);
+	const complete =
+		result.status === "ready" || result.status === "zero-credits";
+	const updateCourse = (
+		id: string,
+		field: keyof Omit<CourseDraft, "id">,
+		value: string,
+	) => {
+		setCourses((current) =>
+			current.map((course) =>
+				course.id === id ? { ...course, [field]: value } : course,
+			),
+		);
+	};
+	const addCourse = () => {
+		if (courses.length >= 200) return;
+		const id = crypto.randomUUID();
+		focusAfterAdd.current = id;
+		setCourses((current) => [
+			...current,
+			{ id, name: "", score: "", credits: "" },
+		]);
+	};
+	const replaceCourses = (action: "clear" | "example") => {
+		setCourses(action === "clear" ? emptyCourses() : exampleCourses());
+		setTouched(new Set());
+		setPending(null);
+		setStorageNotice("");
+	};
+	const resultHint =
+		result.status === "incomplete"
+			? `还有 ${result.incomplete} 门课程的成绩或学分待完善`
+			: result.status === "zero-credits"
+				? "总学分须大于 0，请检查课程学分"
+				: result.status === "overflow"
+					? "输入的数值过大，请检查课程学分"
+					: result.status === "empty"
+						? "填入成绩和学分，结果将在这里自动出现"
+						: "已按当前课程清单计算";
+
+	return (
+		<div>
+			<div className="mb-4 flex items-start justify-between gap-2 sm:mb-8 sm:gap-3">
+				<div>
+					<div className="flex items-center gap-2.5">
+						<h2 className="text-lg font-semibold tracking-tight sm:text-xl">
+							吉大绩点计算
+						</h2>
+						<span className="rounded-md border border-primary/15 bg-secondary px-2 py-0.5 text-[10px] font-medium text-primary">
+							4.0 分制
+						</span>
+					</div>
+					<p className="mt-2 hidden text-[13px] leading-6 text-muted-foreground sm:block">
+						输入课程成绩与学分，让每一分努力都有数。
+					</p>
+				</div>
+				<CalculationRules />
+			</div>
+			{storageNotice && (
+				<p
+					role="status"
+					className="mb-5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-xs leading-5 text-muted-foreground"
+				>
+					{storageNotice}
+				</p>
+			)}
+			<div className="grid min-w-0 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+				<section
+					aria-labelledby="course-list-title"
+					className="min-w-0 overflow-hidden rounded-2xl border bg-card"
+				>
+					<div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-4 sm:px-5">
+						<h3
+							id="course-list-title"
+							className="flex items-center gap-2 text-sm font-semibold"
+						>
+							<FiBookOpen className="h-4 w-4 text-primary" />
+							课程清单
+							<span className="font-mono text-[11px] font-normal text-muted-foreground">
+								{courses.length}
+							</span>
+						</h3>
+						<div className="flex items-center gap-1">
+							<Button
+								variant="ghost"
+								className="h-8 px-2 text-xs text-muted-foreground"
+								onClick={(event) => {
+									if (hasData) {
+										confirmationTrigger.current = event.currentTarget;
+										setPending("example");
+									} else replaceCourses("example");
+								}}
+							>
+								填入示例
+							</Button>
+							<span className="h-3 w-px bg-border" />
+							<Button
+								variant="ghost"
+								disabled={!hasData}
+								className="h-8 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
+								onClick={(event) => {
+									confirmationTrigger.current = event.currentTarget;
+									setPending("clear");
+								}}
+							>
+								<FiTrash2 className="h-3 w-3" />
+								清空
+							</Button>
+						</div>
+					</div>
+					<div
+						className="hidden grid-cols-[minmax(0,1fr)_80px_72px_48px_28px] gap-3 border-b bg-background/60 px-5 py-3 text-[11px] text-muted-foreground sm:grid"
+						aria-hidden="true"
+					>
+						<span>
+							课程名称 <span className="opacity-70">/ 选填</span>
+						</span>
+						<span>成绩 / 百分制</span>
+						<span>学分</span>
+						<span className="text-center">绩点</span>
+						<span />
+					</div>
+					<div ref={courseList}>
+						{courses.map((course, index) => {
+							const inspection = inspectCourse(course);
+							const scoreError =
+								!inspection.scoreValid &&
+								(course.score.length > 0 || touched.has(`${course.id}-score`));
+							const creditError =
+								!inspection.creditsValid &&
+								(course.credits.length > 0 ||
+									touched.has(`${course.id}-credits`));
+							const errors = [
+								scoreError && "成绩须为 0–100 的数字",
+								creditError && "学分须为不小于 0 的数字",
+							].filter(Boolean);
+							return (
+								<div
+									key={course.id}
+									data-course-row
+									className="relative border-b px-4 py-3 last:border-b-0 sm:px-5 sm:py-4"
+								>
+									<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_48px] items-end gap-3 sm:grid-cols-[minmax(0,1fr)_80px_72px_48px_28px]">
+										<div className="col-span-3 flex min-w-0 items-center gap-2 pr-9 sm:col-span-1 sm:pr-0">
+											<span className="font-mono text-[10px] text-muted-foreground/60">
+												{String(index + 1).padStart(2, "0")}
+											</span>
+											<label htmlFor={`name-${course.id}`} className="sr-only">
+												第 {index + 1} 门课程名称（选填）
+											</label>
+											<Input
+												id={`name-${course.id}`}
+												value={course.name}
+												maxLength={100}
+												onChange={(event) =>
+													updateCourse(course.id, "name", event.target.value)
+												}
+												placeholder="课程名称（选填）"
+												className="h-10 min-w-0 rounded-lg border-transparent bg-transparent px-1 text-base shadow-none placeholder:text-muted-foreground/65 focus-visible:bg-background sm:px-2 sm:text-sm"
+											/>
+										</div>
+										<div className="min-w-0">
+											<label
+												htmlFor={`score-${course.id}`}
+												className="mb-1.5 block text-[11px] text-muted-foreground sm:sr-only"
+											>
+												成绩 <span className="opacity-70">/ 百分制</span>
+												<span className="sr-only">，第 {index + 1} 门课程</span>
+											</label>
+											<Input
+												id={`score-${course.id}`}
+												inputMode="decimal"
+												value={course.score}
+												maxLength={20}
+												aria-invalid={scoreError}
+												aria-describedby={
+													scoreError ? `errors-${course.id}` : undefined
+												}
+												onChange={(event) =>
+													updateCourse(course.id, "score", event.target.value)
+												}
+												onBlur={() =>
+													setTouched((current) =>
+														new Set(current).add(`${course.id}-score`),
+													)
+												}
+												placeholder="0–100"
+												className={cn(
+													"h-10 rounded-lg bg-card px-3 font-mono text-base shadow-none sm:bg-background/50 sm:text-sm",
+													scoreError &&
+														"border-destructive focus-visible:ring-destructive",
+												)}
+											/>
+										</div>
+										<div className="min-w-0">
+											<label
+												htmlFor={`credits-${course.id}`}
+												className="mb-1.5 block text-[11px] text-muted-foreground sm:sr-only"
+											>
+												学分
+												<span className="sr-only">，第 {index + 1} 门课程</span>
+											</label>
+											<Input
+												id={`credits-${course.id}`}
+												inputMode="decimal"
+												value={course.credits}
+												maxLength={20}
+												aria-invalid={creditError}
+												aria-describedby={
+													creditError ? `errors-${course.id}` : undefined
+												}
+												onChange={(event) =>
+													updateCourse(course.id, "credits", event.target.value)
+												}
+												onBlur={() =>
+													setTouched((current) =>
+														new Set(current).add(`${course.id}-credits`),
+													)
+												}
+												placeholder="如 3"
+												className={cn(
+													"h-10 rounded-lg bg-card px-3 font-mono text-base shadow-none sm:bg-background/50 sm:text-sm",
+													creditError &&
+														"border-destructive focus-visible:ring-destructive",
+												)}
+											/>
+										</div>
+										<div className="text-center">
+											<span className="mb-1.5 block text-[11px] text-muted-foreground sm:sr-only">
+												绩点
+											</span>
+											<output
+												aria-label={`第 ${index + 1} 门课程绩点`}
+												className={cn(
+													"flex h-10 items-center justify-center rounded-lg font-mono text-sm",
+													inspection.points === null
+														? "text-muted-foreground/50"
+														: "bg-secondary/70 font-medium text-primary",
+												)}
+											>
+												{inspection.points === null
+													? "—"
+													: inspection.points.toFixed(1)}
+											</output>
+										</div>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="absolute right-2 top-2.5 h-11 w-11 text-muted-foreground/60 hover:bg-destructive/5 hover:text-destructive sm:static sm:h-10 sm:w-7"
+											aria-label={`删除第 ${index + 1} 门课程${course.name ? `：${course.name}` : ""}`}
+											onClick={() => {
+												setCourses((current) =>
+													current.filter((item) => item.id !== course.id),
+												);
+												requestAnimationFrame(() => {
+													const row =
+														courseList.current?.querySelectorAll(
+															"[data-course-row]",
+														)[Math.min(index, courses.length - 2)];
+													(
+														row?.querySelector("input") ??
+														document.getElementById("add-course")
+													)?.focus();
+												});
+											}}
+										>
+											<FiTrash2 className="h-3.5 w-3.5" />
+										</Button>
+									</div>
+									{errors.length > 0 && (
+										<p
+											id={`errors-${course.id}`}
+											className="mt-2 text-[11px] leading-5 text-destructive"
+										>
+											{errors.join("；")}
+										</p>
+									)}
+								</div>
+							);
+						})}
+						{courses.length === 0 && (
+							<div className="px-4 py-12 text-center">
+								<FiBookOpen className="mx-auto mb-3 h-7 w-7 text-muted-foreground/40" />
+								<p className="text-sm text-muted-foreground">
+									从第一门课开始，记录这个学期。
+								</p>
+							</div>
+						)}
+					</div>
+					<div className="border-t border-border/70 px-4 py-4 sm:px-5">
+						<Button
+							id="add-course"
+							variant="outline"
+							className="h-11 w-full gap-2 rounded-xl border-dashed bg-transparent text-xs text-muted-foreground hover:border-primary/50 hover:text-primary"
+							onClick={addCourse}
+							disabled={courses.length >= 200}
+						>
+							<FiPlus className="h-4 w-4" />
+							{courses.length >= 200 ? "最多支持 200 门课程" : "添加一门课程"}
+						</Button>
+					</div>
+					<div className="flex flex-wrap items-center justify-between gap-2 border-t bg-background/40 px-4 py-3 text-[11px] leading-5 text-muted-foreground sm:px-5 sm:py-3.5 sm:text-[10px]">
+						<span className="hidden sm:inline">
+							支持小数成绩与学分 · 空白行不参与计算
+						</span>
+						<span className="flex items-center gap-1.5">
+							{storageStatus === "saved" && (
+								<FiCheck className="h-3 w-3 text-primary" />
+							)}
+							{storageStatus === "saved"
+								? "已在此设备保存"
+								: storageStatus === "unavailable"
+									? "本地保存不可用，请保留此页面"
+									: "正在读取本地记录…"}
+						</span>
+					</div>
+				</section>
+				<aside
+					id="gpa-result-details"
+					className="scroll-mt-6 space-y-4 lg:sticky lg:top-6"
+					aria-label="计算结果"
+				>
+					<div className="relative overflow-hidden rounded-2xl bg-[#244e43] p-5 text-white sm:p-7">
+						<div className="tools-dot-grid pointer-events-none absolute -right-6 -top-5 h-36 w-36 text-white/[0.08]" />
+						<div className="flex items-center justify-between">
+							<h3 className="text-xs font-medium text-white/75">
+								加权平均绩点
+							</h3>
+							<span className="flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-1 text-[9px] text-[#d5e8d9]">
+								<span className="h-1 w-1 rounded-full bg-[#c2dcb0]" />
+								自动计算
+							</span>
+						</div>
+						<div
+							className="relative my-4 flex items-baseline gap-2 sm:my-6"
+							aria-live="polite"
+							aria-atomic="true"
+						>
+							<output
+								aria-label="加权平均绩点结果"
+								className="font-mono text-[42px] font-light tracking-[-0.07em] text-[#d7ebc2] sm:text-[46px]"
+							>
+								{result.gpa === null ? "—.—————" : result.gpa.toFixed(5)}
+							</output>
+							<span className="shrink-0 font-mono text-xs text-white/40">
+								/ 4.0
+							</span>
+						</div>
+						<p
+							role="status"
+							className="text-[11px] leading-5 text-white/60 sm:min-h-10"
+						>
+							{resultHint}
+						</p>
+						<div className="mt-4 grid grid-cols-2 gap-4 border-t border-white/15 pt-5">
+							<div>
+								<p className="text-[10px] text-white/55">参与课程</p>
+								<p className="mt-1.5 font-mono text-xl">
+									{result.count}
+									<span className="ml-1.5 font-sans text-[10px] text-white/50">
+										门
+									</span>
+								</p>
+							</div>
+							<div>
+								<p className="text-[10px] text-white/55">总学分</p>
+								<p className="mt-1.5 font-mono text-xl">
+									{complete ? formatNumber(result.totalCredits) : "—"}
+								</p>
+							</div>
+						</div>
+					</div>
+					<details className="group rounded-2xl border bg-card px-5 py-4 lg:hidden">
+						<summary className="flex min-h-7 cursor-pointer list-none items-center justify-between text-xs font-medium [&::-webkit-details-marker]:hidden">
+							{toolsContent.gpaDetailsTitle}
+							<FiChevronRight className="h-3.5 w-3.5 transition-transform group-open:rotate-90" />
+						</summary>
+						<p className="mt-3 text-xs leading-6 text-muted-foreground">
+							{toolsContent.gpaDetailsDescription}
+						</p>
+						<p className="mt-3 rounded-lg bg-background px-3 py-2.5 font-mono text-xs text-muted-foreground">
+							{complete
+								? `${result.totalWeighted.toFixed(2)} ÷ ${formatNumber(result.totalCredits)}`
+								: "Σ (学分 × 绩点) ÷ Σ 学分"}
+						</p>
+					</details>
+					<div className="hidden rounded-2xl border bg-card px-5 py-5 lg:block">
+						<div className="mb-3 flex items-center gap-2 text-xs font-medium">
+							<FiInfo className="h-3.5 w-3.5 text-primary" />
+							怎么算出来的？
+						</div>
+						<p className="text-[12px] leading-6 text-muted-foreground">
+							将每门课的学分乘以对应绩点，相加后除以总学分。
+						</p>
+						<div className="mt-4 flex items-center justify-between rounded-lg bg-background px-3 py-2.5 font-mono text-xs">
+							<span className="text-muted-foreground">
+								{complete
+									? `${result.totalWeighted.toFixed(2)} ÷ ${formatNumber(result.totalCredits)}`
+									: "Σ (学分 × 绩点) ÷ Σ 学分"}
+							</span>
+							<FiChevronRight className="h-3.5 w-3.5 text-primary" />
+						</div>
+						<p className="mt-3 text-[10px] leading-5 text-muted-foreground">
+							未及格课程以 0
+							绩点计入，学分同样参与加权。仅供估算，以学校认定为准。
+						</p>
+					</div>
+					<p className="flex gap-2.5 px-1 text-[10px] leading-5 text-muted-foreground">
+						<FiShield className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/70" />
+						课程信息仅保存在当前浏览器，不会上传。清除浏览器数据会一并删除记录。
+					</p>
+				</aside>
+			</div>
+			{active &&
+				hasData &&
+				loaded &&
+				createPortal(
+					<div
+						data-mobile-result
+						className="fixed inset-x-0 bottom-0 z-30 border-t bg-card/95 px-4 pt-3 shadow-[0_-4px_24px_-12px_hsl(var(--foreground)/0.15)] backdrop-blur-xl lg:hidden"
+						style={{
+							paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+						}}
+					>
+						<div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
+							<div>
+								<p className="text-[10px] text-muted-foreground">
+									当前加权平均绩点
+								</p>
+								<p
+									className={cn(
+										"mt-0.5 font-mono text-[28px] leading-9 tracking-tight text-primary",
+										result.gpa === null && "font-sans text-lg",
+									)}
+								>
+									{result.gpa === null ? "待完善" : result.gpa.toFixed(5)}
+								</p>
+							</div>
+							<div className="min-w-0 text-right">
+								<p className="max-w-[160px] text-[10px] leading-4 text-muted-foreground">
+									{complete
+										? `${result.count} 门课程 · ${formatNumber(result.totalCredits)} 学分`
+										: resultHint}
+								</p>
+								<button
+									type="button"
+									className="mt-1 inline-flex min-h-8 items-center gap-1 rounded text-xs font-medium text-primary outline-none focus-visible:ring-2 focus-visible:ring-ring"
+									onClick={() =>
+										document
+											.getElementById("gpa-result-details")
+											?.scrollIntoView({
+												block: "start",
+												behavior: window.matchMedia(
+													"(prefers-reduced-motion: reduce)",
+												).matches
+													? "instant"
+													: "smooth",
+											})
+									}
+								>
+									计算明细
+									<FiChevronRight className="h-3 w-3" />
+								</button>
+							</div>
+						</div>
+					</div>,
+					document.body,
+				)}
+			<Dialog
+				open={pending !== null}
+				onOpenChange={(open) => {
+					if (!open) setPending(null);
+				}}
+			>
+				<DialogContent
+					className="max-w-sm rounded-2xl p-6"
+					onCloseAutoFocus={(event) => {
+						event.preventDefault();
+						const trigger = confirmationTrigger.current;
+						if (trigger && !trigger.disabled) trigger.focus();
+						else document.getElementById("add-course")?.focus();
+					}}
+				>
+					<DialogHeader>
+						<DialogTitle>
+							{pending === "clear" ? "清空课程清单？" : "用示例替换当前课程？"}
+						</DialogTitle>
+						<DialogDescription className="pt-2 text-sm leading-6">
+							{pending === "clear"
+								? "当前浏览器保存的课程记录也会清空。清空后可以重新录入。"
+								: "当前课程会被三门示例课程替换。示例仅用于体验计算方式。"}
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter className="mt-2 gap-2">
+						<Button variant="outline" onClick={() => setPending(null)}>
+							保留当前课程
+						</Button>
+						<Button
+							variant={pending === "clear" ? "destructive" : "default"}
+							onClick={() => pending && replaceCourses(pending)}
+						>
+							{pending === "clear" ? "确认清空" : "填入示例"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		</div>
+	);
+}

@@ -3,7 +3,7 @@ import { fadeTransition, popIn, springSnappy } from "config/motion";
 import { AnimatePresence, motion } from "framer-motion";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiFileText, FiShield } from "react-icons/fi";
+import { FiFileText, FiGrid, FiShield } from "react-icons/fi";
 import ThemeToggle from "../ui/ThemeToggle";
 
 const QR_SRC = "/qrcode/wechat-official.jpg";
@@ -74,6 +74,13 @@ const Footer = () => {
 						</a>
 					</div>
 					<div className="flex flex-wrap items-center gap-5">
+						<a
+							href="/tools"
+							className="inline-flex items-center gap-1.5 rounded-md outline-none transition-colors duration-300 hover:text-neutral-800 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:text-neutral-200"
+						>
+							<FiGrid className="h-3.5 w-3.5" />
+							校园工具箱
+						</a>
 						<a
 							href="/privacy"
 							className="inline-flex items-center gap-1.5 rounded-md outline-none transition-colors duration-300 hover:text-neutral-800 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:text-neutral-200"

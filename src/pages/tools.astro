@@ -1,0 +1,12 @@
+---
+import ToolsPage from "../features/tools/ToolsPage";
+import ReactPageLayout from "@layouts/ReactPageLayout.astro";
+import { toolsContent } from "../config/tools";
+---
+
+<ReactPageLayout
+	title={toolsContent.title}
+	description={toolsContent.description}
+>
+	<ToolsPage client:load />
+</ReactPageLayout>

@@ -408,6 +408,12 @@ const LandingPage = ({
 							功能
 						</a>
 						<a
+							href="/tools"
+							className="rounded-full px-4 py-2 outline-none transition-colors duration-300 hover:bg-black/[0.05] hover:text-neutral-950 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:bg-white/[0.07] dark:hover:text-white"
+						>
+							工具箱
+						</a>
+						<a
 							href="#story"
 							className="rounded-full px-4 py-2 outline-none transition-colors duration-300 hover:bg-black/[0.05] hover:text-neutral-950 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:bg-white/[0.07] dark:hover:text-white"
 						>
@@ -607,7 +613,7 @@ const LandingPage = ({
 										}}
 										className="group border-b border-black/[0.08] px-1 py-9 transition-colors duration-300 hover:bg-black/[0.02] sm:px-7 sm:odd:border-r lg:border-b-0 lg:border-r lg:last:border-r-0 dark:border-white/[0.1] dark:hover:bg-white/[0.03]"
 									>
-										<div className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-50 text-sky-600 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-110 dark:bg-sky-400/10 dark:text-sky-300">
+										<div className="ease-[cubic-bezier(0.32,0.72,0,1)] flex h-9 w-9 items-center justify-center rounded-full bg-sky-50 text-sky-600 transition-transform duration-300 group-hover:scale-110 dark:bg-sky-400/10 dark:text-sky-300">
 											<Icon className="h-4.5 w-4.5" aria-hidden="true" />
 										</div>
 										<h3 className="mt-6 text-xl font-semibold tracking-[-0.03em] text-neutral-950 dark:text-white">
@@ -654,7 +660,7 @@ const LandingPage = ({
 								>
 									加入我们{" "}
 									<FiArrowRight
-										className="h-4 w-4 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1"
+										className="ease-[cubic-bezier(0.32,0.72,0,1)] h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
 										aria-hidden="true"
 									/>
 								</a>

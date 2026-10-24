@@ -1,0 +1,65 @@
+---
+import "../styles/react-pages.css";
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(
+	Astro.url.pathname,
+	Astro.site ?? "https://northward.zone",
+);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
+		/>
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<link rel="icon" type="image/svg+xml" href="/brand/favicon-512.svg" />
+		<meta
+			name="theme-color"
+			content="#f9f8f6"
+			media="(prefers-color-scheme: light)"
+		/>
+		<meta
+			name="theme-color"
+			content="#111715"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonical} />
+		<meta
+			property="og:image"
+			content="https://northward.zone/brand/og-cover-v2.png"
+		/>
+		<script is:inline>
+			try {
+				const theme = localStorage.getItem("theme");
+				const dark =
+					theme === "dark" ||
+					(theme !== "light" &&
+						matchMedia("(prefers-color-scheme: dark)").matches);
+				document.documentElement.classList.toggle("dark", dark);
+				document.documentElement.style.colorScheme = dark ? "dark" : "light";
+			} catch {
+				const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+				document.documentElement.classList.toggle("dark", dark);
+				document.documentElement.style.colorScheme = dark ? "dark" : "light";
+			}
+		</script>
+	</head>
+	<body class="tools-page min-w-[320px]">
+		<slot />
+	</body>
+</html>
