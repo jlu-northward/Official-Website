@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { FiMonitor, FiMoon, FiSun } from "react-icons/fi";
 
 type Theme = "light" | "dark" | "system";
@@ -13,44 +13,20 @@ const themes: { key: Theme; icon: typeof FiSun; label: string }[] = [
 const ThemeToggle = () => {
 	const [theme, setTheme] = useState<Theme>("system");
 	const [mounted, setMounted] = useState(false);
+	const [embedded, setEmbedded] = useState(false);
 
-	const applyTheme = useCallback((newTheme: Theme) => {
-		const root = document.documentElement;
-
-		// Temporarily disable transitions to prevent flash
-		root.style.transition = "none";
-
-		root.classList.remove("light", "dark");
-
-		if (newTheme === "system") {
-			const prefersDark = window.matchMedia(
-				"(prefers-color-scheme: dark)",
-			).matches;
-			root.classList.add(prefersDark ? "dark" : "light");
-		} else {
-			root.classList.add(newTheme);
-		}
-
-		// Re-enable transitions after a small delay
-		setTimeout(() => {
-			root.style.transition = "";
-		}, 50);
+	useEffect(() => {
+		const sync = () => {
+			setTheme(window.northwardWebsiteTheme?.getPreference() ?? "system");
+			setEmbedded(window.northwardWebsiteTheme?.isEmbedded() ?? false);
+			setMounted(true);
+		};
+		sync();
+		window.addEventListener("websiteThemeChanged", sync);
+		return () => window.removeEventListener("websiteThemeChanged", sync);
 	}, []);
 
-	useEffect(() => {
-		setMounted(true);
-		const savedTheme = (localStorage.getItem("theme") as Theme) || "system";
-		setTheme(savedTheme);
-		applyTheme(savedTheme);
-	}, [applyTheme]);
-
-	useEffect(() => {
-		if (!mounted || theme !== "system") return;
-		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-		const handleChange = () => theme === "system" && applyTheme("system");
-		mediaQuery.addEventListener("change", handleChange);
-		return () => mediaQuery.removeEventListener("change", handleChange);
-	}, [theme, applyTheme, mounted]);
+	if (embedded) return null;
 
 	if (!mounted)
 		return (
@@ -65,9 +41,7 @@ const ThemeToggle = () => {
 				<motion.button
 					key={key}
 					onClick={() => {
-						setTheme(key);
-						localStorage.setItem("theme", key);
-						applyTheme(key);
+						window.northwardWebsiteTheme?.setPreference(key);
 					}}
 					className={`relative cursor-pointer rounded-full p-1.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-sky-500/40 ${
 						theme === key

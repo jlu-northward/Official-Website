@@ -1,5 +1,6 @@
 ---
 import "../styles/react-pages.css";
+import ThemeScript from "../components/ui/ThemeScript.astro";
 
 interface Props {
 	title: string;
@@ -14,7 +15,7 @@ const canonical = new URL(
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="react-page-root">
 	<head>
 		<meta charset="UTF-8" />
 		<meta
@@ -43,21 +44,7 @@ const canonical = new URL(
 			property="og:image"
 			content="https://northward.zone/brand/og-cover-v2.png"
 		/>
-		<script is:inline>
-			try {
-				const theme = localStorage.getItem("theme");
-				const dark =
-					theme === "dark" ||
-					(theme !== "light" &&
-						matchMedia("(prefers-color-scheme: dark)").matches);
-				document.documentElement.classList.toggle("dark", dark);
-				document.documentElement.style.colorScheme = dark ? "dark" : "light";
-			} catch {
-				const dark = matchMedia("(prefers-color-scheme: dark)").matches;
-				document.documentElement.classList.toggle("dark", dark);
-				document.documentElement.style.colorScheme = dark ? "dark" : "light";
-			}
-		</script>
+		<ThemeScript />
 	</head>
 	<body class="tools-page min-w-[320px]">
 		<slot />

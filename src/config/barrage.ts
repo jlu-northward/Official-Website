@@ -2,10 +2,10 @@ export type BarrageComment = readonly [username: string, content: string];
 
 export const barrageRows: readonly (readonly BarrageComment[])[] = [
 	[
-		["猫吃饭","听说今天不上课"],
+		["猫吃饭", "听说今天不上课"],
 		["水月琳琅", "数学真是最sm的学科了"],
 		["俄系小恐龙", "今晚操场有广场舞吗"],
-		["Liangggg", "早八离我远一点"] ,
+		["Liangggg", "早八离我远一点"],
 	],
 	[
 		["lfs", "谢谢向北，我很幸福！"],
@@ -15,7 +15,7 @@ export const barrageRows: readonly (readonly BarrageComment[])[] = [
 	],
 	[
 		["叭叭小猪", "推荐日新楼二楼的轻食窗口"],
-		["菠萝蒸饺", "衣带渐宽终不悔，下课刷向北"] ,
+		["菠萝蒸饺", "衣带渐宽终不悔，下课刷向北"],
 		["C语言玩家", "听说向北给发对象，是不是真的？"],
 		["青和我椒往🫑", "众里寻他千百度，蓦然回首，那人却在，向北评分处"],
 	],
@@ -28,7 +28,7 @@ export const barrageRows: readonly (readonly BarrageComment[])[] = [
 	[
 		["柒个名字", "求清湖天鹅学长联系方式"],
 		["水月琳琅", "数学真是最sm的学科了"],
-		["珞烨芷", "叶文洁呢，快按按钮啊！"] ,
+		["珞烨芷", "叶文洁呢，快按按钮啊！"],
 		["匿名用户", "谁带纸了来日新三楼厕所救我"],
 	],
 ];

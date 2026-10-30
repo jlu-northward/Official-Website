@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
 	FiArrowUpRight,
 	FiBookOpen,
 	FiCheck,
+	FiChevronDown,
 	FiChevronRight,
 	FiHelpCircle,
 	FiInfo,
 	FiPlus,
 	FiShield,
+	FiShare2,
 	FiTrash2,
 } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
@@ -23,15 +25,31 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { toolsContent } from "@/config/tools";
+import { toolsContent } from "./content/tools";
+import { gpaImportContent as importCopy } from "./content/gpa-import";
+import { gpaTranscriptContent as transcriptCopy } from "./content/gpa-transcript";
+import GpaExcelImport from "./GpaExcelImport";
+import {
+	isGradeImportInfo,
+	type GradeImport,
+	type GradeImportInfo,
+	type SkippedGrade,
+} from "./gpa-import";
+import { buildGradeRecords } from "./gpa-records";
 import {
 	calculateGpa,
+	coursesInScope,
 	emptyCourses,
 	inspectCourse,
+	isRequiredCourse,
 	isCourseDrafts,
 	JLU_GRADE_SCALE,
 	type CourseDraft,
+	type GpaScope,
 } from "./gpa";
+
+const GpaTranscriptDialog = lazy(() => import("./GpaTranscriptDialog"));
+const EMPTY_SKIPPED: SkippedGrade[] = [];
 
 function CalculationRules() {
 	return (
@@ -117,22 +135,44 @@ const formatNumber = (value: number) => Number(value.toFixed(3)).toString();
 
 export default function GpaCalculator({ active }: { active: boolean }) {
 	const [courses, setCourses] = useState<CourseDraft[]>(emptyCourses);
+	const [scope, setScope] = useState<GpaScope>("required");
+	const [expanded, setExpanded] = useState(false);
+	const [importInfo, setImportInfo] = useState<GradeImportInfo | null>(null);
+	const [shareOpen, setShareOpen] = useState(false);
+	const [shareLoaded, setShareLoaded] = useState(false);
+	const [stagedImport, setStagedImport] = useState<
+		(GradeImport & { fileName: string }) | null
+	>(null);
 	const [loaded, setLoaded] = useState(false);
 	const [storageStatus, setStorageStatus] = useState("loading");
 	const [storageNotice, setStorageNotice] = useState("");
-	const [pending, setPending] = useState<"clear" | "example" | null>(null);
+	const [pending, setPending] = useState<"clear" | "example" | "import" | null>(
+		null,
+	);
 	const [touched, setTouched] = useState<Set<string>>(() => new Set());
 	const focusAfterAdd = useRef<string | null>(null);
 	const courseList = useRef<HTMLDivElement>(null);
 	const confirmationTrigger = useRef<HTMLButtonElement | null>(null);
+	const shareTrigger = useRef<HTMLButtonElement | null>(null);
 
 	useEffect(() => {
 		try {
 			const saved = localStorage.getItem(toolsContent.storageKey);
+			if (localStorage.getItem(toolsContent.gpaScopeStorageKey) === "all")
+				setScope("all");
 			if (saved !== null) {
 				const parsed: unknown = JSON.parse(saved);
 				if (isCourseDrafts(parsed)) setCourses(parsed);
-				else
+				else if (
+					parsed &&
+					typeof parsed === "object" &&
+					"courses" in parsed &&
+					isCourseDrafts(parsed.courses)
+				) {
+					setCourses(parsed.courses);
+					if ("importInfo" in parsed && isGradeImportInfo(parsed.importInfo))
+						setImportInfo(parsed.importInfo);
+				} else
 					setStorageNotice(
 						"本地记录格式有误，已打开空白清单。你可以正常重新录入。",
 					);
@@ -146,12 +186,16 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 	useEffect(() => {
 		if (!loaded) return;
 		try {
-			localStorage.setItem(toolsContent.storageKey, JSON.stringify(courses));
+			localStorage.setItem(
+				toolsContent.storageKey,
+				JSON.stringify({ courses, importInfo }),
+			);
+			localStorage.setItem(toolsContent.gpaScopeStorageKey, scope);
 			setStorageStatus("saved");
 		} catch {
 			setStorageStatus("unavailable");
 		}
-	}, [courses, loaded]);
+	}, [courses, importInfo, scope, loaded]);
 
 	useEffect(() => {
 		if (!focusAfterAdd.current) return;
@@ -159,8 +203,31 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 		focusAfterAdd.current = null;
 	}, [courses]);
 
-	const result = calculateGpa(courses);
-	const hasData = courses.some((course) => !inspectCourse(course).empty);
+	const scopedCourses = coursesInScope(courses, scope);
+	const gradeRecords = buildGradeRecords(
+		courses,
+		importInfo?.skipped ?? EMPTY_SKIPPED,
+	);
+	const visibleRecords = expanded
+		? gradeRecords
+		: gradeRecords.slice(0, importCopy.previewCount);
+	const enteredCourses = courses.filter(
+		(course) => !inspectCourse(course).empty,
+	);
+	const enteredRecords = gradeRecords.filter(
+		(record) => !inspectCourse(record.course).empty,
+	);
+	const requiredCount = enteredRecords.filter((record) =>
+		isRequiredCourse(record.course),
+	).length;
+	const result = calculateGpa(scopedCourses);
+	const hasData =
+		enteredCourses.length > 0 || Boolean(importInfo?.skipped.length);
+	const openShare = (event: { currentTarget: HTMLButtonElement }) => {
+		shareTrigger.current = event.currentTarget;
+		setShareLoaded(true);
+		setShareOpen(true);
+	};
 	const complete =
 		result.status === "ready" || result.status === "zero-credits";
 	const updateCourse = (
@@ -168,6 +235,21 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 		field: keyof Omit<CourseDraft, "id">,
 		value: string,
 	) => {
+		const excludedRow = /^skipped-row-(\d+)$/.exec(id);
+		if (excludedRow) {
+			setImportInfo(
+				(current) =>
+					current && {
+						...current,
+						skipped: current.skipped.map((grade) =>
+							grade.row === Number(excludedRow[1])
+								? { ...grade, [field]: value }
+								: grade,
+						),
+					},
+			);
+			return;
+		}
 		setCourses((current) =>
 			current.map((course) =>
 				course.id === id ? { ...course, [field]: value } : course,
@@ -178,15 +260,33 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 		if (courses.length >= 200) return;
 		const id = crypto.randomUUID();
 		focusAfterAdd.current = id;
+		setExpanded(true);
 		setCourses((current) => [
 			...current,
-			{ id, name: "", score: "", credits: "" },
+			{ id, name: "", score: "", credits: "", nature: "必修" },
 		]);
 	};
 	const replaceCourses = (action: "clear" | "example") => {
 		setCourses(action === "clear" ? emptyCourses() : exampleCourses());
 		setTouched(new Set());
 		setPending(null);
+		setStorageNotice("");
+		setImportInfo(null);
+		setScope("required");
+		setExpanded(false);
+	};
+	const commitImport = (value: GradeImport, fileName: string) => {
+		setCourses(value.courses);
+		setImportInfo({ fileName, total: value.total, skipped: value.skipped });
+		setScope("required");
+		setExpanded(
+			coursesInScope(value.courses, "required").some(
+				(course) => !inspectCourse(course).valid,
+			),
+		);
+		setTouched(new Set());
+		setPending(null);
+		setStagedImport(null);
 		setStorageNotice("");
 	};
 	const resultHint =
@@ -197,8 +297,14 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 				: result.status === "overflow"
 					? "输入的数值过大，请检查课程学分"
 					: result.status === "empty"
-						? "填入成绩和学分，结果将在这里自动出现"
-						: "已按当前课程清单计算";
+						? hasData
+							? enteredCourses.length === 0
+								? importCopy.noNumericGrades
+								: importCopy.emptyScope
+							: "导入成绩表或填入成绩和学分，结果自动出现"
+						: scope === "required"
+							? "已按必修数字成绩计算"
+							: "已按全部数字成绩计算";
 
 	return (
 		<div>
@@ -212,11 +318,100 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							4.0 分制
 						</span>
 					</div>
-					<p className="mt-2 hidden text-[13px] leading-6 text-muted-foreground sm:block">
-						输入课程成绩与学分，让每一分努力都有数。
+					<p className="mt-2 text-xs leading-6 text-muted-foreground sm:text-[13px]">
+						导入成绩表，或手动录入。默认只算必修，一键切换全部课程。
 					</p>
 				</div>
 				<CalculationRules />
+			</div>
+			<GpaExcelImport
+				fileName={importInfo?.fileName}
+				onImport={(value, fileName) => {
+					if (hasData) {
+						setStagedImport({ ...value, fileName });
+						confirmationTrigger.current = null;
+						setPending("import");
+					} else commitImport(value, fileName);
+				}}
+			/>
+			{importInfo && (
+				<div
+					className="mb-5 text-xs leading-6 text-muted-foreground"
+					role="status"
+				>
+					<p>
+						<FiCheck className="mr-1.5 inline h-3.5 w-3.5 text-primary" />
+						{importCopy.importSummary(
+							enteredRecords.length,
+							importInfo.skipped.length,
+						)}
+					</p>
+					{importInfo.skipped.length > 0 && (
+						<details className="mt-1.5">
+							<summary className="w-fit cursor-pointer text-[11px] text-primary underline-offset-4 hover:underline">
+								{importCopy.skippedTitle}
+							</summary>
+							<ul className="mt-2 max-h-48 overflow-y-auto rounded-xl border bg-card p-3 text-[11px]">
+								{importInfo.skipped.map((item) => (
+									<li
+										key={item.row}
+										className="flex justify-between gap-4 py-1"
+									>
+										<span className="min-w-0 break-words">{item.name}</span>
+										<span className="shrink-0 text-right">
+											{item.score || "—"} ·{" "}
+											{importCopy.skippedReasons[item.reason]}
+										</span>
+									</li>
+								))}
+							</ul>
+						</details>
+					)}
+				</div>
+			)}
+			<div className="mb-5 flex flex-col gap-3 rounded-2xl border bg-card/60 p-4 sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+				<div>
+					<p className="text-xs font-medium">{importCopy.scopeTitle}</p>
+					<p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+						{importCopy.scopeHint}
+					</p>
+				</div>
+				<div
+					role="group"
+					aria-label={importCopy.scopeTitle}
+					className="flex rounded-xl bg-muted p-1"
+				>
+					{(["required", "all"] as const).map((value) => (
+						<button
+							key={value}
+							type="button"
+							aria-pressed={scope === value}
+							onClick={() => {
+								setScope(value);
+								if (
+									coursesInScope(courses, value).some((course) => {
+										const inspection = inspectCourse(course);
+										return !inspection.empty && !inspection.valid;
+									})
+								)
+									setExpanded(true);
+							}}
+							className={cn(
+								"flex h-10 flex-1 items-center justify-center gap-2 rounded-lg px-5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-none",
+								scope === value
+									? "bg-card font-medium text-foreground shadow-sm"
+									: "text-muted-foreground hover:text-foreground",
+							)}
+						>
+							{value === "required" ? importCopy.required : importCopy.all}
+							{hasData && (
+								<span className="font-mono text-[10px] opacity-60">
+									{value === "required" ? requiredCount : enteredRecords.length}
+								</span>
+							)}
+						</button>
+					))}
+				</div>
 			</div>
 			{storageNotice && (
 				<p
@@ -239,7 +434,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							<FiBookOpen className="h-4 w-4 text-primary" />
 							课程清单
 							<span className="font-mono text-[11px] font-normal text-muted-foreground">
-								{courses.length}
+								{gradeRecords.length}
 							</span>
 						</h3>
 						<div className="flex items-center gap-1">
@@ -274,21 +469,27 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 						className="hidden grid-cols-[minmax(0,1fr)_80px_72px_48px_28px] gap-3 border-b bg-background/60 px-5 py-3 text-[11px] text-muted-foreground sm:grid"
 						aria-hidden="true"
 					>
-						<span>
-							课程名称 <span className="opacity-70">/ 选填</span>
-						</span>
-						<span>成绩 / 百分制</span>
+						<span>{importCopy.courseDetails}</span>
+						<span>{importCopy.scoreLabel}</span>
 						<span>学分</span>
 						<span className="text-center">绩点</span>
 						<span />
 					</div>
 					<div ref={courseList}>
-						{courses.map((course, index) => {
+						{visibleRecords.map(({ course, reason }, index) => {
 							const inspection = inspectCourse(course);
+							const points = reason ? null : inspection.points;
+							const excludedNote = reason
+								? importCopy.skippedReasons[reason]
+								: scope === "required" && !isRequiredCourse(course)
+									? importCopy.notInScope
+									: "";
 							const scoreError =
+								!reason &&
 								!inspection.scoreValid &&
 								(course.score.length > 0 || touched.has(`${course.id}-score`));
 							const creditError =
+								!reason &&
 								!inspection.creditsValid &&
 								(course.credits.length > 0 ||
 									touched.has(`${course.id}-credits`));
@@ -300,43 +501,105 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 								<div
 									key={course.id}
 									data-course-row
-									className="relative border-b px-4 py-3 last:border-b-0 sm:px-5 sm:py-4"
+									className="relative border-b border-border/70 px-4 py-4 transition-colors last:border-b-0 hover:bg-muted/20 sm:px-5"
 								>
-									<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_48px] items-end gap-3 sm:grid-cols-[minmax(0,1fr)_80px_72px_48px_28px]">
-										<div className="col-span-3 flex min-w-0 items-center gap-2 pr-9 sm:col-span-1 sm:pr-0">
-											<span className="font-mono text-[10px] text-muted-foreground/60">
-												{String(index + 1).padStart(2, "0")}
-											</span>
-											<label htmlFor={`name-${course.id}`} className="sr-only">
-												第 {index + 1} 门课程名称（选填）
-											</label>
-											<Input
-												id={`name-${course.id}`}
-												value={course.name}
-												maxLength={100}
-												onChange={(event) =>
-													updateCourse(course.id, "name", event.target.value)
-												}
-												placeholder="课程名称（选填）"
-												className="h-10 min-w-0 rounded-lg border-transparent bg-transparent px-1 text-base shadow-none placeholder:text-muted-foreground/65 focus-visible:bg-background sm:px-2 sm:text-sm"
-											/>
+									<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_48px] items-center gap-x-3 gap-y-4 sm:grid-cols-[minmax(0,1fr)_80px_72px_48px_28px]">
+										<div className="col-span-3 min-w-0 pr-8 sm:col-span-1 sm:pr-1">
+											<div className="flex min-w-0 items-center gap-2">
+												<span className="w-5 shrink-0 font-mono text-[10px] text-muted-foreground/50">
+													{String(index + 1).padStart(2, "0")}
+												</span>
+												<label
+													htmlFor={`name-${course.id}`}
+													className="sr-only"
+												>
+													第 {index + 1} 门课程名称（选填）
+												</label>
+												<Input
+													id={`name-${course.id}`}
+													value={course.name}
+													maxLength={100}
+													onChange={(event) =>
+														updateCourse(course.id, "name", event.target.value)
+													}
+													placeholder="课程名称（选填）"
+													title={course.name}
+													className="h-9 min-w-0 flex-1 rounded-lg border-transparent bg-transparent px-0 text-base font-medium shadow-none placeholder:font-normal placeholder:text-muted-foreground/60 focus-visible:bg-background sm:text-sm"
+												/>
+											</div>
+											<div className="ml-7 mt-1 flex min-w-0 items-center gap-2">
+												<div className="relative shrink-0">
+													<select
+														aria-label={`第 ${index + 1} 门${importCopy.natureLabel}`}
+														value={course.nature ?? "必修"}
+														onChange={(event) =>
+															updateCourse(
+																course.id,
+																"nature",
+																event.target.value,
+															)
+														}
+														className="h-8 max-w-[110px] appearance-none rounded-full border border-primary/10 bg-secondary/70 pl-3 pr-7 text-[11px] font-medium text-primary outline-none transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card [&>option]:text-foreground"
+													>
+														{!importCopy.natureOptions.includes(
+															course.nature ?? "必修",
+														) && (
+															<option value={course.nature}>
+																{course.nature}
+															</option>
+														)}
+														{importCopy.natureOptions.map((nature) => (
+															<option key={nature} value={nature}>
+																{nature}
+															</option>
+														))}
+													</select>
+													<FiChevronDown
+														aria-hidden="true"
+														className="pointer-events-none absolute right-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-primary/60"
+													/>
+												</div>
+												<Input
+													aria-label={`第 ${index + 1} 门${importCopy.termLabel}`}
+													value={course.term ?? ""}
+													maxLength={100}
+													onChange={(event) =>
+														updateCourse(course.id, "term", event.target.value)
+													}
+													placeholder={importCopy.termPlaceholder}
+													title={course.term}
+													className="h-8 min-w-0 flex-1 rounded-md border-transparent bg-transparent px-1 text-[11px] text-muted-foreground shadow-none placeholder:text-muted-foreground/45 focus-visible:bg-background md:text-[11px]"
+												/>
+											</div>
 										</div>
 										<div className="min-w-0">
 											<label
 												htmlFor={`score-${course.id}`}
 												className="mb-1.5 block text-[11px] text-muted-foreground sm:sr-only"
 											>
-												成绩 <span className="opacity-70">/ 百分制</span>
+												{importCopy.scoreLabel}
 												<span className="sr-only">，第 {index + 1} 门课程</span>
 											</label>
 											<Input
 												id={`score-${course.id}`}
-												inputMode="decimal"
-												value={course.score}
-												maxLength={20}
+												inputMode={reason ? "text" : "decimal"}
+												readOnly={Boolean(reason)}
+												value={
+													course.score || (reason ? importCopy.noScore : "")
+												}
+												maxLength={reason ? 100 : 20}
+												title={
+													reason
+														? `${course.score || "—"} · ${excludedNote}`
+														: undefined
+												}
 												aria-invalid={scoreError}
 												aria-describedby={
-													scoreError ? `errors-${course.id}` : undefined
+													scoreError
+														? `errors-${course.id}`
+														: excludedNote
+															? `note-${course.id}`
+															: undefined
 												}
 												onChange={(event) =>
 													updateCourse(course.id, "score", event.target.value)
@@ -395,14 +658,12 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 												aria-label={`第 ${index + 1} 门课程绩点`}
 												className={cn(
 													"flex h-10 items-center justify-center rounded-lg font-mono text-sm",
-													inspection.points === null
+													points === null
 														? "text-muted-foreground/50"
 														: "bg-secondary/70 font-medium text-primary",
 												)}
 											>
-												{inspection.points === null
-													? "—"
-													: inspection.points.toFixed(1)}
+												{points === null ? "—" : points.toFixed(1)}
 											</output>
 										</div>
 										<Button
@@ -411,14 +672,32 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 											className="absolute right-2 top-2.5 h-11 w-11 text-muted-foreground/60 hover:bg-destructive/5 hover:text-destructive sm:static sm:h-10 sm:w-7"
 											aria-label={`删除第 ${index + 1} 门课程${course.name ? `：${course.name}` : ""}`}
 											onClick={() => {
-												setCourses((current) =>
-													current.filter((item) => item.id !== course.id),
-												);
+												if (reason) {
+													setImportInfo(
+														(current) =>
+															current && {
+																...current,
+																skipped: current.skipped.filter(
+																	(grade) =>
+																		`skipped-row-${grade.row}` !== course.id,
+																),
+															},
+													);
+												} else {
+													setCourses((current) =>
+														current.filter((item) => item.id !== course.id),
+													);
+												}
 												requestAnimationFrame(() => {
 													const row =
 														courseList.current?.querySelectorAll(
 															"[data-course-row]",
-														)[Math.min(index, courses.length - 2)];
+														)[
+															Math.max(
+																0,
+																Math.min(index, visibleRecords.length - 2),
+															)
+														];
 													(
 														row?.querySelector("input") ??
 														document.getElementById("add-course")
@@ -429,6 +708,14 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 											<FiTrash2 className="h-3.5 w-3.5" />
 										</Button>
 									</div>
+									{excludedNote && (
+										<p
+											id={`note-${course.id}`}
+											className="mt-2 text-[10px] leading-5 text-muted-foreground sm:ml-7"
+										>
+											{excludedNote}
+										</p>
+									)}
 									{errors.length > 0 && (
 										<p
 											id={`errors-${course.id}`}
@@ -440,15 +727,36 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 								</div>
 							);
 						})}
-						{courses.length === 0 && (
+						{gradeRecords.length === 0 && (
 							<div className="px-4 py-12 text-center">
 								<FiBookOpen className="mx-auto mb-3 h-7 w-7 text-muted-foreground/40" />
 								<p className="text-sm text-muted-foreground">
-									从第一门课开始，记录这个学期。
+									{hasData
+										? importCopy.emptyScope
+										: "从第一门课开始，记录这个学期。"}
 								</p>
 							</div>
 						)}
 					</div>
+					{gradeRecords.length > importCopy.previewCount && (
+						<div className="border-t px-4 py-2 text-center sm:px-5">
+							<Button
+								variant="ghost"
+								className="h-10 w-full text-xs text-primary"
+								onClick={() => setExpanded((value) => !value)}
+							>
+								{expanded
+									? importCopy.collapse
+									: `${importCopy.expand}（${gradeRecords.length} 门）`}
+								<FiChevronRight
+									className={cn(
+										"ml-1 h-3.5 w-3.5 transition-transform",
+										expanded ? "-rotate-90" : "rotate-90",
+									)}
+								/>
+							</Button>
+						</div>
+					)}
 					<div className="border-t border-border/70 px-4 py-4 sm:px-5">
 						<Button
 							id="add-course"
@@ -531,6 +839,15 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 								</p>
 							</div>
 						</div>
+						<Button
+							type="button"
+							disabled={!hasData}
+							onClick={openShare}
+							className="relative mt-5 h-11 w-full gap-2 rounded-xl border border-white/20 bg-white/10 text-xs text-white shadow-none hover:bg-white/20"
+						>
+							<FiShare2 className="h-3.5 w-3.5" />
+							{transcriptCopy.trigger}
+						</Button>
 					</div>
 					<details className="group rounded-2xl border bg-card px-5 py-4 lg:hidden">
 						<summary className="flex min-h-7 cursor-pointer list-none items-center justify-between text-xs font-medium [&::-webkit-details-marker]:hidden">
@@ -595,7 +912,11 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 										result.gpa === null && "font-sans text-lg",
 									)}
 								>
-									{result.gpa === null ? "待完善" : result.gpa.toFixed(5)}
+									{result.gpa === null
+										? result.status === "empty"
+											? importCopy.noGpaLabel
+											: "待完善"
+										: result.gpa.toFixed(5)}
 								</p>
 							</div>
 							<div className="min-w-0 text-right">
@@ -604,9 +925,17 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 										? `${result.count} 门课程 · ${formatNumber(result.totalCredits)} 学分`
 										: resultHint}
 								</p>
+								<Button
+									type="button"
+									onClick={openShare}
+									className="mt-1 h-9 gap-1.5 rounded-lg px-3 text-[11px]"
+								>
+									<FiShare2 className="h-3 w-3" />
+									{transcriptCopy.trigger}
+								</Button>
 								<button
 									type="button"
-									className="mt-1 inline-flex min-h-8 items-center gap-1 rounded text-xs font-medium text-primary outline-none focus-visible:ring-2 focus-visible:ring-ring"
+									className="sr-only focus:not-sr-only focus:inline-flex focus:min-h-8 focus:items-center focus:text-xs"
 									onClick={() =>
 										document
 											.getElementById("gpa-result-details")
@@ -628,10 +957,28 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 					</div>,
 					document.body,
 				)}
+			{shareLoaded && (
+				<Suspense fallback={null}>
+					<GpaTranscriptDialog
+						courses={courses}
+						skipped={importInfo?.skipped ?? EMPTY_SKIPPED}
+						scope={scope}
+						open={shareOpen}
+						onOpenChange={setShareOpen}
+						onCloseAutoFocus={(event) => {
+							event.preventDefault();
+							shareTrigger.current?.focus();
+						}}
+					/>
+				</Suspense>
+			)}
 			<Dialog
 				open={pending !== null}
 				onOpenChange={(open) => {
-					if (!open) setPending(null);
+					if (!open) {
+						setPending(null);
+						setStagedImport(null);
+					}
 				}}
 			>
 				<DialogContent
@@ -645,23 +992,44 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 				>
 					<DialogHeader>
 						<DialogTitle>
-							{pending === "clear" ? "清空课程清单？" : "用示例替换当前课程？"}
+							{pending === "clear"
+								? "清空课程清单？"
+								: pending === "import"
+									? importCopy.importTitle
+									: "用示例替换当前课程？"}
 						</DialogTitle>
 						<DialogDescription className="pt-2 text-sm leading-6">
 							{pending === "clear"
 								? "当前浏览器保存的课程记录也会清空。清空后可以重新录入。"
-								: "当前课程会被三门示例课程替换。示例仅用于体验计算方式。"}
+								: pending === "import"
+									? `${stagedImport?.fileName}：${importCopy.importSummary(stagedImport?.total ?? 0, stagedImport?.skipped.length ?? 0)}${importCopy.importDescription}`
+									: "当前课程会被三门示例课程替换。示例仅用于体验计算方式。"}
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter className="mt-2 gap-2">
-						<Button variant="outline" onClick={() => setPending(null)}>
-							保留当前课程
+						<Button
+							variant="outline"
+							onClick={() => {
+								setPending(null);
+								setStagedImport(null);
+							}}
+						>
+							{importCopy.keepCourses}
 						</Button>
 						<Button
 							variant={pending === "clear" ? "destructive" : "default"}
-							onClick={() => pending && replaceCourses(pending)}
+							onClick={() => {
+								if (pending === "import" && stagedImport)
+									commitImport(stagedImport, stagedImport.fileName);
+								else if (pending === "clear" || pending === "example")
+									replaceCourses(pending);
+							}}
 						>
-							{pending === "clear" ? "确认清空" : "填入示例"}
+							{pending === "clear"
+								? "确认清空"
+								: pending === "import"
+									? importCopy.confirmImport
+									: "填入示例"}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

@@ -1,3 +1,9 @@
+/* Stop viewport rubber-banding at either vertical boundary without locking scroll. */
+.react-page-root,
+.tools-page {
+	overscroll-behavior-y: none;
+}
+
 /* Keep shadcn tokens local to React pages so the existing website keeps its theme. */
 .tools-page {
 	--background: 48 20% 97%;
@@ -60,6 +66,12 @@
 
 .tools-page input[type="number"] {
 	-moz-appearance: textfield;
+}
+
+/* Allow the native date value to shrink within narrow mobile forms. */
+.tools-page #classroom-date::-webkit-date-and-time-value {
+	min-width: 0;
+	text-align: left;
 }
 
 .tools-page input::-webkit-inner-spin-button,

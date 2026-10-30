@@ -18,7 +18,20 @@ export interface CourseDraft {
 	name: string;
 	score: string;
 	credits: string;
+	nature?: string;
+	term?: string;
 }
+
+export type GpaScope = "required" | "all";
+
+export function isRequiredCourse(course: CourseDraft): boolean {
+	return /^(必修|必修课)$/.test(
+		(course.nature ?? "必修").normalize("NFKC").replace(/\s+/g, ""),
+	);
+}
+
+export const coursesInScope = (courses: CourseDraft[], scope: GpaScope) =>
+	scope === "all" ? courses : courses.filter(isRequiredCourse);
 
 export function gradePoint(score: number): number {
 	if (!Number.isFinite(score) || score < 0 || score > 100) {
@@ -106,7 +119,11 @@ export function isCourseDrafts(value: unknown): value is CourseDraft[] {
 				course.id.length > 0 &&
 				course.name.length <= 100 &&
 				course.score.length <= 20 &&
-				course.credits.length <= 20,
+				course.credits.length <= 20 &&
+				(course.nature === undefined ||
+					(typeof course.nature === "string" && course.nature.length <= 30)) &&
+				(course.term === undefined ||
+					(typeof course.term === "string" && course.term.length <= 100)),
 		) &&
 		new Set(value.map((course) => course.id)).size === value.length
 	);

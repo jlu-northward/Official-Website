@@ -2,6 +2,7 @@
 import Footer from "@components/sections/Footer";
 import EasterEggToast from "@components/ui/EasterEggToast";
 import WeChatGuide from "@components/ui/WeChatGuide";
+import ThemeScript from "@components/ui/ThemeScript.astro";
 import { baiduSiteVerification } from "../config/siteVerification";
 
 interface Props {
@@ -128,23 +129,7 @@ const shareImageType = {
 			)
 		}
 
-		<script is:inline>
-			const theme = localStorage.getItem("theme") || "system";
-			const root = document.documentElement;
-			root.classList.remove("light", "dark");
-
-			if (theme === "system") {
-				const prefersDark = window.matchMedia(
-					"(prefers-color-scheme: dark)",
-				).matches;
-				root.classList.add(prefersDark ? "dark" : "light");
-			} else {
-				root.classList.add(theme);
-			}
-
-			if (!localStorage.getItem("theme"))
-				localStorage.setItem("theme", "system");
-		</script>
+		<ThemeScript />
 	</head>
 	<body
 		class="bg-[#f5f5f7] text-neutral-950 antialiased selection:bg-sky-200 selection:text-sky-950 dark:bg-[#09090b] dark:text-white dark:selection:bg-sky-700 dark:selection:text-white"

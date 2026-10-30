@@ -17,7 +17,7 @@ export interface ToolCategory {
 	links: CampusLink[];
 }
 
-// Match the navigation in northward-app/lib/page/square/quick_links_sheet.dart.
+// Based on the App navigation, with additional website service links.
 export const toolCategories: ToolCategory[] = [
 	{
 		id: "campus",
@@ -112,6 +112,20 @@ export const toolCategories: ToolCategory[] = [
 				keywords: "一卡通 充值",
 			},
 			{
+				name: "体育馆预约系统",
+				href: "https://ss.jlu.edu.cn/easyserpApp/index.html#/branch?clubId=26&userId=2328F15C2FFF0B5BBC08A45853FD1257",
+				description: "体育场馆预约入口",
+				icon: "seat",
+				keywords: "体育 运动 场地 场馆 预约",
+			},
+			{
+				name: "校外人员入校预约系统",
+				href: "https://ehall.jlu.edu.cn/infoplus/form/118761951/render",
+				description: "校外访客入校预约",
+				icon: "users",
+				keywords: "访客 来访 进校 入校 预约",
+			},
+			{
 				name: "网络中心",
 				href: "https://nic.jlu.edu.cn",
 				description: "校园网络服务与指南",
@@ -166,6 +180,13 @@ export const toolCategories: ToolCategory[] = [
 				keywords: "借书 文献 论文",
 			},
 			{
+				name: "图书馆书目检索系统",
+				href: "https://opac.jlu.edu.cn/#/Home",
+				description: "查询图书馆馆藏书目",
+				icon: "book",
+				keywords: "OPAC 书目 检索 馆藏 查书 找书",
+			},
+			{
 				name: "图书馆预定座位",
 				href: "https://libseat.jlu.edu.cn",
 				description: "提前安排你的自习座位",
@@ -201,11 +222,13 @@ export const toolCategories: ToolCategory[] = [
 export const toolsContent = {
 	title: "校园工具箱｜向北",
 	description:
-		"吉大人的校园工具箱：校园网站导航、教务与校内服务入口，以及吉大绩点计算。",
+		"吉大人的校园工具箱：校园网站导航、教务与校内服务入口、吉大绩点计算、空教室查询和蹭课课程安排。",
 	heroTitle: "校园日常，",
 	heroAccent: "一处就好。",
 	calculatorLoading: "正在打开绩点计算…",
 	calculatorLoadError: "暂时无法打开绩点计算，请检查网络后重试。",
+	classroomLoading: "正在打开空教室查询…",
+	classroomLoadError: "暂时无法打开空教室查询，请检查网络后重试。",
 	gpaDetailsTitle: "计算明细与说明",
 	gpaDetailsDescription:
 		"各门课程的学分乘以对应绩点，加总后除以总学分。未及格课程以 0 绩点计入，学分同样参与加权。仅供估算，以学校认定为准。",
@@ -214,4 +237,5 @@ export const toolsContent = {
 	gpaReference:
 		"https://github.com/vinoxuan/JLU-Toolkit/blob/main/jlu_gpa_calculator.html",
 	storageKey: "northward.tools.gpa.v1",
+	gpaScopeStorageKey: "northward.tools.gpa.scope.v1",
 };

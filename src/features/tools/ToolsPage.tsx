@@ -38,7 +38,7 @@ import {
 	toolsContent,
 	type CampusLink,
 	type ToolCategoryId,
-} from "@/config/tools";
+} from "./content/tools";
 
 const icons: Record<string, IconType> = {
 	campus: FiHome,
@@ -70,26 +70,17 @@ const totalLinks = toolCategories.reduce(
 
 function ThemeButton() {
 	const [dark, setDark] = useState(false);
+	const [embedded, setEmbedded] = useState(false);
 	useEffect(() => {
-		setDark(document.documentElement.classList.contains("dark"));
-		const media = window.matchMedia("(prefers-color-scheme: dark)");
 		const sync = () => {
-			let preference: string | null = null;
-			try {
-				preference = localStorage.getItem("theme");
-			} catch {
-				/* Theme still works without storage. */
-			}
-			if (preference === "light" || preference === "dark") return;
-			setDark(media.matches);
-			document.documentElement.classList.toggle("dark", media.matches);
-			document.documentElement.style.colorScheme = media.matches
-				? "dark"
-				: "light";
+			setDark(document.documentElement.classList.contains("dark"));
+			setEmbedded(window.northwardWebsiteTheme?.isEmbedded() ?? false);
 		};
-		media.addEventListener("change", sync);
-		return () => media.removeEventListener("change", sync);
+		sync();
+		window.addEventListener("websiteThemeChanged", sync);
+		return () => window.removeEventListener("websiteThemeChanged", sync);
 	}, []);
+	if (embedded) return null;
 	return (
 		<Button
 			variant="ghost"
@@ -97,15 +88,7 @@ function ThemeButton() {
 			className="h-10 w-10 rounded-full text-muted-foreground"
 			aria-label={dark ? "切换为浅色主题" : "切换为深色主题"}
 			onClick={() => {
-				const next = !dark;
-				setDark(next);
-				document.documentElement.classList.toggle("dark", next);
-				document.documentElement.style.colorScheme = next ? "dark" : "light";
-				try {
-					localStorage.setItem("theme", next ? "dark" : "light");
-				} catch {
-					/* Optional preference persistence. */
-				}
+				window.northwardWebsiteTheme?.setPreference(dark ? "light" : "dark");
 			}}
 		>
 			{dark ? (
@@ -368,6 +351,12 @@ export default function ToolsPage() {
 	} | null>(null);
 	const [gpaLoadFailed, setGpaLoadFailed] = useState(false);
 	const [gpaLoadAttempt, setGpaLoadAttempt] = useState(0);
+	const [classroomRequested, setClassroomRequested] = useState(false);
+	const [classroomModule, setClassroomModule] = useState<{
+		default: ComponentType<{ active: boolean }>;
+	} | null>(null);
+	const [classroomLoadFailed, setClassroomLoadFailed] = useState(false);
+	const [classroomLoadAttempt, setClassroomLoadAttempt] = useState(0);
 	const workspace = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		if (!gpaRequested) return;
@@ -385,11 +374,33 @@ export default function ToolsPage() {
 		};
 	}, [gpaRequested, gpaLoadAttempt]);
 	useEffect(() => {
+		if (!classroomRequested) return;
+		let cancelled = false;
+		setClassroomLoadFailed(false);
+		import("./ClassroomTools")
+			.then((module) => {
+				if (!cancelled) setClassroomModule(module);
+			})
+			.catch(() => {
+				if (!cancelled) setClassroomLoadFailed(true);
+			});
+		return () => {
+			cancelled = true;
+		};
+	}, [classroomRequested, classroomLoadAttempt]);
+	useEffect(() => {
 		const sync = () => {
-			const isGpa = window.location.hash === "#gpa";
-			setTab(isGpa ? "gpa" : "navigation");
-			if (isGpa) setGpaRequested(true);
-			if (isGpa)
+			const hash = window.location.hash;
+			const selected =
+				hash === "#gpa"
+					? "gpa"
+					: hash === "#classrooms"
+						? "classrooms"
+						: "navigation";
+			setTab(selected);
+			if (selected === "gpa") setGpaRequested(true);
+			if (selected === "classrooms") setClassroomRequested(true);
+			if (selected !== "navigation")
 				requestAnimationFrame(() =>
 					workspace.current?.scrollIntoView({ block: "start" }),
 				);
@@ -401,10 +412,11 @@ export default function ToolsPage() {
 	const selectTab = (value: string, scroll = false) => {
 		setTab(value);
 		if (value === "gpa") setGpaRequested(true);
+		if (value === "classrooms") setClassroomRequested(true);
 		window.history.replaceState(
 			null,
 			"",
-			`${window.location.pathname}${window.location.search}${value === "gpa" ? "#gpa" : ""}`,
+			`${window.location.pathname}${window.location.search}${value === "navigation" ? "" : `#${value}`}`,
 		);
 		if (scroll) {
 			workspace.current?.scrollIntoView({
@@ -421,6 +433,7 @@ export default function ToolsPage() {
 		}
 	};
 	const Calculator = calculatorModule?.default;
+	const ClassroomFinder = classroomModule?.default;
 	return (
 		<div
 			className={cn(
@@ -561,13 +574,13 @@ export default function ToolsPage() {
 					<Tabs value={tab} onValueChange={(value) => selectTab(value)}>
 						<div className="sticky top-0 z-20 -mx-4 mb-4 flex items-center justify-between gap-3 bg-background px-4 py-3 sm:static sm:mx-0 sm:mb-9 sm:border-b sm:bg-transparent sm:px-0 sm:pb-5 sm:pt-0">
 							<TabsList
-								className="grid h-12 w-full grid-cols-2 gap-1 rounded-xl border border-border/60 bg-muted/70 p-1 sm:inline-flex sm:w-auto"
+								className="grid h-12 w-full grid-cols-3 gap-1 rounded-xl border border-border/60 bg-muted/70 p-1 sm:inline-flex sm:w-auto"
 								aria-label="工具类型"
 							>
 								<TabsTrigger
 									id="tools-tab-navigation"
 									value="navigation"
-									className="h-10 gap-2 rounded-lg px-4 text-[13px] data-[state=active]:bg-card data-[state=active]:text-foreground sm:px-5"
+									className="h-10 gap-1.5 rounded-lg px-2 text-xs data-[state=active]:bg-card data-[state=active]:text-foreground sm:gap-2 sm:px-5 sm:text-[13px]"
 								>
 									<FiCompass className="h-4 w-4" />
 									校园导航
@@ -578,10 +591,18 @@ export default function ToolsPage() {
 								<TabsTrigger
 									id="tools-tab-gpa"
 									value="gpa"
-									className="h-10 gap-2 rounded-lg px-4 text-[13px] data-[state=active]:bg-card data-[state=active]:text-foreground sm:px-5"
+									className="h-10 gap-1.5 rounded-lg px-2 text-xs data-[state=active]:bg-card data-[state=active]:text-foreground sm:gap-2 sm:px-5 sm:text-[13px]"
 								>
 									<FiGrid className="h-4 w-4" />
 									绩点计算
+								</TabsTrigger>
+								<TabsTrigger
+									id="tools-tab-classrooms"
+									value="classrooms"
+									className="h-10 gap-1.5 rounded-lg px-2 text-xs data-[state=active]:bg-card data-[state=active]:text-foreground sm:gap-2 sm:px-5 sm:text-[13px]"
+								>
+									<FiMapPin className="h-4 w-4" />
+									空教室查询
 								</TabsTrigger>
 							</TabsList>
 							<span className="hidden items-center gap-1.5 text-[11px] text-muted-foreground sm:flex">
@@ -625,6 +646,38 @@ export default function ToolsPage() {
 										</>
 									) : (
 										toolsContent.calculatorLoading
+									)}
+								</div>
+							) : null}
+						</TabsContent>
+						<TabsContent
+							value="classrooms"
+							aria-labelledby="tools-tab-classrooms"
+							forceMount
+							className="mt-0 outline-none data-[state=inactive]:hidden"
+						>
+							{ClassroomFinder ? (
+								<ClassroomFinder active={tab === "classrooms"} />
+							) : classroomRequested ? (
+								<div
+									role="status"
+									className="rounded-2xl border bg-card px-5 py-12 text-center text-sm text-muted-foreground"
+								>
+									{classroomLoadFailed ? (
+										<>
+											<p>{toolsContent.classroomLoadError}</p>
+											<Button
+												variant="outline"
+												className="mt-4"
+												onClick={() =>
+													setClassroomLoadAttempt((attempt) => attempt + 1)
+												}
+											>
+												重新加载
+											</Button>
+										</>
+									) : (
+										toolsContent.classroomLoading
 									)}
 								</div>
 							) : null}

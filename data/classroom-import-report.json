@@ -1,0 +1,2837 @@
+{
+  "counts": {
+    "courseRows": 7731,
+    "scheduleEntries": 20460,
+    "mappedEntries": 15132,
+    "unscheduledRows": 1135,
+    "unmappedLocation": 3868,
+    "missingLocation": 1460
+  },
+  "roomCount": 570,
+  "slotCount": 7719,
+  "issues": [
+    {
+      "reason": "unmappedLocation",
+      "location": "线上教学-前卫",
+      "count": 346,
+      "exampleRows": [
+        87,
+        1233,
+        1234,
+        1235,
+        1236
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "计算机软件实验室（三）B212-213",
+      "count": 23,
+      "exampleRows": [
+        136,
+        138,
+        142,
+        143,
+        144
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "计算机软件实验室（二）A209-210",
+      "count": 18,
+      "exampleRows": [
+        137,
+        139,
+        148,
+        182,
+        184
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "网络与安全实验室（三）B312-313",
+      "count": 6,
+      "exampleRows": [
+        141,
+        151,
+        217,
+        402
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "计算机软件实验室（四）B214-215",
+      "count": 2,
+      "exampleRows": [
+        145,
+        150
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "软件工程卓越培养实验室B110",
+      "count": 10,
+      "exampleRows": [
+        146,
+        159,
+        160,
+        220,
+        221
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "单片机与嵌入式实验室（一）A422-423",
+      "count": 9,
+      "exampleRows": [
+        152,
+        157,
+        200,
+        201,
+        202
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "物联网工程实验室（一）A419-420",
+      "count": 7,
+      "exampleRows": [
+        154,
+        155,
+        156,
+        235,
+        236
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "公共计算机教学实验中心101",
+      "count": 11,
+      "exampleRows": [
+        161,
+        239,
+        243,
+        246,
+        251
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "401实验室",
+      "count": 9,
+      "exampleRows": [
+        162,
+        288,
+        289,
+        290,
+        291
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "李四光505实验室",
+      "count": 15,
+      "exampleRows": [
+        163,
+        256,
+        259,
+        264,
+        316
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "李四光507实验室",
+      "count": 21,
+      "exampleRows": [
+        164,
+        168,
+        170,
+        257,
+        260
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "敬信A区501A实验室",
+      "count": 35,
+      "exampleRows": [
+        165,
+        166,
+        169,
+        172,
+        173
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "敬信A区501B实验室",
+      "count": 28,
+      "exampleRows": [
+        167,
+        171,
+        174,
+        175,
+        176
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "微机系统与接口实验室（一）A327-328",
+      "count": 5,
+      "exampleRows": [
+        195,
+        196,
+        197,
+        198,
+        199
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "网络与信创实验室1-534",
+      "count": 13,
+      "exampleRows": [
+        208,
+        209,
+        210,
+        211,
+        212
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "物联网工程实验室（三）A224-225",
+      "count": 9,
+      "exampleRows": [
+        214,
+        215,
+        216
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "物联网工程实验室（二）A323-324",
+      "count": 2,
+      "exampleRows": [
+        232,
+        233
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "公共计算机教学实验中心311",
+      "count": 28,
+      "exampleRows": [
+        240,
+        241,
+        242,
+        244,
+        245
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "403实验室",
+      "count": 8,
+      "exampleRows": [
+        275,
+        277,
+        279,
+        282,
+        287
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "405实验室",
+      "count": 5,
+      "exampleRows": [
+        276,
+        278,
+        280,
+        281,
+        283
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "504实验室",
+      "count": 3,
+      "exampleRows": [
+        284,
+        285,
+        286
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "李四光教学楼508机房",
+      "count": 8,
+      "exampleRows": [
+        297,
+        301,
+        303,
+        310,
+        7340
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "李四光508实验室",
+      "count": 6,
+      "exampleRows": [
+        298,
+        305,
+        306,
+        307,
+        308
+      ]
+    },
+    {
+      "reason": "missingLocation",
+      "location": "",
+      "count": 1460,
+      "exampleRows": [
+        362,
+        363,
+        364,
+        393,
+        433
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "软件综合实验室1A108",
+      "count": 15,
+      "exampleRows": [
+        368,
+        388,
+        389,
+        394,
+        397
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "软件综合实验室3A310",
+      "count": 17,
+      "exampleRows": [
+        391,
+        392,
+        396,
+        400,
+        401
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "软件综合实验室2A110",
+      "count": 4,
+      "exampleRows": [
+        398,
+        415
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "软件综合实验室4-600",
+      "count": 6,
+      "exampleRows": [
+        419,
+        420,
+        421
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "前卫--音乐厅",
+      "count": 22,
+      "exampleRows": [
+        569,
+        600,
+        601,
+        602,
+        603
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "404",
+      "count": 1,
+      "exampleRows": [
+        646
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "137油泥实验室",
+      "count": 7,
+      "exampleRows": [
+        668
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "207机房",
+      "count": 4,
+      "exampleRows": [
+        712
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "宋治平体育馆-宋治平体育馆篮球训练馆",
+      "count": 29,
+      "exampleRows": [
+        827,
+        833,
+        840,
+        859,
+        866
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "宋治平体育馆-宋治平体育馆篮球比赛馆",
+      "count": 8,
+      "exampleRows": [
+        839,
+        874,
+        941,
+        969
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "宋治平体育馆-宋治平体育馆排球馆",
+      "count": 35,
+      "exampleRows": [
+        842,
+        843,
+        844,
+        860,
+        867
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "宋治平体育馆-宋治平体育馆田径馆",
+      "count": 56,
+      "exampleRows": [
+        849,
+        871,
+        878,
+        898,
+        900
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "宋治平体育馆-乒乓球馆",
+      "count": 23,
+      "exampleRows": [
+        852,
+        862,
+        886,
+        895,
+        896
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "宋治平体育馆-宋治平体育馆网球馆",
+      "count": 17,
+      "exampleRows": [
+        857,
+        869,
+        880,
+        889,
+        890
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "宋治平体育馆-宋治平体育馆健身馆",
+      "count": 7,
+      "exampleRows": [
+        902,
+        5348,
+        5363,
+        5376,
+        5495
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "经济实验教学中心综合实验室B213",
+      "count": 9,
+      "exampleRows": [
+        1022,
+        1023,
+        1024,
+        1025,
+        1058
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "线上教学-和平",
+      "count": 24,
+      "exampleRows": [
+        1265,
+        1266,
+        1267,
+        1268,
+        1279
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "线上教学-南湖",
+      "count": 28,
+      "exampleRows": [
+        1280,
+        1282,
+        1283,
+        1524,
+        1525
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "南湖--线上教学",
+      "count": 6,
+      "exampleRows": [
+        1281,
+        4746,
+        4773,
+        6640,
+        7313
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "线上教学-南岭",
+      "count": 155,
+      "exampleRows": [
+        1289,
+        1290,
+        1291,
+        1292,
+        1293
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "和平-实践",
+      "count": 10,
+      "exampleRows": [
+        1461,
+        1471,
+        4011,
+        4065,
+        4069
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "语音室345",
+      "count": 2,
+      "exampleRows": [
+        1853
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "中子技术实验室153",
+      "count": 2,
+      "exampleRows": [
+        1886,
+        1907
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "磁性测量实验室105",
+      "count": 1,
+      "exampleRows": [
+        1906
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "计算机软件实验室（一）A211-212",
+      "count": 1,
+      "exampleRows": [
+        1908
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "检测声学实验室281-283",
+      "count": 1,
+      "exampleRows": [
+        1924
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "仪器分析实验室513",
+      "count": 2,
+      "exampleRows": [
+        2044
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "有机化学实验室426",
+      "count": 5,
+      "exampleRows": [
+        2049,
+        2050,
+        2051,
+        2052,
+        2065
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "物理化学实验室415",
+      "count": 5,
+      "exampleRows": [
+        2053,
+        2054,
+        2055,
+        2056,
+        2057
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "化工原理实验室A115",
+      "count": 2,
+      "exampleRows": [
+        2058,
+        2059
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "化学综合实验室A613",
+      "count": 2,
+      "exampleRows": [
+        2060
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "材料化学综合实验室221",
+      "count": 2,
+      "exampleRows": [
+        2061
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "化工综合实验室A501-502",
+      "count": 2,
+      "exampleRows": [
+        2062
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "应用化学实验室A507",
+      "count": 2,
+      "exampleRows": [
+        2063
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "高分子工程实验室116",
+      "count": 1,
+      "exampleRows": [
+        2064
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "高分子化学实验室109",
+      "count": 1,
+      "exampleRows": [
+        2066
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "微格实验室C256-258",
+      "count": 57,
+      "exampleRows": [
+        2134,
+        2135,
+        2136,
+        2137,
+        2138
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "普通生物学基础实验室IIC229",
+      "count": 34,
+      "exampleRows": [
+        2134,
+        2135,
+        2136,
+        2137,
+        2138
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "普通生物学基础实验室IIIC358-360",
+      "count": 54,
+      "exampleRows": [
+        2139,
+        2140,
+        2142,
+        2152,
+        2153
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "普通生物学基础实验室IVC335-337",
+      "count": 48,
+      "exampleRows": [
+        2141,
+        2143,
+        2152,
+        2153,
+        2154
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "现代生物学基础实验室ⅠC439-441",
+      "count": 34,
+      "exampleRows": [
+        2145,
+        2146,
+        2147,
+        2148,
+        2149
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "现代生物学基础实验室ⅡC445-447",
+      "count": 27,
+      "exampleRows": [
+        2145,
+        2146,
+        2147,
+        2148,
+        2149
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "创新创业实验室IIIC462-464",
+      "count": 40,
+      "exampleRows": [
+        2146,
+        2147,
+        2148,
+        2149,
+        2150
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物信息学实验室C239-241",
+      "count": 17,
+      "exampleRows": [
+        2161,
+        2162,
+        2163,
+        2164,
+        2165
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "普通生物学基础实验室IC233-235",
+      "count": 26,
+      "exampleRows": [
+        2168,
+        2169,
+        2170,
+        2171,
+        2172
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物制药实验室ⅠC133",
+      "count": 14,
+      "exampleRows": [
+        2177,
+        2178,
+        2184,
+        2185,
+        2186
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "化工原理实验室A117",
+      "count": 2,
+      "exampleRows": [
+        2177,
+        2178
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物制药实验室ⅡC141",
+      "count": 22,
+      "exampleRows": [
+        2180,
+        2181,
+        2182,
+        2183
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "发酵室C160-162",
+      "count": 25,
+      "exampleRows": [
+        2180,
+        2181,
+        2182,
+        2183,
+        2184
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药物制剂室ⅠC154",
+      "count": 3,
+      "exampleRows": [
+        2184,
+        2185,
+        2186
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药物制剂室ⅡC156",
+      "count": 3,
+      "exampleRows": [
+        2184,
+        2185,
+        2186
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药物制剂室 ⅢC164",
+      "count": 3,
+      "exampleRows": [
+        2184,
+        2185,
+        2186
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药物制剂室 ⅣC166",
+      "count": 1,
+      "exampleRows": [
+        2184
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "超临界CO2萃取室C146",
+      "count": 1,
+      "exampleRows": [
+        2184
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物制药分析室C135",
+      "count": 4,
+      "exampleRows": [
+        2185,
+        2186
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药物分析检测室C168",
+      "count": 2,
+      "exampleRows": [
+        2185,
+        2186
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药理学实验准备室C250",
+      "count": 1,
+      "exampleRows": [
+        2186
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "矿物学实验室137",
+      "count": 8,
+      "exampleRows": [
+        2995,
+        3071
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼208",
+      "count": 19,
+      "exampleRows": [
+        3000,
+        3004,
+        3006,
+        3094,
+        3123
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼203",
+      "count": 27,
+      "exampleRows": [
+        3003,
+        3111,
+        3120,
+        3126,
+        3138
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼302",
+      "count": 14,
+      "exampleRows": [
+        3014,
+        3114,
+        3143,
+        3204,
+        3208
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼204",
+      "count": 13,
+      "exampleRows": [
+        3018,
+        3103,
+        3106,
+        3174,
+        3233
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "地质学基础实验室139",
+      "count": 8,
+      "exampleRows": [
+        3023,
+        3024,
+        3025,
+        3082,
+        3083
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "李四光实验楼-139",
+      "count": 1,
+      "exampleRows": [
+        3026
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "岩石学实验室146",
+      "count": 51,
+      "exampleRows": [
+        3027,
+        3028,
+        3031,
+        3032,
+        3049
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "岩石学实验室147",
+      "count": 37,
+      "exampleRows": [
+        3029,
+        3030,
+        3031,
+        3032,
+        3047
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "地层学与古生物学实验室 144",
+      "count": 3,
+      "exampleRows": [
+        3033,
+        3034,
+        3051
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "构造地质学实验室132",
+      "count": 12,
+      "exampleRows": [
+        3038,
+        3039
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼103",
+      "count": 23,
+      "exampleRows": [
+        3053,
+        3112,
+        3127,
+        3128,
+        3161
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼304",
+      "count": 41,
+      "exampleRows": [
+        3054,
+        3093,
+        3097,
+        3099,
+        3101
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "矿产勘查实验室220",
+      "count": 6,
+      "exampleRows": [
+        3054,
+        3055,
+        3056,
+        3059
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "石油地质实验室123",
+      "count": 2,
+      "exampleRows": [
+        3054
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "流体包裹体实验室204",
+      "count": 4,
+      "exampleRows": [
+        3058
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "土壤学实验室224",
+      "count": 1,
+      "exampleRows": [
+        3080
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "地质学基础实验室142",
+      "count": 2,
+      "exampleRows": [
+        3082,
+        3085
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼104",
+      "count": 26,
+      "exampleRows": [
+        3100,
+        3108,
+        3115,
+        3130,
+        3134
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼301",
+      "count": 32,
+      "exampleRows": [
+        3104,
+        3105,
+        3118,
+        3144,
+        3179
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼205",
+      "count": 6,
+      "exampleRows": [
+        3107,
+        3122
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼201",
+      "count": 17,
+      "exampleRows": [
+        3113,
+        3132,
+        3139,
+        3141,
+        3147
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼202",
+      "count": 21,
+      "exampleRows": [
+        3121,
+        3152,
+        3173,
+        3182,
+        3183
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "计算室109",
+      "count": 9,
+      "exampleRows": [
+        3134,
+        3135,
+        3137,
+        3138,
+        3149
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼101",
+      "count": 22,
+      "exampleRows": [
+        3135,
+        3187,
+        3188,
+        3192,
+        3195
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼102",
+      "count": 22,
+      "exampleRows": [
+        3136,
+        3190,
+        3202,
+        3212,
+        3214
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "黄大年楼303",
+      "count": 18,
+      "exampleRows": [
+        3137,
+        3149,
+        3180,
+        3181,
+        3184
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "岩化楼208",
+      "count": 3,
+      "exampleRows": [
+        3139
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "数字摄影测量实验室139",
+      "count": 2,
+      "exampleRows": [
+        3145
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "岩石物性测试实验室135－2",
+      "count": 3,
+      "exampleRows": [
+        3165,
+        3166
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "测量基础实验室137",
+      "count": 2,
+      "exampleRows": [
+        3167
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "501实验室",
+      "count": 1,
+      "exampleRows": [
+        3217
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "岩石力学性质测定实验室509",
+      "count": 2,
+      "exampleRows": [
+        3219,
+        3240
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "岩心钻探工具实验室502",
+      "count": 2,
+      "exampleRows": [
+        3219,
+        3240
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "实验大厅103",
+      "count": 1,
+      "exampleRows": [
+        3219
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "定向钻进与钻孔弯曲实验室506",
+      "count": 3,
+      "exampleRows": [
+        3219,
+        3234,
+        3240
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "503实验室",
+      "count": 2,
+      "exampleRows": [
+        3225,
+        3240
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "土的渗透淤堵模拟实验室108",
+      "count": 1,
+      "exampleRows": [
+        3226
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "土动三轴实验室103",
+      "count": 1,
+      "exampleRows": [
+        3226
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "李四光实验楼120",
+      "count": 8,
+      "exampleRows": [
+        3227,
+        3228,
+        3229,
+        3230
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "桥梁结构检测实验室",
+      "count": 1,
+      "exampleRows": [
+        3237
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "油页岩含油率测定实验室607",
+      "count": 2,
+      "exampleRows": [
+        3239
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "岩土体与结构材料实验室106",
+      "count": 1,
+      "exampleRows": [
+        3263
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "土力学实验室113",
+      "count": 4,
+      "exampleRows": [
+        3266,
+        3267
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "土质学实验室119",
+      "count": 2,
+      "exampleRows": [
+        3266,
+        3267
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "土力学实验室112",
+      "count": 2,
+      "exampleRows": [
+        3266,
+        3267
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "非饱和土实验室215",
+      "count": 2,
+      "exampleRows": [
+        3266,
+        3267
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "扫描电镜实验室102",
+      "count": 2,
+      "exampleRows": [
+        3266,
+        3267
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "土静三轴实验室111",
+      "count": 1,
+      "exampleRows": [
+        3267
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "建筑材料实验室131",
+      "count": 1,
+      "exampleRows": [
+        3275
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病理学实验平台401",
+      "count": 28,
+      "exampleRows": [
+        3411,
+        3413,
+        3426,
+        3428,
+        3430
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病理学实验平台409",
+      "count": 31,
+      "exampleRows": [
+        3411,
+        3413,
+        3426,
+        3428,
+        3430
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病理学实验平台406",
+      "count": 31,
+      "exampleRows": [
+        3411,
+        3426,
+        3428,
+        3430,
+        3501
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "组织学与胚胎学实验平台411",
+      "count": 23,
+      "exampleRows": [
+        3411,
+        3413,
+        3426,
+        3428
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "组织学与胚胎学实验平台417",
+      "count": 7,
+      "exampleRows": [
+        3411,
+        3413,
+        3940,
+        3942
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病理学实验平台403",
+      "count": 32,
+      "exampleRows": [
+        3411,
+        3413,
+        3426,
+        3428,
+        3430
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "组织学与胚胎学实验平台419",
+      "count": 1,
+      "exampleRows": [
+        3413
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "机能科学实验平台303",
+      "count": 24,
+      "exampleRows": [
+        3415,
+        3417,
+        3419,
+        3423,
+        3424
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "机能科学实验平台201",
+      "count": 39,
+      "exampleRows": [
+        3415,
+        3417,
+        3419,
+        3421,
+        3423
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "机能科学实验平台209",
+      "count": 48,
+      "exampleRows": [
+        3415,
+        3417,
+        3419,
+        3421,
+        3423
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "机能科学实验平台301",
+      "count": 38,
+      "exampleRows": [
+        3415,
+        3417,
+        3419,
+        3421,
+        3423
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "机能科学实验平台306",
+      "count": 42,
+      "exampleRows": [
+        3415,
+        3417,
+        3419,
+        3421,
+        3423
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "机能科学实验平台203",
+      "count": 48,
+      "exampleRows": [
+        3415,
+        3417,
+        3419,
+        3421,
+        3423
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "机能科学实验平台309",
+      "count": 23,
+      "exampleRows": [
+        3415,
+        3417,
+        3419,
+        3423,
+        3424
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "机能科学实验平台206",
+      "count": 31,
+      "exampleRows": [
+        3417,
+        3419,
+        3421,
+        3423,
+        3424
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物化学与分子生物学实验平台314",
+      "count": 27,
+      "exampleRows": [
+        3438,
+        3440,
+        3481,
+        3483,
+        3484
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物化学与分子生物学实验平台317",
+      "count": 28,
+      "exampleRows": [
+        3438,
+        3440,
+        3481,
+        3483,
+        3484
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物化学与分子生物学实验平台219",
+      "count": 19,
+      "exampleRows": [
+        3438,
+        3440,
+        3511,
+        3513
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物化学与分子生物学实验平台311",
+      "count": 24,
+      "exampleRows": [
+        3438,
+        3440,
+        3481,
+        3483,
+        3484
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物化学与分子生物学实验平台319",
+      "count": 22,
+      "exampleRows": [
+        3438,
+        3440,
+        3481,
+        3509,
+        3511
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病原免疫细胞遗传学实验平台230",
+      "count": 26,
+      "exampleRows": [
+        3442,
+        3444,
+        3446,
+        3448,
+        3450
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "机能科学实验平台101",
+      "count": 33,
+      "exampleRows": [
+        3442,
+        3444,
+        3446,
+        3448,
+        3450
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "组织学与胚胎学实验平台414",
+      "count": 27,
+      "exampleRows": [
+        3442,
+        3444,
+        3446,
+        3448,
+        3450
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物医学科学实验平台103",
+      "count": 23,
+      "exampleRows": [
+        3442,
+        3444,
+        3446,
+        3448,
+        3450
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病原免疫细胞遗传学实验平台109",
+      "count": 25,
+      "exampleRows": [
+        3442,
+        3444,
+        3446,
+        3448,
+        3450
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病原免疫细胞遗传学实验平台217",
+      "count": 21,
+      "exampleRows": [
+        3442,
+        3444,
+        3446,
+        3448,
+        3450
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病原免疫细胞遗传学实验平台328",
+      "count": 19,
+      "exampleRows": [
+        3450,
+        3452,
+        3454,
+        3455,
+        3457
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病原免疫细胞遗传学实验平台422",
+      "count": 9,
+      "exampleRows": [
+        3459,
+        3461,
+        3466,
+        3476,
+        3477
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病原免疫细胞遗传学实验平台430",
+      "count": 15,
+      "exampleRows": [
+        3459,
+        3461,
+        3463,
+        3464,
+        3466
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病原免疫细胞遗传学实验平台428",
+      "count": 15,
+      "exampleRows": [
+        3459,
+        3461,
+        3463,
+        3464,
+        3466
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "病原免疫细胞遗传学实验平台425",
+      "count": 15,
+      "exampleRows": [
+        3459,
+        3461,
+        3463,
+        3464,
+        3466
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "人体解剖学实验平台138",
+      "count": 27,
+      "exampleRows": [
+        3469,
+        3470,
+        3520,
+        3533
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "人体解剖学实验平台132",
+      "count": 20,
+      "exampleRows": [
+        3469,
+        3470,
+        3520,
+        3528,
+        3531
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "人体解剖学实验平台134",
+      "count": 17,
+      "exampleRows": [
+        3469,
+        3470,
+        3528,
+        3531,
+        3533
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "人体解剖学实验平台130",
+      "count": 15,
+      "exampleRows": [
+        3470,
+        3528,
+        3529,
+        3531,
+        3533
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "人体解剖学实验平台128",
+      "count": 7,
+      "exampleRows": [
+        3470,
+        3533
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物医学科学实验平台228",
+      "count": 26,
+      "exampleRows": [
+        3493,
+        3494,
+        3495,
+        3518
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "人体解剖学实验平台137",
+      "count": 18,
+      "exampleRows": [
+        3520
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-实验室（二）",
+      "count": 5,
+      "exampleRows": [
+        3579,
+        3581,
+        3592,
+        3594
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "计算机综合实习室",
+      "count": 4,
+      "exampleRows": [
+        3579,
+        3580,
+        3581,
+        3582
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-核酸分析实验室",
+      "count": 3,
+      "exampleRows": [
+        3579,
+        3581,
+        3582
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-仪器室（一）",
+      "count": 6,
+      "exampleRows": [
+        3579,
+        3581,
+        3594,
+        3595,
+        3596
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-仪器室（二）",
+      "count": 3,
+      "exampleRows": [
+        3579,
+        3581,
+        3597
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-仪器室（三）",
+      "count": 4,
+      "exampleRows": [
+        3579,
+        3581,
+        3596,
+        3597
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-生物辐照室",
+      "count": 4,
+      "exampleRows": [
+        3579,
+        3592
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-储藏室",
+      "count": 3,
+      "exampleRows": [
+        3580,
+        3582,
+        3587
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-细胞培养室",
+      "count": 2,
+      "exampleRows": [
+        3580,
+        3582
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-荧光成像实验室",
+      "count": 2,
+      "exampleRows": [
+        3580,
+        3582
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-学生实验室",
+      "count": 2,
+      "exampleRows": [
+        3580
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-分子生物学实验室",
+      "count": 2,
+      "exampleRows": [
+        3580,
+        3582
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射生物室-仪器室（四）",
+      "count": 4,
+      "exampleRows": [
+        3581,
+        3594,
+        3595,
+        3596
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射医学实验教学中心-X射线机房",
+      "count": 5,
+      "exampleRows": [
+        3582,
+        3585,
+        3590,
+        3595
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射化学与放射毒理室-放射源库",
+      "count": 2,
+      "exampleRows": [
+        3584,
+        3586
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射化学与放射毒理室-乙级非密封场所",
+      "count": 2,
+      "exampleRows": [
+        3584,
+        3587
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射医学实验教学中心-蒸馏水室",
+      "count": 2,
+      "exampleRows": [
+        3584,
+        3586
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射化学与放射毒理室-仪器室（一）",
+      "count": 2,
+      "exampleRows": [
+        3584,
+        3587
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射化学与放射毒理室-仪器室（三）",
+      "count": 1,
+      "exampleRows": [
+        3585
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射化学与放射毒理室-实验室（一）",
+      "count": 6,
+      "exampleRows": [
+        3585,
+        3591
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射化学与放射毒理室-仪器室（二）",
+      "count": 4,
+      "exampleRows": [
+        3585,
+        3587,
+        3589
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "辐射剂量室-γ能谱实验室",
+      "count": 6,
+      "exampleRows": [
+        3586,
+        3589,
+        3590,
+        3592
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "放射化学与放射毒理室-显微镜室",
+      "count": 2,
+      "exampleRows": [
+        3586,
+        3591
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "辐射剂量室-学生实验室",
+      "count": 4,
+      "exampleRows": [
+        3589,
+        3590
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "食品理化实验室",
+      "count": 10,
+      "exampleRows": [
+        3607,
+        3609,
+        3610
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "空气和水质理化实验室",
+      "count": 16,
+      "exampleRows": [
+        3607,
+        3608,
+        3609,
+        3610
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "毒理学实验室",
+      "count": 21,
+      "exampleRows": [
+        3607,
+        3608,
+        3609,
+        3610
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物样品实验室",
+      "count": 10,
+      "exampleRows": [
+        3607,
+        3609,
+        3610
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "毒理学实验室-细胞培养室",
+      "count": 4,
+      "exampleRows": [
+        3608
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "毒理学实验室-仪器室",
+      "count": 4,
+      "exampleRows": [
+        3608
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "分子生物学实验室",
+      "count": 24,
+      "exampleRows": [
+        3612,
+        3615,
+        3629,
+        3630,
+        3631
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "微生物检验室",
+      "count": 32,
+      "exampleRows": [
+        3612,
+        3613,
+        3615,
+        3629,
+        3630
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "免疫学实验室",
+      "count": 21,
+      "exampleRows": [
+        3612,
+        3614,
+        3629,
+        3631,
+        3632
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "卫生微生物实验室1",
+      "count": 25,
+      "exampleRows": [
+        3612,
+        3614,
+        3629,
+        3630,
+        3631
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "卫生微生物实验室2",
+      "count": 9,
+      "exampleRows": [
+        3613,
+        3629,
+        3630,
+        3631,
+        3632
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "新民 二教 2601 （计算机机房 110个机器）",
+      "count": 24,
+      "exampleRows": [
+        3618,
+        3619,
+        3621,
+        3622,
+        3623
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "营养厨房",
+      "count": 4,
+      "exampleRows": [
+        3638,
+        3639,
+        3640,
+        3641
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "样品处理室1",
+      "count": 4,
+      "exampleRows": [
+        3644,
+        3645
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物工程实验中心准备室",
+      "count": 12,
+      "exampleRows": [
+        3686,
+        3687,
+        3688,
+        3689,
+        3690
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物工程实验中心普通实验室",
+      "count": 23,
+      "exampleRows": [
+        3692,
+        3694,
+        3698,
+        3699,
+        3700
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物工程实验中心无菌实验室",
+      "count": 18,
+      "exampleRows": [
+        3696,
+        3703,
+        3722,
+        3723,
+        3724
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药剂与药分实验室",
+      "count": 30,
+      "exampleRows": [
+        3706,
+        3707,
+        3708,
+        3709
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药物分析实验室",
+      "count": 14,
+      "exampleRows": [
+        3710,
+        3711
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药理与疾病模型教学实验室1",
+      "count": 30,
+      "exampleRows": [
+        3712,
+        3713,
+        3714,
+        3715
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药理与疾病模型教学实验室2",
+      "count": 13,
+      "exampleRows": [
+        3712,
+        3716
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药化与天然药物化学实验室",
+      "count": 15,
+      "exampleRows": [
+        3719,
+        3720,
+        3721
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "营养评估实训室1508",
+      "count": 3,
+      "exampleRows": [
+        3754
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "口腔医院行政楼教室",
+      "count": 75,
+      "exampleRows": [
+        3962,
+        3963,
+        3965,
+        3966,
+        3967
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "新民义和路口腔多站式实训基地",
+      "count": 3,
+      "exampleRows": [
+        3966,
+        3967
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "口腔医院医疗楼科室",
+      "count": 2,
+      "exampleRows": [
+        3967
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "和平--CAD实验室-植物楼",
+      "count": 7,
+      "exampleRows": [
+        3999,
+        4003,
+        4039
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物育种实验室304",
+      "count": 11,
+      "exampleRows": [
+        4016,
+        4019,
+        4020,
+        4081
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "CAD实验室S107",
+      "count": 4,
+      "exampleRows": [
+        4018,
+        4038
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "资源与环境实验室S205",
+      "count": 3,
+      "exampleRows": [
+        4021,
+        4042
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "土壤与肥料实验室S201",
+      "count": 4,
+      "exampleRows": [
+        4022,
+        4032,
+        4033,
+        4035
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "和平-图书馆多媒体",
+      "count": 4,
+      "exampleRows": [
+        4023
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "植物保护实验室303",
+      "count": 5,
+      "exampleRows": [
+        4024,
+        4025,
+        4028,
+        4029,
+        4031
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "数码显微互动实验室602",
+      "count": 2,
+      "exampleRows": [
+        4026,
+        4040
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "农药学实验室S101",
+      "count": 1,
+      "exampleRows": [
+        4027
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "植物生理生化实验室510",
+      "count": 3,
+      "exampleRows": [
+        4030,
+        4036
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "作物遗传育种实验室310",
+      "count": 2,
+      "exampleRows": [
+        4034,
+        4037
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "园艺实验室404",
+      "count": 4,
+      "exampleRows": [
+        4043,
+        4044,
+        4045,
+        4046
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "和平--实验-遗传与育种实验室植物楼",
+      "count": 3,
+      "exampleRows": [
+        4067
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "南湖-第1教学楼129",
+      "count": 1,
+      "exampleRows": [
+        4350
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "朝阳校区体育馆-朝阳体育馆",
+      "count": 4,
+      "exampleRows": [
+        4791,
+        5199,
+        5207,
+        5623
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "和平-物理实验室",
+      "count": 9,
+      "exampleRows": [
+        5725,
+        5893,
+        5898,
+        5899,
+        5900
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "和平--化学实验室",
+      "count": 4,
+      "exampleRows": [
+        5937,
+        5942,
+        5943
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "兽医公共卫生实验室-205",
+      "count": 3,
+      "exampleRows": [
+        6531,
+        6532,
+        6541
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "显微互动实验室（一）-303",
+      "count": 7,
+      "exampleRows": [
+        6531,
+        6532,
+        6604,
+        6605,
+        6606
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "临床检测室一-216",
+      "count": 2,
+      "exampleRows": [
+        6531,
+        6532
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "临床兽医学实验室-102",
+      "count": 7,
+      "exampleRows": [
+        6534,
+        6535,
+        6601,
+        6602,
+        6603
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "兽医外产科学实验室-103",
+      "count": 3,
+      "exampleRows": [
+        6537,
+        6538
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "动物疫病诊断实验室-308",
+      "count": 20,
+      "exampleRows": [
+        6539,
+        6540,
+        6564,
+        6565,
+        6566
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "实验动物与环境卫生实验室-412",
+      "count": 6,
+      "exampleRows": [
+        6542,
+        6544,
+        6545
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "分子生物学技术实验室-511",
+      "count": 2,
+      "exampleRows": [
+        6546
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "显微互动实验室（二）-223",
+      "count": 22,
+      "exampleRows": [
+        6547,
+        6559,
+        6560,
+        6561,
+        6562
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "微生物与免疫学实验室-312",
+      "count": 6,
+      "exampleRows": [
+        6548,
+        6604,
+        6605,
+        6606,
+        6607
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "动物机能学实验室-318",
+      "count": 8,
+      "exampleRows": [
+        6549,
+        6551,
+        6552,
+        6553,
+        6554
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "动物解剖学实验室-110",
+      "count": 13,
+      "exampleRows": [
+        6555,
+        6556,
+        6557,
+        6558
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "显微互动实验室（三）-509",
+      "count": 17,
+      "exampleRows": [
+        6568,
+        6569,
+        6570,
+        6604,
+        6605
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "动物病理解剖学实验室-104",
+      "count": 3,
+      "exampleRows": [
+        6568,
+        6569,
+        6570
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "透射电镜室-109",
+      "count": 3,
+      "exampleRows": [
+        6576,
+        6577,
+        6578
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "兽医内科诊断实验室-201",
+      "count": 12,
+      "exampleRows": [
+        6579,
+        6580,
+        6581,
+        6582
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "组织切片实验室-305",
+      "count": 28,
+      "exampleRows": [
+        6594,
+        6595,
+        6596,
+        6597,
+        6598
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "药园",
+      "count": 4,
+      "exampleRows": [
+        6600,
+        6601,
+        6602,
+        6603
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "教学动物医院1楼",
+      "count": 5,
+      "exampleRows": [
+        6600,
+        6601,
+        6602,
+        6603
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "标本馆-208A",
+      "count": 4,
+      "exampleRows": [
+        6600,
+        6601,
+        6602,
+        6603
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "生物技能实训室-106",
+      "count": 8,
+      "exampleRows": [
+        6608,
+        6609
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "五月花广场0001",
+      "count": 3,
+      "exampleRows": [
+        6717,
+        6718,
+        6734
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "南岭-工程训练中心",
+      "count": 15,
+      "exampleRows": [
+        6773,
+        6774,
+        6775,
+        6776,
+        6777
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "食品工程原理实验室管理楼1002",
+      "count": 4,
+      "exampleRows": [
+        6951,
+        6952,
+        6953,
+        6956
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "食品基础实验室一管理楼221",
+      "count": 22,
+      "exampleRows": [
+        6952,
+        6953,
+        6954,
+        6955,
+        6956
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "食品营养成分分析实验室食品楼213",
+      "count": 6,
+      "exampleRows": [
+        6957,
+        6958,
+        6959,
+        6964,
+        6965
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "食品工艺综合实验室1食品楼117",
+      "count": 19,
+      "exampleRows": [
+        6960,
+        6961,
+        6962,
+        6967,
+        6968
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "食品安全实验室一管理楼321",
+      "count": 17,
+      "exampleRows": [
+        6973,
+        6974,
+        6975,
+        6977,
+        6978
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "食品基础实验室二管理楼222",
+      "count": 11,
+      "exampleRows": [
+        6984,
+        6985,
+        6986,
+        6990
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "食品微生物实验室管理楼313",
+      "count": 3,
+      "exampleRows": [
+        6984,
+        6985,
+        6986
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "电子商务实验室308",
+      "count": 9,
+      "exampleRows": [
+        7671
+      ]
+    },
+    {
+      "reason": "unmappedLocation",
+      "location": "工商管理实验室316",
+      "count": 2,
+      "exampleRows": [
+        7671
+      ]
+    }
+  ]
+}

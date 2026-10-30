@@ -33,7 +33,7 @@ const FAQ = ({ items }: FAQProps) => (
 								{item.question}
 							</h3>
 							<svg
-								className="h-5 w-5 flex-shrink-0 text-gray-600 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-open:rotate-180 dark:text-gray-400"
+								className="ease-[cubic-bezier(0.32,0.72,0,1)] h-5 w-5 flex-shrink-0 text-gray-600 transition-transform duration-300 group-open:rotate-180 dark:text-gray-400"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"

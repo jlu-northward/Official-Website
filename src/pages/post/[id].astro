@@ -336,7 +336,9 @@ const commentText = (comment: PublicComment) => {
 			downloadLink.addEventListener("click", (event) => {
 				event.preventDefault();
 				let leftPage = false;
-				const markLeft = () => { leftPage = true; };
+				const markLeft = () => {
+					leftPage = true;
+				};
 				document.addEventListener("visibilitychange", markLeft, { once: true });
 				window.addEventListener("pagehide", markLeft, { once: true });
 				window.location.href = downloadLink.href;
