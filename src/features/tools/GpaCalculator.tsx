@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-	FiArrowUpRight,
 	FiBookOpen,
 	FiCheck,
 	FiChevronDown,
@@ -67,7 +66,7 @@ function CalculationRules() {
 				<DialogHeader>
 					<DialogTitle>吉大绩点计算规则</DialogTitle>
 					<DialogDescription className="pt-1 text-xs leading-6">
-						采用 JLU-Toolkit 的“吉大模式”，成绩按以下区间换算为单科绩点。
+						{toolsContent.gpaRulesDescription}
 					</DialogDescription>
 				</DialogHeader>
 				<div className="overflow-hidden rounded-xl border">
@@ -103,23 +102,13 @@ function CalculationRules() {
 						GPA = Σ（学分 × 单科绩点）÷ Σ 学分
 					</p>
 					<p className="mt-1 text-muted-foreground">
-						与参考实现一致：每门课的加权值先保留两位小数，最终 GPA
-						保留五位小数。未及格课程以 0 绩点参与计算，学分仍计入总学分。允许 0
-						学分课程，但总学分须大于 0。
+						每门课的加权值先保留两位小数，最终 GPA 保留五位小数。未及格课程以 0
+						绩点参与计算，学分仍计入总学分。允许 0 学分课程，但总学分须大于 0。
 					</p>
 				</div>
 				<p className="text-[11px] leading-5 text-muted-foreground">
 					仅作为成绩估算工具，课程计入范围请按你的实际要求选择，最终以学校认定为准。
 				</p>
-				<a
-					href={toolsContent.gpaReference}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="inline-flex items-center gap-1 text-xs text-primary underline underline-offset-4"
-				>
-					查看计算方式参考 · JLU-Toolkit
-					<FiArrowUpRight />
-				</a>
 			</DialogContent>
 		</Dialog>
 	);
@@ -308,8 +297,8 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 
 	return (
 		<div>
-			<div className="mb-4 flex items-start justify-between gap-2 sm:mb-8 sm:gap-3">
-				<div>
+			<div className="mb-5 sm:mb-6">
+				<div className="flex items-center justify-between gap-2">
 					<div className="flex items-center gap-2.5">
 						<h2 className="text-lg font-semibold tracking-tight sm:text-xl">
 							吉大绩点计算
@@ -318,11 +307,11 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							4.0 分制
 						</span>
 					</div>
-					<p className="mt-2 text-xs leading-6 text-muted-foreground sm:text-[13px]">
-						导入成绩表，或手动录入。默认只算必修，一键切换全部课程。
-					</p>
+					<CalculationRules />
 				</div>
-				<CalculationRules />
+				<p className="mt-1 text-xs leading-6 text-muted-foreground sm:text-[13px]">
+					{importCopy.calculatorDescription}
+				</p>
 			</div>
 			<GpaExcelImport
 				fileName={importInfo?.fileName}
@@ -369,50 +358,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 					)}
 				</div>
 			)}
-			<div className="mb-5 flex flex-col gap-3 rounded-2xl border bg-card/60 p-4 sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-				<div>
-					<p className="text-xs font-medium">{importCopy.scopeTitle}</p>
-					<p className="mt-1 text-[11px] leading-5 text-muted-foreground">
-						{importCopy.scopeHint}
-					</p>
-				</div>
-				<div
-					role="group"
-					aria-label={importCopy.scopeTitle}
-					className="flex rounded-xl bg-muted p-1"
-				>
-					{(["required", "all"] as const).map((value) => (
-						<button
-							key={value}
-							type="button"
-							aria-pressed={scope === value}
-							onClick={() => {
-								setScope(value);
-								if (
-									coursesInScope(courses, value).some((course) => {
-										const inspection = inspectCourse(course);
-										return !inspection.empty && !inspection.valid;
-									})
-								)
-									setExpanded(true);
-							}}
-							className={cn(
-								"flex h-10 flex-1 items-center justify-center gap-2 rounded-lg px-5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-none",
-								scope === value
-									? "bg-card font-medium text-foreground shadow-sm"
-									: "text-muted-foreground hover:text-foreground",
-							)}
-						>
-							{value === "required" ? importCopy.required : importCopy.all}
-							{hasData && (
-								<span className="font-mono text-[10px] opacity-60">
-									{value === "required" ? requiredCount : enteredRecords.length}
-								</span>
-							)}
-						</button>
-					))}
-				</div>
-			</div>
+
 			{storageNotice && (
 				<p
 					role="status"
@@ -424,16 +370,16 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 			<div className="grid min-w-0 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
 				<section
 					aria-labelledby="course-list-title"
-					className="min-w-0 overflow-hidden rounded-2xl border bg-card"
+					className="min-w-0 overflow-hidden rounded-2xl border border-border/80 bg-card"
 				>
-					<div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-4 sm:px-5">
+					<div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-3.5 sm:px-5">
 						<h3
 							id="course-list-title"
 							className="flex items-center gap-2 text-sm font-semibold"
 						>
 							<FiBookOpen className="h-4 w-4 text-primary" />
 							课程清单
-							<span className="font-mono text-[11px] font-normal text-muted-foreground">
+							<span className="rounded-md bg-secondary px-2 py-0.5 font-mono text-[10px] font-medium text-primary">
 								{gradeRecords.length}
 							</span>
 						</h3>
@@ -465,8 +411,54 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							</Button>
 						</div>
 					</div>
+					<div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border/60 bg-background/40 px-4 py-3 sm:px-5">
+						<p className="text-[11px] text-muted-foreground">
+							{importCopy.scopeTitle}
+						</p>
+						<div
+							role="group"
+							aria-label={importCopy.scopeTitle}
+							className="flex rounded-lg border border-border/60 bg-card p-0.5"
+						>
+							{(["required", "all"] as const).map((value) => (
+								<button
+									key={value}
+									type="button"
+									aria-pressed={scope === value}
+									onClick={() => {
+										setScope(value);
+										if (
+											coursesInScope(courses, value).some((course) => {
+												const inspection = inspectCourse(course);
+												return !inspection.empty && !inspection.valid;
+											})
+										)
+											setExpanded(true);
+									}}
+									className={cn(
+										"flex h-8 items-center justify-center gap-1.5 rounded-md px-2.5 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-3",
+										scope === value
+											? "bg-secondary font-medium text-primary"
+											: "text-muted-foreground hover:text-foreground",
+									)}
+								>
+									{value === "required" ? importCopy.required : importCopy.all}
+									{hasData && (
+										<span className="font-mono text-[10px] opacity-60">
+											{value === "required"
+												? requiredCount
+												: enteredRecords.length}
+										</span>
+									)}
+								</button>
+							))}
+						</div>
+						<p className="w-full text-[10px] leading-5 text-muted-foreground/80 xl:ml-auto xl:w-auto">
+							{importCopy.scopeHint}
+						</p>
+					</div>
 					<div
-						className="hidden grid-cols-[minmax(0,1fr)_80px_72px_48px_28px] gap-3 border-b bg-background/60 px-5 py-3 text-[11px] text-muted-foreground sm:grid"
+						className="hidden grid-cols-[minmax(0,1fr)_76px_64px_44px_28px] gap-3 border-b border-border/60 px-5 py-2.5 text-[11px] text-muted-foreground sm:grid"
 						aria-hidden="true"
 					>
 						<span>{importCopy.courseDetails}</span>
@@ -501,12 +493,12 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 								<div
 									key={course.id}
 									data-course-row
-									className="relative border-b border-border/70 px-4 py-4 transition-colors last:border-b-0 hover:bg-muted/20 sm:px-5"
+									className="relative border-b border-border/60 px-4 py-3 transition-colors last:border-b-0 hover:bg-muted/20 sm:px-5"
 								>
-									<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_48px] items-center gap-x-3 gap-y-4 sm:grid-cols-[minmax(0,1fr)_80px_72px_48px_28px]">
+									<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_48px] items-center gap-x-3 gap-y-2 sm:grid-cols-[minmax(0,1fr)_76px_64px_44px_28px]">
 										<div className="col-span-3 min-w-0 pr-8 sm:col-span-1 sm:pr-1">
 											<div className="flex min-w-0 items-center gap-2">
-												<span className="w-5 shrink-0 font-mono text-[10px] text-muted-foreground/50">
+												<span className="w-4 shrink-0 font-mono text-[10px] text-muted-foreground/50">
 													{String(index + 1).padStart(2, "0")}
 												</span>
 												<label
@@ -515,19 +507,29 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 												>
 													第 {index + 1} 门课程名称（选填）
 												</label>
-												<Input
-													id={`name-${course.id}`}
-													value={course.name}
-													maxLength={100}
-													onChange={(event) =>
-														updateCourse(course.id, "name", event.target.value)
-													}
-													placeholder="课程名称（选填）"
-													title={course.name}
-													className="h-9 min-w-0 flex-1 rounded-lg border-transparent bg-transparent px-0 text-base font-medium shadow-none placeholder:font-normal placeholder:text-muted-foreground/60 focus-visible:bg-background sm:text-sm"
-												/>
-											</div>
-											<div className="ml-7 mt-1 flex min-w-0 items-center gap-2">
+												<div className="relative min-w-0 flex-initial">
+													<span
+														aria-hidden="true"
+														className="invisible block h-8 truncate whitespace-pre pr-1 text-base font-medium leading-8 sm:text-sm"
+													>
+														{course.name || "课程名称（选填）"}
+													</span>
+													<Input
+														id={`name-${course.id}`}
+														value={course.name}
+														maxLength={100}
+														onChange={(event) =>
+															updateCourse(
+																course.id,
+																"name",
+																event.target.value,
+															)
+														}
+														placeholder="课程名称（选填）"
+														title={course.name}
+														className="absolute inset-0 h-8 min-w-0 rounded-md border-transparent bg-transparent px-0 text-base font-medium shadow-none placeholder:font-normal placeholder:text-muted-foreground/60 focus-visible:bg-background sm:text-sm"
+													/>
+												</div>
 												<div className="relative shrink-0">
 													<select
 														aria-label={`第 ${index + 1} 门${importCopy.natureLabel}`}
@@ -539,7 +541,8 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 																event.target.value,
 															)
 														}
-														className="h-8 max-w-[110px] appearance-none rounded-full border border-primary/10 bg-secondary/70 pl-3 pr-7 text-[11px] font-medium text-primary outline-none transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card [&>option]:text-foreground"
+														title={course.nature ?? "必修"}
+														className="h-6 max-w-[96px] appearance-none truncate rounded-md border border-transparent bg-secondary/60 pl-2 pr-5 text-[10px] font-medium text-primary outline-none transition-colors hover:border-primary/20 hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card [&>option]:text-foreground"
 													>
 														{!importCopy.natureOptions.includes(
 															course.nature ?? "必修",
@@ -556,9 +559,11 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 													</select>
 													<FiChevronDown
 														aria-hidden="true"
-														className="pointer-events-none absolute right-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-primary/60"
+														className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-primary/60"
 													/>
 												</div>
+											</div>
+											<div className="ml-6 flex min-w-0 items-center">
 												<Input
 													aria-label={`第 ${index + 1} 门${importCopy.termLabel}`}
 													value={course.term ?? ""}
@@ -568,7 +573,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 													}
 													placeholder={importCopy.termPlaceholder}
 													title={course.term}
-													className="h-8 min-w-0 flex-1 rounded-md border-transparent bg-transparent px-1 text-[11px] text-muted-foreground shadow-none placeholder:text-muted-foreground/45 focus-visible:bg-background md:text-[11px]"
+													className="h-6 min-w-0 flex-1 rounded-md border-transparent bg-transparent px-0 text-[11px] text-muted-foreground shadow-none placeholder:text-muted-foreground/45 focus-visible:bg-background md:text-[11px]"
 												/>
 											</div>
 										</div>
@@ -611,7 +616,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 												}
 												placeholder="0–100"
 												className={cn(
-													"h-10 rounded-lg bg-card px-3 font-mono text-base shadow-none sm:bg-background/50 sm:text-sm",
+													"h-10 rounded-lg border-border/70 bg-background/50 px-3 font-mono text-base shadow-none focus-visible:bg-card sm:h-9 sm:text-sm",
 													scoreError &&
 														"border-destructive focus-visible:ring-destructive",
 												)}
@@ -644,7 +649,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 												}
 												placeholder="如 3"
 												className={cn(
-													"h-10 rounded-lg bg-card px-3 font-mono text-base shadow-none sm:bg-background/50 sm:text-sm",
+													"h-10 rounded-lg border-border/70 bg-background/50 px-3 font-mono text-base shadow-none focus-visible:bg-card sm:h-9 sm:text-sm",
 													creditError &&
 														"border-destructive focus-visible:ring-destructive",
 												)}
@@ -657,7 +662,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 											<output
 												aria-label={`第 ${index + 1} 门课程绩点`}
 												className={cn(
-													"flex h-10 items-center justify-center rounded-lg font-mono text-sm",
+													"flex h-10 items-center justify-center rounded-lg font-mono text-sm sm:h-9",
 													points === null
 														? "text-muted-foreground/50"
 														: "bg-secondary/70 font-medium text-primary",
@@ -669,7 +674,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 										<Button
 											variant="ghost"
 											size="icon"
-											className="absolute right-2 top-2.5 h-11 w-11 text-muted-foreground/60 hover:bg-destructive/5 hover:text-destructive sm:static sm:h-10 sm:w-7"
+											className="absolute right-2 top-2 h-10 w-10 text-muted-foreground/60 hover:bg-destructive/5 hover:text-destructive sm:static sm:h-10 sm:w-7"
 											aria-label={`删除第 ${index + 1} 门课程${course.name ? `：${course.name}` : ""}`}
 											onClick={() => {
 												if (reason) {
@@ -757,23 +762,21 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							</Button>
 						</div>
 					)}
-					<div className="border-t border-border/70 px-4 py-4 sm:px-5">
+					<div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 px-3 py-2.5 sm:px-4">
 						<Button
 							id="add-course"
-							variant="outline"
-							className="h-11 w-full gap-2 rounded-xl border-dashed bg-transparent text-xs text-muted-foreground hover:border-primary/50 hover:text-primary"
+							variant="ghost"
+							className="h-9 gap-1.5 rounded-lg px-2 text-xs text-primary hover:bg-secondary/70"
 							onClick={addCourse}
 							disabled={courses.length >= 200}
 						>
 							<FiPlus className="h-4 w-4" />
 							{courses.length >= 200 ? "最多支持 200 门课程" : "添加一门课程"}
 						</Button>
-					</div>
-					<div className="flex flex-wrap items-center justify-between gap-2 border-t bg-background/40 px-4 py-3 text-[11px] leading-5 text-muted-foreground sm:px-5 sm:py-3.5 sm:text-[10px]">
-						<span className="hidden sm:inline">
-							支持小数成绩与学分 · 空白行不参与计算
-						</span>
-						<span className="flex items-center gap-1.5">
+						<span
+							className="flex items-center gap-1 pr-1 text-[10px] text-muted-foreground"
+							title="支持小数成绩与学分 · 空白行不参与计算"
+						>
 							{storageStatus === "saved" && (
 								<FiCheck className="h-3 w-3 text-primary" />
 							)}
@@ -790,7 +793,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 					className="scroll-mt-6 space-y-4 lg:sticky lg:top-6"
 					aria-label="计算结果"
 				>
-					<div className="relative overflow-hidden rounded-2xl bg-[#244e43] p-5 text-white sm:p-7">
+					<div className="relative overflow-hidden rounded-2xl bg-[#244e43] p-5 text-white sm:p-6">
 						<div className="tools-dot-grid pointer-events-none absolute -right-6 -top-5 h-36 w-36 text-white/[0.08]" />
 						<div className="flex items-center justify-between">
 							<h3 className="text-xs font-medium text-white/75">
@@ -802,7 +805,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							</span>
 						</div>
 						<div
-							className="relative my-4 flex items-baseline gap-2 sm:my-6"
+							className="relative mb-3 mt-4 flex items-baseline gap-2 sm:mt-5"
 							aria-live="polite"
 							aria-atomic="true"
 						>
@@ -816,13 +819,10 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 								/ 4.0
 							</span>
 						</div>
-						<p
-							role="status"
-							className="text-[11px] leading-5 text-white/60 sm:min-h-10"
-						>
+						<p role="status" className="text-[11px] leading-5 text-white/60">
 							{resultHint}
 						</p>
-						<div className="mt-4 grid grid-cols-2 gap-4 border-t border-white/15 pt-5">
+						<div className="mt-4 grid grid-cols-2 gap-4 border-t border-white/15 pt-4">
 							<div>
 								<p className="text-[10px] text-white/55">参与课程</p>
 								<p className="mt-1.5 font-mono text-xl">
@@ -896,7 +896,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 				createPortal(
 					<div
 						data-mobile-result
-						className="fixed inset-x-0 bottom-0 z-30 border-t bg-card/95 px-4 pt-3 shadow-[0_-4px_24px_-12px_hsl(var(--foreground)/0.15)] backdrop-blur-xl lg:hidden"
+						className="fixed inset-x-0 bottom-0 z-30 border-t bg-card/95 px-4 pt-2 shadow-[0_-4px_24px_-12px_hsl(var(--foreground)/0.15)] backdrop-blur-xl lg:hidden"
 						style={{
 							paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
 						}}
@@ -908,7 +908,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 								</p>
 								<p
 									className={cn(
-										"mt-0.5 font-mono text-[28px] leading-9 tracking-tight text-primary",
+										"mt-0.5 font-mono text-2xl leading-8 tracking-tight text-primary",
 										result.gpa === null && "font-sans text-lg",
 									)}
 								>

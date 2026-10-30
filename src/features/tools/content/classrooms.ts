@@ -3,7 +3,7 @@ import classroomData from "../data/classroom-data.json";
 export const classroomContent = {
 	dataUrl: classroomData.url,
 	storageKey: "northward.tools.classrooms.favorites.v1",
-	title: "空教室查询",
+	title: "教室查询",
 	roomMode: "找空教室",
 	courseMode: "蹭课",
 	courseModeLoading: "正在打开蹭课查询…",

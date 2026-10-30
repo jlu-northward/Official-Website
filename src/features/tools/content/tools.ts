@@ -37,13 +37,6 @@ export const toolCategories: ToolCategory[] = [
 				description: "吉大人自己的校园社区",
 				icon: "northward",
 			},
-			{
-				name: "吉林大学网站导航",
-				href: "https://stulenpid.cn",
-				description: "发现更多校园网站",
-				icon: "compass",
-				keywords: "导航 网址",
-			},
 		],
 	},
 	{
@@ -202,6 +195,13 @@ export const toolCategories: ToolCategory[] = [
 		icon: "utilities",
 		links: [
 			{
+				name: "吉林大学网站导航",
+				href: "https://stulenpid.cn",
+				description: "发现更多校园网站",
+				icon: "compass",
+				keywords: "导航 网址",
+			},
+			{
 				name: "更改地址工具包（仅限苹果）",
 				href: "https://www.i4.cn/pro_pc.html",
 				description: "爱思助手 · iOS 设备工具",
@@ -222,20 +222,19 @@ export const toolCategories: ToolCategory[] = [
 export const toolsContent = {
 	title: "校园工具箱｜向北",
 	description:
-		"吉大人的校园工具箱：校园网站导航、教务与校内服务入口、吉大绩点计算、空教室查询和蹭课课程安排。",
+		"吉大人的校园工具箱：校园网站导航、教务与校内服务入口、吉大绩点计算、教室查询和蹭课课程安排。",
 	heroTitle: "校园日常，",
 	heroAccent: "一处就好。",
 	calculatorLoading: "正在打开绩点计算…",
 	calculatorLoadError: "暂时无法打开绩点计算，请检查网络后重试。",
-	classroomLoading: "正在打开空教室查询…",
-	classroomLoadError: "暂时无法打开空教室查询，请检查网络后重试。",
+	classroomLoading: "正在打开教室查询…",
+	classroomLoadError: "暂时无法打开教室查询，请检查网络后重试。",
 	gpaDetailsTitle: "计算明细与说明",
+	gpaRulesDescription: "百分制成绩按以下区间换算为单科绩点。",
 	gpaDetailsDescription:
 		"各门课程的学分乘以对应绩点，加总后除以总学分。未及格课程以 0 绩点计入，学分同样参与加权。仅供估算，以学校认定为准。",
 	heroDescription:
 		"常用网站不必翻找，学期努力清晰有数。\n把吉大生活里需要的小工具，放在你手边。",
-	gpaReference:
-		"https://github.com/vinoxuan/JLU-Toolkit/blob/main/jlu_gpa_calculator.html",
 	storageKey: "northward.tools.gpa.v1",
 	gpaScopeStorageKey: "northward.tools.gpa.scope.v1",
 };

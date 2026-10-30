@@ -1,4 +1,5 @@
 export const gpaImportContent = {
+	calculatorDescription: "导入或手动录入课程，自动计算你的 GPA。",
 	title: "导入成绩，一步算好。",
 	description: "拖入教务导出的 Excel 成绩表，或选择文件。",
 	exportTipBefore: "还没有成绩表？前往",
@@ -26,7 +27,7 @@ export const gpaImportContent = {
 	scopeTitle: "计算范围",
 	required: "仅必修",
 	all: "全部课程",
-	scopeHint: "范围仅影响 GPA 计算；全部课程正常展示，文字成绩不计入 GPA。",
+	scopeHint: "全部课程均展示，文字成绩不计入 GPA",
 	importedHint: "按百分制换算绩点；文字成绩正常展示，不计入 GPA。",
 	importSummary: (total: number, excluded: number) =>
 		`已保留 ${total} 门课程。${excluded ? `其中 ${excluded} 门文字、未出分或无效成绩只展示，不计入 GPA。` : ""}`,
@@ -50,7 +51,7 @@ export const gpaImportContent = {
 	natureLabel: "课程性质",
 	termLabel: "学年学期",
 	termPlaceholder: "添加学期（选填）",
-	courseDetails: "课程 / 学期与性质",
+	courseDetails: "课程",
 	natureOptions: ["必修", "选修", "限选", "其他"],
 	emptyScope:
 		"当前没有可计算 GPA 的必修成绩，可切换全部课程；所有记录均已保留展示。",

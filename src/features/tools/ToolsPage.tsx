@@ -602,7 +602,7 @@ export default function ToolsPage() {
 									className="h-10 gap-1.5 rounded-lg px-2 text-xs data-[state=active]:bg-card data-[state=active]:text-foreground sm:gap-2 sm:px-5 sm:text-[13px]"
 								>
 									<FiMapPin className="h-4 w-4" />
-									空教室查询
+									教室查询
 								</TabsTrigger>
 							</TabsList>
 							<span className="hidden items-center gap-1.5 text-[11px] text-muted-foreground sm:flex">
