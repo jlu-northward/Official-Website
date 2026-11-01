@@ -17,11 +17,9 @@ import {
 	FiHeart,
 	FiHome,
 	FiMapPin,
-	FiMoon,
 	FiSearch,
 	FiShield,
 	FiSmartphone,
-	FiSun,
 	FiTool,
 	FiUsers,
 	FiWifi,
@@ -30,6 +28,7 @@ import {
 import type { IconType } from "react-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ThemeButton from "@/components/ui/ThemeButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { appInfo } from "@/config/appInfo";
@@ -67,38 +66,6 @@ const totalLinks = toolCategories.reduce(
 	(total, category) => total + category.links.length,
 	0,
 );
-
-function ThemeButton() {
-	const [dark, setDark] = useState(false);
-	const [embedded, setEmbedded] = useState(false);
-	useEffect(() => {
-		const sync = () => {
-			setDark(document.documentElement.classList.contains("dark"));
-			setEmbedded(window.northwardWebsiteTheme?.isEmbedded() ?? false);
-		};
-		sync();
-		window.addEventListener("websiteThemeChanged", sync);
-		return () => window.removeEventListener("websiteThemeChanged", sync);
-	}, []);
-	if (embedded) return null;
-	return (
-		<Button
-			variant="ghost"
-			size="icon"
-			className="h-10 w-10 rounded-full text-muted-foreground"
-			aria-label={dark ? "切换为浅色主题" : "切换为深色主题"}
-			onClick={() => {
-				window.northwardWebsiteTheme?.setPreference(dark ? "light" : "dark");
-			}}
-		>
-			{dark ? (
-				<FiSun className="h-[18px] w-[18px]" />
-			) : (
-				<FiMoon className="h-[18px] w-[18px]" />
-			)}
-		</Button>
-	);
-}
 
 function LinkCard({ link }: { link: CampusLink }) {
 	const Icon = icons[link.icon] ?? FiGlobe;

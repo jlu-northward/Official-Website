@@ -1,0 +1,12 @@
+---
+import SquarePage from "../features/square/SquarePage";
+import ReactPageLayout from "@layouts/ReactPageLayout.astro";
+import { squareContent } from "../features/square/content/square";
+---
+
+<ReactPageLayout
+	title={squareContent.title}
+	description={squareContent.description}
+>
+	<SquarePage client:load />
+</ReactPageLayout>

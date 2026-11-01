@@ -24,6 +24,8 @@
 		root.classList.toggle("dark", mode === "dark");
 		root.classList.toggle("light", mode === "light");
 		root.style.colorScheme = mode;
+		// Lets CSS hide web-only chrome inside the App before the first paint.
+		root.toggleAttribute("data-embedded", appMode() !== null);
 		window.dispatchEvent(new Event("websiteThemeChanged"));
 	};
 
