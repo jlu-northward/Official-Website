@@ -368,7 +368,7 @@ const LandingPage = ({
 				className="fixed inset-x-0 top-0 z-[60] h-[2px] origin-left transform-gpu bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 will-change-transform"
 				aria-hidden="true"
 			/>
-			<header className="fixed inset-x-0 top-3 z-50 px-3 sm:top-4 sm:px-5">
+			<header className="fixed inset-x-0 top-3 z-50 px-3 embedded:hidden sm:top-4 sm:px-5">
 				<motion.nav
 					style={{ scale: navScale, y: navY }}
 					aria-label="主导航"

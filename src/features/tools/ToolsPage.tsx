@@ -414,7 +414,7 @@ export default function ToolsPage() {
 			>
 				跳到工具内容
 			</a>
-			<header className="border-b border-border/65 bg-background/90">
+			<header className="border-b border-border/65 bg-background/90 embedded:hidden">
 				<div className="mx-auto flex h-16 max-w-[1248px] items-center justify-between gap-3 px-4 sm:h-[76px] sm:px-7 lg:px-10">
 					<a
 						href="/"
@@ -652,7 +652,7 @@ export default function ToolsPage() {
 					</Tabs>
 				</div>
 			</main>
-			<footer className="border-t border-border/70">
+			<footer className="border-t border-border/70 embedded:hidden">
 				<div className="mx-auto flex max-w-[1248px] flex-col gap-4 px-4 py-7 text-[11px] text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-7 lg:px-10">
 					<div className="flex items-center gap-2">
 						<FiCompass className="h-3.5 w-3.5 text-primary" />

@@ -64,6 +64,8 @@ module.exports = {
 		require("tailwind-scrollbar-hide"),
 		({ addVariant }) => {
 			addVariant("light", ".light &");
+			// Set by the theme script when the App injects its theme.
+			addVariant("embedded", "html[data-embedded] &");
 		},
 	],
 };
