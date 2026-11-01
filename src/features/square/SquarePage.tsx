@@ -23,8 +23,7 @@ const enter =
 export default function SquarePage() {
 	return (
 		<div className="flex min-h-svh flex-col">
-			{/* The App tab supplies its own chrome, so the web header stays out of it. */}
-			<header className="border-b border-border/65 bg-background/90 [html[data-embedded]_&]:hidden">
+			<header className="border-b border-border/65 bg-background/90 embedded:hidden">
 				<div className="mx-auto flex h-16 max-w-[1248px] items-center justify-between gap-3 px-4 sm:h-[76px] sm:px-7 lg:px-10">
 					<a
 						href="/"

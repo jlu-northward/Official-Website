@@ -13,6 +13,10 @@ npm run preview    # 预览构建产物
 
 更多命令约定（提交规范、代码风格、PR 流程）见 [AGENTS.md](./AGENTS.md)。
 
+## 在 App 内打开
+
+App 的网页容器在文档启动时注入 `window.northwardTheme`，主题脚本（`src/lib/theme-script.js`）据此给 `<html>` 加上 `data-embedded`。页眉、页脚、面包屑等网页导航用 Tailwind 的 `embedded:hidden` 在 App 内隐藏，首屏绘制前即生效；浏览器打开时不受影响。不要改用网址参数：App 内“在浏览器打开”和复制出的链接会把参数带到浏览器里。新增页面的网页导航同样加上 `embedded:hidden`。
+
 ## 校园工具箱 `/tools`
 
 新页面使用 React + shadcn/ui + 现有 Tailwind CSS 3；`src/pages/tools.astro` 仅挂载页面和轻量 HTML 布局，沿用官网构建及 Vercel 发布。首页导航与页脚提供入口，`/tools#gpa` 可直达绩点计算，`/tools#classrooms` 可直达空教室查询。

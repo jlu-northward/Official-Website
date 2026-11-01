@@ -9,7 +9,7 @@ const Breadcrumbs = ({ items }: BreadcrumbsProps) => (
 		initial={{ opacity: 0, y: 12 }}
 		animate={{ opacity: 1, y: 0 }}
 		transition={springGentle}
-		className="mb-8 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+		className="mb-8 flex items-center space-x-2 text-sm text-gray-500 embedded:hidden dark:text-gray-400"
 	>
 		<a
 			href="/"
