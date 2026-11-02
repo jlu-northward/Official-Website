@@ -11,7 +11,8 @@ export const classroomContent = {
 	dataSource: (updatedAt: string) => `数据来自教务系统，更新于 ${updatedAt}`,
 	loading: "正在加载课程表…",
 	loadError: "课程表暂时无法加载，请检查网络后重试。",
-	coverage: "覆盖课表中可定位的教室。临时借用、考试及开放情况请以现场为准。",
+	coverage:
+		"覆盖本科生和研究生课表中可定位的教室。临时借用、考试及开放情况请以现场为准。",
 	weekdays: [
 		"星期一",
 		"星期二",

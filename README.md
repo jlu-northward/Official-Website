@@ -62,15 +62,17 @@ App 的网页容器在文档启动时注入 `window.northwardTheme`，主题脚�
 npm run timetable
 ```
 
+数据来自两份 Excel：本科生课表（每行一个教学班，含“已排时间地点”列）和研究生课表（按“节次/星期”排列的总课表）。CLI 按表头自动识别，每次可只更换其中一份，另一份沿用上次导入的数据。
+
 菜单提供“更换 Excel”“只修改开学日期”“查看当前配置”。更换 Excel 时会询问第一教学周周一、学期名称、总周数，回车沿用当前设置。也支持直接传参：
 
 ```bash
-# 更换学期：一次指定新 Excel、第一教学周周一、名称和周数
-npm run timetable -- update "/绝对路径/新学期课表.xlsx" \
+# 更换学期：一次传入两份新 Excel，并指定第一教学周周一、名称和周数
+npm run timetable -- update "/绝对路径/本科生课表.xlsx" "/绝对路径/研究生课表.xlsx" \
   --start 2027-03-01 --name "2026—2027 第二学期" --weeks 18 --reset-overrides
 
-# 同学期只刷新 Excel，沿用当前日期、名称、周数和调休设置
-npm run timetable -- update "/绝对路径/更新后的课表.xlsx"
+# 同学期只刷新其中一份 Excel，沿用当前日期、名称、周数、调休设置和另一份课表
+npm run timetable -- update "/绝对路径/更新后的研究生课表.xlsx"
 
 # 只改第一教学周周一，不需要找到原 Excel
 npm run timetable -- date 2026-09-07
@@ -87,7 +89,9 @@ npm run timetable -- update --help
 
 `--start` 必须是**第一教学周的周一**，格式为 `YYYY-MM-DD`，无效日期或非周一会拒绝更新。省略 `--start`、`--name`、`--weeks` 时沿用当前值；`--reset-overrides` 清空旧学期的调休/停课表，省略则保留。交互菜单在开学日期变动且已有调休表时会询问是否清空。单独改日期会保留课程、占用记录和原 Excel 导入日期。
 
-CLI 完成解析校验后会同步写入学期配置、空教室与蹭课 JSON、内容哈希索引；写入失败会回滚，成功后清理被替换的旧哈希文件。原 Excel 只读，不会复制到官网或自动发布。更新后用 `npm run dev` 本地检查，再执行 `npm run build` 并按官网现有流程发布。
+`--name` 改了学期名称即视为换学期：没有一并传入的另一份课表属于旧学期，会停止使用并给出提示，等新学期的课表发布后再用 `update` 加入。只改开学日期或周数不会影响已导入的课表。
+
+每份 Excel 解析后的课程保存在 `data/classroom-sources/undergraduate.json`、`graduate.json`，发布时合并成同一份空教室与蹭课数据，所以只换一份 Excel 时不需要另一份的原文件。CLI 完成解析校验后会同步写入学期配置、各来源数据、空教室与蹭课 JSON、内容哈希索引；写入失败会回滚，成功后清理被替换的旧哈希文件。原 Excel 只读，不会复制到官网或自动发布。更新后用 `npm run dev` 本地检查，再执行 `npm run build` 并按官网现有流程发布。
 
 高级配置仍在 `data/classroom-semester.json`：教学楼别名用 `buildingAliases`；`dateOverrides` 用 `{"YYYY-MM-DD":{"week":1,"weekday":3}}` 表示某日期按指定教学周、星期上课，用 `null` 表示停课日。空教室与蹭课共用这份校历。手动修改后需要重新运行 `update`；若仅修改日期或调休表，可以运行 `date` 同步。当前起点为 `2026-09-07`；起点为 `null` 时仅提供按周次查询。
 
@@ -100,7 +104,11 @@ npx astro check
 npm run build
 ```
 
-转换器按表头寻找字段，不依赖 Excel 的 dimension 范围。它支持单周、连续和分散周次、单双周及节次简写，合并同一地点的占用记录；无法识别的时间阻止导入，缺少地点及无法映射到校区/楼宇的记录写入 `data/classroom-import-report.json`，应在更新时检查。原始 Excel 不需要提交。生成的 `src/features/tools/data/classroom-data.json`、`public/data/classrooms/`、`data/classroom-semester.json`、`data/classroom-import-report.json` 应随代码一起提交；文件名随内容变化，避免命中旧课表缓存。课程数据保留课程名与任课教师，用于蹭课搜索，不含选课人数等无关字段。旧命令 `python3 scripts/import-classrooms.py "/路径/课表.xlsx" --imported-at YYYY-MM-DD` 仍可使用。
+转换器按表头寻找字段，不依赖 Excel 的 dimension 范围。它支持单周、连续和分散周次、单双周及节次简写，合并同一地点的占用记录；无法识别的时间或无法拆分的研究生课表单元格阻止导入，缺少地点及无法映射到校区/楼宇的记录按来源写入 `data/classroom-import-report.json`，应在更新时检查（研究生课表以“星期一第1节”指出位置）。
+
+研究生课表每个单元格是一节课，导入时按教学班、星期和地点把每周连续的节次合并为一次上课；“未安排周次”的课程保留在蹭课搜索中，排到学期周数以后的周次不计入并给出条数提示。`前卫校区前卫-逸夫楼-301` 这类标准地点与本科生课表一样映射到教室；教师自填的 `★萃文232`、`★东荣A209` 等地点只在能唯一对应到已有教室时计入占用，不会新增教室，避免写法不一的同一间教室被误判为空闲。地点名里“（研究生）”“（研究生英语）”等备注与“优先”类备注一样忽略。
+
+原始 Excel 不需要提交。生成的 `src/features/tools/data/classroom-data.json`、`public/data/classrooms/`、`data/classroom-sources/`、`data/classroom-semester.json`、`data/classroom-import-report.json` 应随代码一起提交；文件名随内容变化，避免命中旧课表缓存。课程数据保留课程名与任课教师，用于蹭课搜索，不含选课人数等无关字段。旧命令 `python3 scripts/import-classrooms.py "/路径/课表.xlsx" --imported-at YYYY-MM-DD` 仍可使用。
 
 查询范围是课表中能定位的教室；未排过课的教室、临时借用、考试及教室开放情况需要另行核实。
 

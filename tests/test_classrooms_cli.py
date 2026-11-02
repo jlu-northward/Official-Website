@@ -19,26 +19,38 @@ cli = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(cli)
 
 
-def write_workbook(path, course="数学分析", schedule="1-4周 星期一 1-2节 前卫-逸夫楼-101"):
+def write_rows(path, rows):
     namespace = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     sheet = ET.Element("worksheet", xmlns=namespace)
     # Match the real export's incorrect dimension rather than relying on it.
     ET.SubElement(sheet, "dimension", ref="A1")
     sheet_data = ET.SubElement(sheet, "sheetData")
-    rows = [
-        ["课程号", "课程名", "课序号", "上课教师", "已排时间地点"],
-        ["math", course, "01", "张三", schedule],
-        ["lab", "未排课程", "02", "李四", ""],
-    ]
     for number, values in enumerate(rows, 1):
         row = ET.SubElement(sheet_data, "row", r=str(number))
-        for column, text in zip("ABCDE", values):
+        for column, text in zip("ABCDEFGHI", values):
             cell = ET.SubElement(row, "c", r=f"{column}{number}", t="inlineStr")
             ET.SubElement(ET.SubElement(cell, "is"), "t").text = text
     with zipfile.ZipFile(path, "w") as archive:
         archive.writestr("xl/workbook.xml", f'<workbook xmlns="{namespace}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="全校课程表" sheetId="1" r:id="rId1"/></sheets></workbook>')
         archive.writestr("xl/_rels/workbook.xml.rels", '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Target="worksheets/sheet1.xml"/></Relationships>')
         archive.writestr("xl/worksheets/sheet1.xml", ET.tostring(sheet, encoding="utf-8"))
+
+
+def write_workbook(path, course="数学分析", schedule="1-4周 星期一 1-2节 前卫-逸夫楼-101"):
+    write_rows(path, [
+        ["课程号", "课程名", "课序号", "上课教师", "已排时间地点"],
+        ["math", course, "01", "张三", schedule],
+        ["lab", "未排课程", "02", "李四", ""],
+    ])
+
+
+def write_graduate(path, place="前卫校区前卫-逸夫楼-研讨室19", weeks="1-14周"):
+    cell = f"城市经济学 [城市经济学01] \t\t侯力/{place}\t\t{weeks}\t \t\t"
+    write_rows(path, [
+        ["节次/星期", "时间", "星期一", "星期二"],
+        ["第一节", "08:00~08:45", "", cell],
+        ["第二节", "08:55~09:40", "", cell],
+    ])
 
 
 class ClassroomsCliTest(unittest.TestCase):
@@ -129,13 +141,76 @@ class ClassroomsCliTest(unittest.TestCase):
                          {k: v for k, v in old_courses.items() if k != "semester"})
         self.assertEqual((self.root / "data/classroom-import-report.json").read_bytes(), old_report)
 
+    def test_graduate_update_keeps_undergraduate_until_the_semester_changes(self):
+        graduate = self.folder / "研究生课表.xlsx"
+        write_graduate(graduate)
+        code, output, error = self.run_cli("update", str(graduate), "--imported-at", "2026-11-02")
+        self.assertEqual(code, 0, error)
+        self.assertIn("已识别为研究生课表", output)
+        self.assertIn("本科生课表：全校课程表 (更新版).xlsx", output)
+        _manifest, rooms, courses, _config = self.current()
+        self.assertEqual([course[1] for course in courses["courses"]], ["数学分析", "未排课程", "城市经济学"])
+        self.assertEqual(courses["courses"][2][4], [[2, 3, 2 ** 14 - 1, 1]])
+        self.assertEqual(rooms["importedAt"], "2026-11-02")
+        self.assertEqual([room[:3] for room in rooms["rooms"]], [["前卫", "逸夫楼", "101"], ["前卫", "逸夫楼", "研讨室19"]])
+        code, output, error = self.run_cli("status")
+        self.assertEqual(code, 0, error)
+        self.assertIn("研究生课表：研究生课表.xlsx，导入于 2026-11-02", output)
+
+        code, _output, error = self.run_cli("date", "2026-09-14")
+        self.assertEqual(code, 0, error)
+        self.assertEqual(len(self.current()[2]["courses"]), 3)
+
+        # A new semester name without the graduate Excel retires the previous term's graduate data.
+        code, output, error = self.run_cli("update", str(self.source), "--name", "新学期", "--imported-at", "2027-02-25")
+        self.assertEqual(code, 0, error)
+        self.assertIn("旧学期的研究生课表（研究生课表.xlsx）不再使用", output)
+        self.assertFalse((self.root / "data/classroom-sources/graduate.json").exists())
+        self.assertEqual(len(self.current()[2]["courses"]), 2)
+
+    def test_both_exports_can_be_imported_together_but_not_twice(self):
+        graduate = self.folder / "研究生课表.xlsx"
+        write_graduate(graduate)
+        code, _output, error = self.run_cli("update", str(self.source), str(graduate), "--name", "新学期")
+        self.assertEqual(code, 0, error)
+        self.assertEqual(len(self.current()[2]["courses"]), 3)
+        before = self.snapshot()
+        code, _output, error = self.run_cli("update", str(graduate), str(graduate))
+        self.assertEqual(code, 1)
+        self.assertIn("两份研究生课表", error)
+        self.assertEqual(self.snapshot(), before)
+
+    def test_failed_update_restores_a_retired_export(self):
+        graduate = self.folder / "研究生课表.xlsx"
+        write_graduate(graduate)
+        self.assertEqual(self.run_cli("update", str(graduate))[0], 0)
+        before = self.snapshot()
+        original_replace = Path.replace
+
+        def fail_manifest(path, destination):
+            if destination.name == "classroom-data.json":
+                raise OSError("simulated disk error")
+            return original_replace(path, destination)
+
+        with patch.object(Path, "replace", fail_manifest):
+            code, _output, error = self.run_cli("update", str(self.source), "--name", "新学期")
+        self.assertEqual(code, 1)
+        self.assertIn("simulated disk error", error)
+        self.assertEqual(self.snapshot(), before)
+
     def test_invalid_inputs_leave_all_current_files_unchanged(self):
         before = self.snapshot()
         invalid_zip = self.folder / "损坏.xlsx"
         invalid_zip.write_text("not an excel", encoding="utf-8")
         bad_time = self.folder / "不支持的时间.xlsx"
         write_workbook(bad_time, schedule="1-4周 星期一 时间待定 前卫-逸夫楼-101")
+        bad_graduate = self.folder / "研究生周次有误.xlsx"
+        write_graduate(bad_graduate, weeks="第三周")
+        unknown = self.folder / "其他表格.xlsx"
+        write_rows(unknown, [["姓名", "学号"], ["张三", "1"]])
         for arguments in [
+            ("update", str(bad_graduate)),
+            ("update", str(unknown)),
             ("date", "2026-09-08"),
             ("date", "2026-02-30"),
             ("date", "20260907"),
