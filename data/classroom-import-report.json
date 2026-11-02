@@ -20,12 +20,12 @@
   ],
   "counts": {
     "meetings": 19947,
-    "mappedMeetings": 12426,
-    "unmappedLocation": 5754,
+    "mappedMeetings": 12429,
+    "unmappedLocation": 5751,
     "missingLocation": 1767
   },
-  "roomCount": 624,
-  "slotCount": 9045,
+  "roomCount": 620,
+  "slotCount": 9432,
   "issues": [
     {
       "source": "undergraduate",
@@ -6360,19 +6360,6 @@
         "星期四第2节",
         "星期四第3节",
         "星期四第4节"
-      ]
-    },
-    {
-      "source": "graduate",
-      "reason": "unmappedLocation",
-      "location": "前卫校区 经信楼A424",
-      "count": 3,
-      "examples": [
-        "星期二第5节",
-        "星期日第5节",
-        "星期二第6节",
-        "星期日第6节",
-        "星期二第7节"
       ]
     },
     {

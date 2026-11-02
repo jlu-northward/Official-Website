@@ -36,6 +36,8 @@ WEEK_TOKEN = re.compile(r"^(\d+)(?:-(\d+))?周(?:[（(]([单双])[）)])?$")
 GRADUATE_WEEK = re.compile(r"(\d+)(?:-(\d+))?([单双])?周?")
 GRADUATE_COURSE = re.compile(r"(?P<name>.+?)\s*\[(?P<section>[^\[\]]*)\]", re.S)
 ROOM_NOTE = re.compile(r"[（(](?=[^）)]*(?:优先|教班|教学班|年级|专用|研究生))")
+# Some exports repeat the place, as in 前卫-敬信教学楼 前卫-敬信教学楼-A103; the last one is complete.
+DOUBLED_LOCATION = re.compile(rf"^(?:(?:{CAMPUS})-\S+\s+)+(?=(?:{CAMPUS})-)")
 # Graduate places a teacher typed in, e.g. 前卫校区 萃文232; see graduate_location.
 FREE_LOCATION = re.compile(rf"(?P<campus>{CAMPUS})校区(?: (?P<text>.+))?", re.S)
 BUILDING_SUFFIX = re.compile(r"(?:教学楼|大厦|大楼|楼|馆)$")
@@ -84,7 +86,7 @@ def parse_schedules(text, total_weeks):
 
 
 def parse_location(location, aliases):
-    parts = location.split("-", 2)
+    parts = DOUBLED_LOCATION.sub("", location).split("-", 2)
     if len(parts) < 2 or parts[0] not in CAMPUSES:
         return None
     campus = parts[0]
@@ -106,6 +108,23 @@ def parse_location(location, aliases):
     if not building or not room or building == "第":
         return None
     return campus, building, room
+
+
+def display_location(location, aliases):
+    """Name each building once in course results, e.g. 前卫-经信教学楼-F区第四阶梯 as 敬信教学楼."""
+    location = DOUBLED_LOCATION.sub("", location)
+    parts = location.split("-", 2)
+    if len(parts) == 3 and parts[0] in CAMPUSES:
+        building = parts[1].strip()
+        return "-".join((parts[0], aliases.get(parts[0], {}).get(building, building), parts[2]))
+    found = FREE_LOCATION.fullmatch(location)
+    if found and found["text"]:
+        names = aliases.get(found["campus"], {})
+        for alias in sorted(names, key=len, reverse=True):
+            # 敬信 also abbreviates 敬信教学楼 itself, which is already the shown name.
+            if found["text"].startswith(alias) and not found["text"].startswith(names[alias]):
+                return f"{found['campus']}校区 {names[alias]}{found['text'][len(alias):]}"
+    return location
 
 
 def is_missing(location):
@@ -467,7 +486,8 @@ def build(parts, semester):
                     room_types[key] = room_types.get(key) or part["roomTypes"].get(location, "")
                     slot = (*key, day, periods)
                     occupancy[slot] = occupancy.get(slot, 0) | weeks
-                merged.append([day, periods, weeks, locations.setdefault(location, len(locations))])
+                shown = display_location(location, aliases)
+                merged.append([day, periods, weeks, locations.setdefault(shown, len(locations))])
             courses.append([code, name, section, teacher, merged])
     if not room_types or not occupancy:
         raise ValueError("没有可查询的教室记录")

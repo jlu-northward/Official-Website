@@ -142,6 +142,29 @@ class ImportClassroomsTest(unittest.TestCase):
         self.assertIsNone(importer.parse_location("401实验室", {}))
         self.assertIsNone(importer.parse_location("线上教学-前卫", {}))
 
+    def test_old_building_names_and_doubled_places_merge_into_one_building(self):
+        aliases = {"前卫": {"敬信": "敬信教学楼", "经信": "敬信教学楼", "经信教学楼": "敬信教学楼"}}
+        semester = {**SEMESTER, "buildingAliases": aliases}
+        part = read([
+            (1, {"B": "课程名", "G": "上课教师", "I": "已排时间地点"}),
+            (2, {"B": "甲", "G": "张三", "I": "1周 星期一 1-2节 前卫-经信教学楼-F区第四阶梯"}),
+            (3, {"B": "乙", "G": "李四", "I": "2周 星期一 1-2节 前卫-敬信教学楼-F区第四阶梯"}),
+            (4, {"B": "丙", "G": "王五", "I": "3周 星期一 1-2节 前卫-敬信教学楼 前卫-敬信教学楼-A103"}),
+        ], semester)
+        occupancy, catalog, _report = importer.build([part], semester)
+        self.assertEqual([room[:3] for room in occupancy["rooms"]],
+                         [["前卫", "敬信教学楼", "A103"], ["前卫", "敬信教学楼", "F区第四阶梯"]])
+        self.assertEqual(catalog["locations"], ["前卫-敬信教学楼-F区第四阶梯", "前卫-敬信教学楼-A103"])
+        self.assertIsNone(importer.parse_location("新民校区 新民-通汇大厦1601", {}))
+        for location, shown in [
+            ("前卫校区 经信419", "前卫校区 敬信教学楼419"),
+            ("前卫校区 敬信教学楼-E区107", "前卫校区 敬信教学楼-E区107"),
+            ("前卫-李四光楼 前卫-李四光楼-114（医学优先）", "前卫-李四光楼-114（医学优先）"),
+            ("线上教学-前卫", "线上教学-前卫"),
+        ]:
+            with self.subTest(location=location):
+                self.assertEqual(importer.display_location(location, aliases), shown)
+
     def test_free_text_rooms_need_an_unambiguous_building_and_known_room(self):
         match = importer.room_matcher({
             ("前卫", "萃文楼", "232"), ("前卫", "东荣大厦", "A209"), ("和平", "科学讲堂", "601教室"),
