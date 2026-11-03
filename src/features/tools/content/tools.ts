@@ -53,18 +53,6 @@ export const toolCategories: ToolCategory[] = [
 				keywords: "选课 成绩 绩点",
 			},
 			{
-				name: "学生事务管理系统",
-				href: "https://sais.jlu.edu.cn",
-				description: "学生事务在线办理",
-				icon: "file",
-			},
-			{
-				name: "教务处",
-				href: "https://eol.jlu.edu.cn",
-				description: "教务信息与服务入口",
-				icon: "book",
-			},
-			{
 				name: "本科教学信息网",
 				href: "https://jwc.jlu.edu.cn",
 				description: "本科教学通知与资讯",
