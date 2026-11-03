@@ -8,7 +8,7 @@ export const gpaImportContent = {
 		"https://iedu.jlu.edu.cn/jwapp/sys/cjcx/*default/index.do?THEME=purple&EMAP_LANG=zh#/cjcx",
 	exportTipAfter: "导出成绩 Excel，再到这里上传。",
 	newWindow: "（新窗口打开）",
-	privacy: "仅在浏览器本地读取，成绩表不会上传。",
+	privacy: "仅在本地读取和计算，成绩表不会上传。",
 	format: ".xlsx · 最大 5 MB",
 	choose: "选择成绩表",
 	change: "更换成绩表",
