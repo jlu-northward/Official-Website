@@ -67,6 +67,37 @@ const totalLinks = toolCategories.reduce(
 	0,
 );
 
+// Some Android browsers and in-app WebViews lack the async Clipboard API or
+// deny its permission, so fall back to the legacy selection-based copy.
+function copyWithSelection(text: string) {
+	const active = document.activeElement as HTMLElement | null;
+	const textarea = document.createElement("textarea");
+	textarea.value = text;
+	textarea.setAttribute("readonly", "");
+	textarea.style.cssText =
+		"position:fixed;top:0;left:0;opacity:0;font-size:12pt;pointer-events:none";
+	document.body.appendChild(textarea);
+	textarea.select();
+	textarea.setSelectionRange(0, text.length);
+	try {
+		return document.execCommand("copy");
+	} catch {
+		return false;
+	} finally {
+		textarea.remove();
+		active?.focus({ preventScroll: true });
+	}
+}
+
+async function copyText(text: string) {
+	try {
+		await navigator.clipboard.writeText(text);
+		return true;
+	} catch {
+		return copyWithSelection(text);
+	}
+}
+
 function LinkCard({ link }: { link: CampusLink }) {
 	const Icon = icons[link.icon] ?? FiGlobe;
 	const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
@@ -106,12 +137,7 @@ function LinkCard({ link }: { link: CampusLink }) {
 				aria-label={`复制${link.name}链接`}
 				title="复制链接"
 				onClick={async () => {
-					try {
-						await navigator.clipboard.writeText(link.href);
-						setCopyStatus("copied");
-					} catch {
-						setCopyStatus("failed");
-					}
+					setCopyStatus((await copyText(link.href)) ? "copied" : "failed");
 					clearTimeout(timer.current);
 					timer.current = setTimeout(() => setCopyStatus("idle"), 2500);
 				}}
