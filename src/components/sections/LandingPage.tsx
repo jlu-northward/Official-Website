@@ -17,6 +17,7 @@ import {
 } from "react-icons/fi";
 import PartnerMarquee from "@components/sections/PartnerMarquee";
 import CommentBarrage from "@components/ui/CommentBarrage";
+import { cn } from "@/lib/utils";
 import type { AppHeroProps, Feature, Partner } from "config";
 import {
 	revealFadeUp,
@@ -86,6 +87,16 @@ const productScenes = [
 		accent: "from-fuchsia-300/30 via-purple-400/10 to-transparent",
 		meta: "更多实用工具持续加入",
 	},
+];
+
+// Same-page anchors only make sense on the wide layout; phones keep the
+// standalone pages, which are otherwise only linked from the footer.
+const navLinks = [
+	{ href: "#product", label: "产品" },
+	{ href: "#features", label: "功能" },
+	{ href: "/tools", label: "工具箱", mobile: true },
+	{ href: "/square", label: "广场", mobile: true },
+	{ href: "#story", label: "关于我们" },
 ];
 
 const featureIcons = [FiMessageCircle, FiUsers, FiStar, FiBookOpen];
@@ -372,7 +383,7 @@ const LandingPage = ({
 				<motion.nav
 					style={{ scale: navScale, y: navY }}
 					aria-label="主导航"
-					className="liquid-glass liquid-glass--deep liquid-glass--interactive mx-auto flex h-14 max-w-6xl origin-top transform-gpu items-center justify-between overflow-hidden rounded-full border border-black/[0.06] px-3 will-change-transform dark:border-white/10"
+					className="liquid-glass liquid-glass--deep liquid-glass--interactive mx-auto flex h-14 max-w-6xl origin-top transform-gpu items-center justify-between overflow-hidden whitespace-nowrap rounded-full border border-black/[0.06] px-3 will-change-transform dark:border-white/10"
 				>
 					<motion.div
 						style={{ opacity: navSurfaceOpacity }}
@@ -394,37 +405,19 @@ const LandingPage = ({
 							向北
 						</span>
 					</a>
-					<div className="hidden items-center gap-1 text-[13px] font-medium text-neutral-600 md:flex dark:text-neutral-300">
-						<a
-							href="#product"
-							className="rounded-full px-4 py-2 outline-none transition-colors duration-300 hover:bg-black/[0.05] hover:text-neutral-950 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:bg-white/[0.07] dark:hover:text-white"
-						>
-							产品
-						</a>
-						<a
-							href="#features"
-							className="rounded-full px-4 py-2 outline-none transition-colors duration-300 hover:bg-black/[0.05] hover:text-neutral-950 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:bg-white/[0.07] dark:hover:text-white"
-						>
-							功能
-						</a>
-						<a
-							href="/tools"
-							className="rounded-full px-4 py-2 outline-none transition-colors duration-300 hover:bg-black/[0.05] hover:text-neutral-950 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:bg-white/[0.07] dark:hover:text-white"
-						>
-							工具箱
-						</a>
-						<a
-							href="/square"
-							className="rounded-full px-4 py-2 outline-none transition-colors duration-300 hover:bg-black/[0.05] hover:text-neutral-950 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:bg-white/[0.07] dark:hover:text-white"
-						>
-							广场
-						</a>
-						<a
-							href="#story"
-							className="rounded-full px-4 py-2 outline-none transition-colors duration-300 hover:bg-black/[0.05] hover:text-neutral-950 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:bg-white/[0.07] dark:hover:text-white"
-						>
-							关于我们
-						</a>
+					<div className="flex items-center gap-0.5 text-[13px] font-medium text-neutral-600 md:gap-1 dark:text-neutral-300">
+						{navLinks.map((link) => (
+							<a
+								key={link.href}
+								href={link.href}
+								className={cn(
+									"rounded-full px-2.5 py-2 outline-none transition-colors duration-300 hover:bg-black/[0.05] hover:text-neutral-950 focus-visible:ring-2 focus-visible:ring-sky-500/30 md:px-4 dark:hover:bg-white/[0.07] dark:hover:text-white",
+									!link.mobile && "hidden md:block",
+								)}
+							>
+								{link.label}
+							</a>
+						))}
 					</div>
 					<a
 						href="#download"
