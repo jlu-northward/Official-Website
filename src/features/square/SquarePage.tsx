@@ -67,8 +67,9 @@ export default function SquarePage() {
 					className={cn("relative isolate", enter)}
 					aria-labelledby="square-title"
 				>
+					{/* 宽度不超过视口：iOS WebKit 不会用 body 的 overflow-x 拦住横向拖动，超宽会让整页可被横移。 */}
 					<div
-						className="pointer-events-none absolute -top-28 left-1/2 -z-10 hidden h-64 w-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--primary)/0.12),transparent)] dark:block"
+						className="pointer-events-none absolute -top-28 left-1/2 -z-10 hidden h-64 w-[min(36rem,100vw)] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--primary)/0.12),transparent)] dark:block"
 						aria-hidden="true"
 					/>
 					<div className="flex items-center justify-between gap-3">
