@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { gpaImportContent as copy } from "./content/gpa-import";
 import { cn } from "@/lib/utils";
 import type { GradeImport } from "./gpa-import";
+import { track } from "@/lib/analytics";
 
 export default function GpaExcelImport({
 	fileName,
@@ -33,10 +34,15 @@ export default function GpaExcelImport({
 		if (busy.current) return;
 		setError("");
 		if (!/\.xlsx$/i.test(file.name)) {
+			track("gpa-import", { result: "error", reason: "type" });
 			setError(copy.typeError);
 			return;
 		}
 		if (!file.size || file.size > copy.maxBytes) {
+			track("gpa-import", {
+				result: "error",
+				reason: file.size ? "size" : "empty",
+			});
 			setError(file.size ? copy.sizeError : copy.emptyError);
 			return;
 		}
@@ -45,13 +51,19 @@ export default function GpaExcelImport({
 		try {
 			const { readGradeExcel } = await import("./gpa-excel");
 			const value = await readGradeExcel(file);
+			track("gpa-import", {
+				result: "success",
+				courses: value.courses.length,
+				skipped: value.skipped.length,
+			});
 			onImportRef.current(value, file.name);
 		} catch (cause) {
-			setError(
-				cause instanceof Error && cause.name === "GradeImportError"
-					? cause.message
-					: copy.readError,
-			);
+			const known = cause instanceof Error && cause.name === "GradeImportError";
+			track("gpa-import", {
+				result: "error",
+				reason: known ? "format" : "read",
+			});
+			setError(known ? cause.message : copy.readError);
 		} finally {
 			busy.current = false;
 			setLoading(false);

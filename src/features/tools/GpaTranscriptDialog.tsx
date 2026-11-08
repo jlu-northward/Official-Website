@@ -18,6 +18,7 @@ import { gpaTranscriptContent as copy } from "./content/gpa-transcript";
 import type { CourseDraft, GpaScope } from "./gpa";
 import type { SkippedGrade } from "./gpa-import";
 import { buildGpaTranscript } from "./gpa-transcript";
+import { track } from "@/lib/analytics";
 
 interface GpaTranscriptDialogProps {
 	courses: CourseDraft[];
@@ -89,6 +90,7 @@ export default function GpaTranscriptDialog({
 			document.body.appendChild(link);
 			link.click();
 			link.remove();
+			track("gpa-share-save");
 		} catch {
 			setError(copy.saveError);
 		}

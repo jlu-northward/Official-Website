@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ThemeButton from "@/components/ui/ThemeButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { track, trackLink } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { appInfo } from "@/config/appInfo";
 import {
@@ -98,7 +99,13 @@ async function copyText(text: string) {
 	}
 }
 
-function LinkCard({ link }: { link: CampusLink }) {
+function LinkCard({
+	link,
+	category,
+}: {
+	link: CampusLink;
+	category: ToolCategoryId;
+}) {
 	const Icon = icons[link.icon] ?? FiGlobe;
 	const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
 		"idle",
@@ -111,6 +118,7 @@ function LinkCard({ link }: { link: CampusLink }) {
 				href={link.href}
 				target="_blank"
 				rel="noopener noreferrer"
+				{...trackLink("tools-link", { name: link.name, category })}
 				className="flex min-h-[76px] min-w-0 flex-1 items-center gap-3 py-3 pl-3.5 pr-12 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:items-start sm:rounded-2xl sm:p-5 sm:pb-11"
 			>
 				<span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary/60 text-primary transition-colors group-hover:bg-secondary sm:mt-0.5 sm:h-10 sm:w-10 sm:border sm:border-border/50 sm:bg-background">
@@ -244,9 +252,10 @@ function CampusNavigation() {
 									key={category.id}
 									type="button"
 									aria-pressed={categoryId === category.id}
-									onClick={() =>
-										setCategoryId(category.id as ToolCategoryId | "all")
-									}
+									onClick={() => {
+										setCategoryId(category.id as ToolCategoryId | "all");
+										track("tools-category", { category: category.id });
+									}}
 									className={cn(
 										"flex min-h-11 shrink-0 items-center justify-center gap-2.5 whitespace-nowrap rounded-xl border border-transparent px-2 py-2 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring sm:justify-start sm:px-3.5 sm:py-2.5 sm:text-[13px] lg:w-full",
 										categoryId === category.id
@@ -302,7 +311,11 @@ function CampusNavigation() {
 							</div>
 							<div className="grid divide-y overflow-hidden rounded-2xl border bg-card sm:grid-cols-2 sm:gap-3 sm:divide-y-0 sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent xl:grid-cols-3">
 								{category.links.map((link) => (
-									<LinkCard key={link.href} link={link} />
+									<LinkCard
+										key={link.href}
+										link={link}
+										category={category.id}
+									/>
 								))}
 							</div>
 						</section>
@@ -393,16 +406,19 @@ export default function ToolsPage() {
 			setTab(selected);
 			if (selected === "gpa") setGpaRequested(true);
 			if (selected === "classrooms") setClassroomRequested(true);
-			if (selected !== "navigation")
+			if (selected !== "navigation") {
+				track("tools-tab", { tab: selected, source: "hash" });
 				requestAnimationFrame(() =>
 					workspace.current?.scrollIntoView({ block: "start" }),
 				);
+			}
 		};
 		sync();
 		window.addEventListener("hashchange", sync);
 		return () => window.removeEventListener("hashchange", sync);
 	}, []);
-	const selectTab = (value: string, scroll = false) => {
+	const selectTab = (value: string, source: "tabs" | "hero") => {
+		track("tools-tab", { tab: value, source });
 		setTab(value);
 		if (value === "gpa") setGpaRequested(true);
 		if (value === "classrooms") setClassroomRequested(true);
@@ -411,7 +427,7 @@ export default function ToolsPage() {
 			"",
 			`${window.location.pathname}${window.location.search}${value === "navigation" ? "" : `#${value}`}`,
 		);
-		if (scroll) {
+		if (source === "hero") {
 			workspace.current?.scrollIntoView({
 				behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
 					? "instant"
@@ -521,7 +537,7 @@ export default function ToolsPage() {
 					</div>
 					<button
 						type="button"
-						onClick={() => selectTab("gpa", true)}
+						onClick={() => selectTab("gpa", "hero")}
 						className="group relative isolate overflow-hidden rounded-[20px] bg-[#244e43] p-4 text-left text-white outline-none transition-shadow hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background sm:rounded-[24px] sm:p-7 lg:min-h-[255px] lg:p-8"
 						aria-label="打开吉大绩点计算工具"
 					>
@@ -564,7 +580,7 @@ export default function ToolsPage() {
 					tabIndex={-1}
 					className="scroll-mt-0 pb-10 outline-none sm:scroll-mt-6 sm:pb-20"
 				>
-					<Tabs value={tab} onValueChange={(value) => selectTab(value)}>
+					<Tabs value={tab} onValueChange={(value) => selectTab(value, "tabs")}>
 						<div className="sticky top-0 z-20 -mx-4 mb-4 flex items-center justify-between gap-3 bg-background px-4 py-3 sm:static sm:mx-0 sm:mb-9 sm:border-b sm:bg-transparent sm:px-0 sm:pb-5 sm:pt-0">
 							<TabsList
 								className="grid h-12 w-full grid-cols-3 gap-1 rounded-xl border border-border/60 bg-muted/70 p-1 sm:inline-flex sm:w-auto"

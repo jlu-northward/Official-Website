@@ -18,6 +18,7 @@ import {
 	type ClassroomIndex,
 	type ClassroomQuery,
 } from "./classrooms";
+import { track } from "@/lib/analytics";
 
 const selectClass =
 	"h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
@@ -180,14 +181,19 @@ export default function EmptyClassroomFinder({ active }: { active: boolean }) {
 				className="rounded-2xl border bg-card p-4 sm:p-6"
 				onSubmit={(event) => {
 					event.preventDefault();
-					if (selectedDay)
-						setQuery({
-							campus,
-							building,
-							...selectedDay,
-							startPeriod,
-							endPeriod,
-						});
+					if (!selectedDay) return;
+					track("classroom-search", {
+						campus,
+						building: building || "all",
+						periods: endPeriod - startPeriod + 1,
+					});
+					setQuery({
+						campus,
+						building,
+						...selectedDay,
+						startPeriod,
+						endPeriod,
+					});
 				}}
 			>
 				<div className="grid gap-4 sm:grid-cols-2">

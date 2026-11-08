@@ -3,6 +3,7 @@ import Footer from "@components/sections/Footer";
 import EasterEggToast from "@components/ui/EasterEggToast";
 import WeChatGuide from "@components/ui/WeChatGuide";
 import ThemeScript from "@components/ui/ThemeScript.astro";
+import Analytics from "@components/ui/Analytics.astro";
 import { baiduSiteVerification } from "../config/siteVerification";
 
 interface Props {
@@ -119,15 +120,7 @@ const shareImageType = {
 		<meta name="twitter:image" content={shareImageUrl.href} />
 		{shareImageAlt && <meta name="twitter:image:alt" content={shareImageAlt} />}
 
-		{
-			analytics && (
-				<script
-					async
-					src="https://uma.nohup.life/allfx"
-					data-website-id="8372d9c0-6720-4357-879e-755bc3befc1a"
-				/>
-			)
-		}
+		{analytics && <Analytics />}
 
 		<ThemeScript />
 	</head>

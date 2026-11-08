@@ -1,6 +1,7 @@
 ---
 import "../styles/react-pages.css";
 import ThemeScript from "../components/ui/ThemeScript.astro";
+import Analytics from "../components/ui/Analytics.astro";
 
 interface Props {
 	title: string;
@@ -44,6 +45,7 @@ const canonical = new URL(
 			property="og:image"
 			content="https://northward.zone/brand/og-cover-v2.png"
 		/>
+		<Analytics />
 		<ThemeScript />
 	</head>
 	<body class="tools-page min-w-[320px]">

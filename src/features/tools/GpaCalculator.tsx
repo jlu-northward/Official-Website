@@ -46,6 +46,7 @@ import {
 	type CourseDraft,
 	type GpaScope,
 } from "./gpa";
+import { track } from "@/lib/analytics";
 
 const GpaTranscriptDialog = lazy(() => import("./GpaTranscriptDialog"));
 const EMPTY_SKIPPED: SkippedGrade[] = [];
@@ -213,6 +214,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 	const hasData =
 		enteredCourses.length > 0 || Boolean(importInfo?.skipped.length);
 	const openShare = (event: { currentTarget: HTMLButtonElement }) => {
+		track("gpa-share", { scope, courses: result.count });
 		shareTrigger.current = event.currentTarget;
 		setShareLoaded(true);
 		setShareOpen(true);

@@ -21,6 +21,7 @@ import {
 	type CourseIndex,
 	type CourseQuery,
 } from "./course-auditing";
+import { track } from "@/lib/analytics";
 
 const shortDate = (date: string) =>
 	`${Number(date.slice(5, 7))}月${Number(date.slice(8, 10))}日`;
@@ -120,6 +121,14 @@ export default function CourseAuditingFinder({ active }: { active: boolean }) {
 				onSubmit={(event) => {
 					event.preventDefault();
 					if (name.trim() || teacher.trim()) {
+						track("course-search", {
+							by:
+								name.trim() && teacher.trim()
+									? "both"
+									: name.trim()
+										? "name"
+										: "teacher",
+						});
 						setQuery({ name, teacher, week });
 						setPage(0);
 					}
