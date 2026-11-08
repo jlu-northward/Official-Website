@@ -479,10 +479,9 @@ export default function ToolsPage() {
 						>
 							/
 						</span>
-						<h1 className="text-base font-semibold sm:hidden">校园工具箱</h1>
-						<span className="hidden text-[13px] text-muted-foreground sm:block">
+						<h1 className="text-base font-semibold sm:text-[13px] sm:font-normal sm:text-muted-foreground">
 							校园工具箱
-						</span>
+						</h1>
 					</a>
 					<div className="flex items-center gap-2 sm:gap-5">
 						<a
@@ -506,14 +505,14 @@ export default function ToolsPage() {
 							<span className="h-1.5 w-1.5 rounded-full bg-primary" />
 							NORTHWARD · CAMPUS ESSENTIALS
 						</p>
-						<h1
+						<h2
 							id="tools-title"
 							className="text-[28px] font-semibold leading-[1.3] tracking-[-0.05em] sm:text-5xl lg:text-[54px]"
 						>
 							{toolsContent.heroTitle}
 							<br className="hidden sm:block" />
 							<span className="text-primary">{toolsContent.heroAccent}</span>
-						</h1>
+						</h2>
 						<p className="mt-5 hidden whitespace-pre-line text-sm leading-7 text-muted-foreground sm:block">
 							{toolsContent.heroDescription}
 						</p>
@@ -704,7 +703,7 @@ export default function ToolsPage() {
 						<a href="/" className="hover:text-foreground">
 							关于向北
 						</a>
-						<a href="/privacy" className="hover:text-foreground">
+						<a href="/privacy/" className="hover:text-foreground">
 							隐私政策
 						</a>
 						<a

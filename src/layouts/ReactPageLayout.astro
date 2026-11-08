@@ -2,13 +2,15 @@
 import "../styles/react-pages.css";
 import ThemeScript from "../components/ui/ThemeScript.astro";
 import Analytics from "../components/ui/Analytics.astro";
+import SiteHead from "../components/ui/SiteHead.astro";
 
 interface Props {
 	title: string;
 	description: string;
+	keywords?: string[];
 }
 
-const { title, description } = Astro.props;
+const { title, description, keywords } = Astro.props;
 const canonical = new URL(
 	Astro.url.pathname,
 	Astro.site ?? "https://northward.zone",
@@ -26,7 +28,7 @@ const canonical = new URL(
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
-		<link rel="icon" type="image/svg+xml" href="/brand/favicon-512.svg" />
+		<SiteHead keywords={keywords} />
 		<meta
 			name="theme-color"
 			content="#f9f8f6"

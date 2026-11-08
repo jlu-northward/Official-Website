@@ -94,8 +94,8 @@ const productScenes = [
 const navLinks = [
 	{ href: "#product", label: "产品" },
 	{ href: "#features", label: "功能" },
-	{ href: "/tools", label: "工具箱", mobile: true },
-	{ href: "/square", label: "广场", mobile: true },
+	{ href: "/tools/", label: "工具箱", mobile: true },
+	{ href: "/square/", label: "广场", mobile: true },
 	{ href: "#story", label: "关于我们" },
 ];
 
@@ -476,14 +476,14 @@ const LandingPage = ({
 								className="mt-7 flex flex-col items-stretch justify-center gap-2.5 sm:mt-9 sm:flex-row sm:items-center sm:gap-3 lg:justify-start"
 							>
 								<DownloadButton
-									href="/download-ios"
+									href="/download-ios/"
 									platform="iOS"
 									label="下载适用于"
 									icon={FaApple}
 									primary
 								/>
 								<DownloadButton
-									href="/download-android"
+									href="/download-android/"
 									platform="Android"
 									label="下载适用于"
 									icon={FaGooglePlay}
@@ -709,14 +709,14 @@ const LandingPage = ({
 						</p>
 						<div className="mt-7 flex flex-col items-stretch justify-center gap-2.5 sm:mt-9 sm:flex-row sm:items-center sm:gap-3">
 							<DownloadButton
-								href="/download-ios"
+								href="/download-ios/"
 								platform="iOS"
 								label="下载适用于"
 								icon={FaApple}
 								primary
 							/>
 							<DownloadButton
-								href="/download-android"
+								href="/download-android/"
 								platform="Android"
 								label="下载适用于"
 								icon={FaGooglePlay}

@@ -75,28 +75,28 @@ const Footer = () => {
 					</div>
 					<div className="flex flex-wrap items-center gap-5">
 						<a
-							href="/tools"
+							href="/tools/"
 							className="inline-flex items-center gap-1.5 rounded-md outline-none transition-colors duration-300 hover:text-neutral-800 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:text-neutral-200"
 						>
 							<FiGrid className="h-3.5 w-3.5" />
 							校园工具箱
 						</a>
 						<a
-							href="/square"
+							href="/square/"
 							className="inline-flex items-center gap-1.5 rounded-md outline-none transition-colors duration-300 hover:text-neutral-800 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:text-neutral-200"
 						>
 							<FiCompass className="h-3.5 w-3.5" />
 							广场
 						</a>
 						<a
-							href="/privacy"
+							href="/privacy/"
 							className="inline-flex items-center gap-1.5 rounded-md outline-none transition-colors duration-300 hover:text-neutral-800 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:text-neutral-200"
 						>
 							<FiShield className="h-3.5 w-3.5" />
 							隐私政策
 						</a>
 						<a
-							href="/terms"
+							href="/terms/"
 							className="inline-flex items-center gap-1.5 rounded-md outline-none transition-colors duration-300 hover:text-neutral-800 focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:hover:text-neutral-200"
 						>
 							<FiFileText className="h-3.5 w-3.5" />

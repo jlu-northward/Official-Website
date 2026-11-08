@@ -4,11 +4,13 @@ import EasterEggToast from "@components/ui/EasterEggToast";
 import WeChatGuide from "@components/ui/WeChatGuide";
 import ThemeScript from "@components/ui/ThemeScript.astro";
 import Analytics from "@components/ui/Analytics.astro";
+import SiteHead from "@components/ui/SiteHead.astro";
 import { baiduSiteVerification } from "../config/siteVerification";
 
 interface Props {
 	title: string;
 	description?: string;
+	keywords?: string[];
 	showFooter?: boolean;
 	canonical?: string;
 	shareImage?: string;
@@ -23,6 +25,7 @@ interface Props {
 const {
 	title,
 	description,
+	keywords,
 	showFooter = true,
 	canonical,
 	shareImage,
@@ -76,7 +79,7 @@ const shareImageType = {
 			media="(prefers-color-scheme: dark)"
 		/>
 
-		<link rel="icon" type="image/svg+xml" href="/brand/favicon-512.svg" />
+		<SiteHead keywords={keywords} />
 		<link rel="manifest" href="/manifest.json" />
 		<link rel="canonical" href={canonicalUrl.href} />
 		{robots && <meta name="robots" content={robots} />}

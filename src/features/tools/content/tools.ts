@@ -208,9 +208,19 @@ export const toolCategories: ToolCategory[] = [
 ];
 
 export const toolsContent = {
-	title: "校园工具箱｜向北",
+	title: "吉大绩点计算 · 空教室查询 · 校园网站导航｜向北校园工具箱",
 	description:
-		"吉大人的校园工具箱：校园网站导航、教务与校内服务入口、吉大绩点计算、教室查询和蹭课课程安排。",
+		"吉林大学校园工具箱：吉大绩点计算（可导入教务成绩表，成绩只在本地计算）、空教室查询、蹭课查询，以及教务、校园网、图书馆等常用网站导航。",
+	keywords: [
+		"吉大绩点计算",
+		"吉林大学绩点计算",
+		"吉大空教室",
+		"吉林大学空教室查询",
+		"吉大蹭课",
+		"吉林大学教务",
+		"吉林大学校园网站导航",
+		"向北",
+	],
 	heroTitle: "校园日常，",
 	heroAccent: "一处就好。",
 	calculatorLoading: "正在打开绩点计算…",
@@ -222,7 +232,7 @@ export const toolsContent = {
 	gpaDetailsDescription:
 		"各门课程的学分乘以对应绩点，加总后除以总学分。未及格课程以 0 绩点计入，学分同样参与加权。仅供估算，以学校认定为准。",
 	heroDescription:
-		"常用网站不必翻找，学期努力清晰有数。\n把吉大生活里需要的小工具，放在你手边。",
+		"校园网站导航、绩点计算、空教室与蹭课查询，\n把吉大生活里需要的小工具，放在你手边。",
 	storageKey: "northward.tools.gpa.v1",
 	gpaScopeStorageKey: "northward.tools.gpa.scope.v1",
 };

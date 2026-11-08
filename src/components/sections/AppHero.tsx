@@ -26,7 +26,7 @@ const AppHero = ({ title, description, storeLinks, logo }: AppHeroProps) => (
 
 			<div className="flex flex-col justify-center gap-4 md:flex-row md:justify-start">
 				<a
-					href="/download-ios"
+					href="/download-ios/"
 					target="_blank"
 					rel="noopener noreferrer"
 					data-umami-event="download-ios"
@@ -46,7 +46,7 @@ const AppHero = ({ title, description, storeLinks, logo }: AppHeroProps) => (
 				</a>
 
 				<a
-					href="/download-android"
+					href="/download-android/"
 					target="_blank"
 					rel="noopener noreferrer"
 					data-umami-event="download-android"

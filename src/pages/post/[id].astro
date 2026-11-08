@@ -331,9 +331,9 @@ const commentText = (comment: PublicComment) => {
 		if (downloadLink instanceof HTMLAnchorElement) {
 			const userAgent = navigator.userAgent.toLowerCase();
 			const fallbackHref = /iphone|ipad|ipod/.test(userAgent)
-				? "/download-ios"
+				? "/download-ios/"
 				: /android/.test(userAgent)
-					? "/download-android"
+					? "/download-android/"
 					: "/#download";
 			downloadLink.addEventListener("click", (event) => {
 				event.preventDefault();

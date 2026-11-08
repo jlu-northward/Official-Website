@@ -1,0 +1,28 @@
+---
+// Head tags shared by every layout: icons, keywords and Baidu hints.
+interface Props {
+	keywords?: string[];
+}
+
+const { keywords } = Astro.props;
+---
+
+<link rel="icon" type="image/svg+xml" href="/brand/favicon-512.svg" />
+<!-- Baidu and older browsers ignore SVG icons. -->
+<link
+	rel="icon"
+	type="image/png"
+	sizes="192x192"
+	href="/brand/favicon-192.png"
+/>
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+{
+	keywords && keywords.length > 0 && (
+		<meta name="keywords" content={keywords.join(",")} />
+	)
+}
+<!-- One responsive page for both: stop Baidu from transcoding it on mobile. -->
+<meta name="applicable-device" content="pc,mobile" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
