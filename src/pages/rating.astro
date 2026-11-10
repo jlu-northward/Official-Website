@@ -1,0 +1,11 @@
+---
+import RatingApp from "../features/rating/RatingApp";
+import ReactPageLayout from "../layouts/ReactPageLayout.astro";
+---
+
+<ReactPageLayout
+	title="向北评分榜"
+	description="发现校园里值得推荐的美食、风景、运动、自习与课程。"
+>
+	<RatingApp client:only="react" />
+</ReactPageLayout>
