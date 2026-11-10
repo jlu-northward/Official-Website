@@ -8,12 +8,14 @@ import {
 	ImagesInput,
 	Loading,
 	Modal,
+	Stars,
 	useInfiniteLoad,
 } from "./ui";
 
 export interface ComposeTarget {
 	editing?: Comment;
 	reply?: Comment;
+	score?: number;
 }
 export function Composer({
 	subjectId,
@@ -29,7 +31,7 @@ export function Composer({
 	const editing = target.editing;
 	const reply = target.reply;
 	const isReply = Boolean(reply || editing?.parentId);
-	const [score, setScore] = useState(editing?.score || 0);
+	const [score, setScore] = useState(editing?.score || target.score || 0);
 	const [content, setContent] = useState(editing?.content || "");
 	const [anonymous, setAnonymous] = useState(editing?.is_anonymous === 1);
 	const [images, setImages] = useState<Upload[]>(
@@ -216,6 +218,7 @@ export function CommentCard({
 		? "匿名同学"
 		: comment.authorName || "向北同学";
 	const root = comment.rootId || comment.rateId;
+	const displayScore = comment.score || comment.user_score;
 	return (
 		<article className={`rate-comment ${compact ? "compact" : ""}`}>
 			<button
@@ -233,12 +236,22 @@ export function CommentCard({
 			<div className="rate-comment-body">
 				<div className="rate-comment-meta">
 					<b>{name}</b>
-					{comment.score || comment.user_score ? (
-						<span className="rate-score-badge">
-							★ {comment.score || comment.user_score}分
+					{comment.is_owner && <small>我</small>}
+				</div>
+				<div className="rate-comment-rating">
+					{displayScore ? (
+						<span
+							className="rate-comment-stars"
+							role="img"
+							aria-label={`${displayScore}分`}
+						>
+							<Stars score={displayScore} />
 						</span>
 					) : null}
-					{comment.is_owner && <small>我</small>}
+					<small>
+						{comment.createTime?.replace("T", " ").slice(0, 16)}
+						{comment.isEdited ? " · 已编辑" : ""}
+					</small>
 				</div>
 				{comment.replyToName && (
 					<p className="rate-reply-to">
@@ -262,10 +275,6 @@ export function CommentCard({
 					</div>
 				)}
 				<div className="rate-comment-actions">
-					<small>
-						{comment.createTime?.replace("T", " ").slice(0, 16)}
-						{comment.isEdited ? " · 已编辑" : ""}
-					</small>
 					<span>
 						<button
 							aria-label={liked ? "取消点赞" : "点赞"}

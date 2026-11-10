@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiEdit3, FiMapPin, FiShare2 } from "react-icons/fi";
+import { FiEdit3, FiMapPin, FiShare2, FiStar } from "react-icons/fi";
 import { call, request } from "./api";
 import { type Rank, type Subject, scoreText, typeLabels } from "./types";
 import {
@@ -9,6 +9,8 @@ import {
 	LocationLine,
 	Modal,
 	PageHeader,
+	Stars,
+	rankStyle,
 } from "./ui";
 import { Comments, Composer, type ComposeTarget } from "./Comments";
 
@@ -82,7 +84,10 @@ export function SubjectView({
 			</PageHeader>
 			{!replyRoot && (
 				<>
-					<section className="rate-detail-hero">
+					<section
+						className="rate-detail-hero"
+						style={rankStyle(subject.rankListId)}
+					>
 						<button
 							className="rate-cover-button"
 							onClick={() => setCover(true)}
@@ -95,13 +100,6 @@ export function SubjectView({
 							</span>
 							<h1>{subject.title}</h1>
 							<LocationLine subject={subject} campuses={campuses} />
-							<div className="rate-detail-score">
-								<b>{scoreText(subject.avgScore)}</b>
-								<span>
-									<span className="rate-stars">★★★★★</span>
-									<small>{subject.totalCount || 0}人评分</small>
-								</span>
-							</div>
 						</div>
 					</section>
 					<section className="rate-description">
@@ -158,6 +156,63 @@ export function SubjectView({
 							</div>
 						)}
 					</section>
+					<section className="rate-rating-panel" aria-label="评分概况">
+						<div className="rate-rating-overview">
+							<div className="rate-detail-score">
+								<span className="rate-score-label">向北评分</span>
+								<b>
+									{subject.totalCount > 0 ? scoreText(subject.avgScore) : "—"}
+								</b>
+								<small>
+									{subject.totalCount > 0
+										? `${subject.totalCount}人评分`
+										: "暂无评分"}
+								</small>
+							</div>
+							<div className="rate-rating-stars">
+								<Stars score={subject.totalCount > 0 ? subject.avgScore : 0} />
+								<span>
+									{subject.totalCount > 0
+										? "同学们的综合评分"
+										: "来分享第一份体验"}
+								</span>
+							</div>
+						</div>
+						{!readOnly && (
+							<div className="rate-quick-rating">
+								<span>
+									{subject.myComment
+										? `我的评分 ${subject.myComment.score}分`
+										: "立即评分"}
+								</span>
+								<div aria-label="选择我的评分">
+									{[1, 2, 3, 4, 5].map((star) => (
+										<button
+											key={star}
+											aria-label={`评${star * 2}分`}
+											className={
+												(subject.myComment?.score || 0) >= star * 2 ? "lit" : ""
+											}
+											onClick={() =>
+												setCompose(
+													subject.myComment
+														? {
+																editing: {
+																	...subject.myComment,
+																	score: star * 2,
+																},
+															}
+														: { score: star * 2 },
+												)
+											}
+										>
+											<FiStar />
+										</button>
+									))}
+								</div>
+							</div>
+						)}
+					</section>
 					{!!subject.products?.length && (
 						<section className="rate-products">
 							<h2>招牌单品</h2>
@@ -194,15 +249,22 @@ export function SubjectView({
 				readOnly={readOnly}
 			/>
 			{!replyRoot && !readOnly && (
-				<button
-					className="rate-floating"
-					onClick={() =>
-						setCompose(subject.myComment ? { editing: subject.myComment } : {})
-					}
-				>
-					<FiEdit3 />
-					{subject.myComment ? "修改我的评价" : "我要评分"}
-				</button>
+				<div className="rate-actionbar">
+					<button
+						className="rate-comment-entry"
+						onClick={() =>
+							setCompose(
+								subject.myComment ? { editing: subject.myComment } : {},
+							)
+						}
+					>
+						<FiEdit3 />
+						{subject.myComment ? "修改我的评价…" : "我来评两句…"}
+					</button>
+					<button className="rate-icon" aria-label="分享评分" onClick={share}>
+						<FiShare2 />
+					</button>
+				</div>
 			)}
 			{readOnly && <p className="rate-readonly">当前榜单或对象仅供浏览</p>}
 			{compose && (

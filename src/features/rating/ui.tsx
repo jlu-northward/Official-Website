@@ -88,7 +88,7 @@ export function Cover({
 			className={`rate-cover rate-cover-empty ${className}`}
 			aria-label={title}
 		>
-			<FiImage />
+			<span aria-hidden="true">{title.replace(/\s/g, "").slice(0, 2)}</span>
 		</span>
 	);
 }
@@ -96,30 +96,51 @@ export function SubjectRow({
 	subject,
 	campuses,
 	index,
+	preview = false,
 }: {
 	subject: Subject;
 	campuses: string[];
 	index?: number;
+	preview?: boolean;
 }) {
 	return (
-		<a href={`#/subjects/${subject.id}`} className="rate-subject-row">
-			{index != null && (
-				<b className={`rate-position position-${index}`}>{index + 1}</b>
-			)}
-			<Cover src={subject.coverUrl} title={subject.title} />
+		<a
+			href={`#/subjects/${subject.id}`}
+			className={`rate-subject-row ${preview ? "is-preview" : ""}`}
+		>
+			<span className="rate-subject-thumb">
+				<Cover src={subject.coverUrl} title={subject.title} />
+			</span>
 			<span className="rate-subject-copy">
-				<strong>{subject.title}</strong>
-				<span className="rate-muted rate-small">
-					{locationText(subject, campuses)}
-				</span>
-				<span className="rate-summary">
-					{subject.description || "来写下你的体验"}
-				</span>
+				<strong>
+					{!preview && index != null && (
+						<em className="rate-position">{index + 1}</em>
+					)}
+					{subject.title}
+				</strong>
+				{locationText(subject, campuses) && (
+					<span className="rate-muted rate-small">
+						{locationText(subject, campuses)}
+					</span>
+				)}
+				{preview && (
+					<span className="rate-summary">
+						{subject.description || "来写下你的体验"}
+					</span>
+				)}
 			</span>
 			<span className="rate-score">
-				<b>{scoreText(subject.avgScore)}</b>
-				<small>{subject.totalCount || 0}人评分</small>
+				{!preview && (
+					<Stars score={subject.totalCount > 0 ? subject.avgScore : 0} />
+				)}
+				<b>{subject.totalCount > 0 ? scoreText(subject.avgScore) : "—"}</b>
+				<small>
+					{subject.totalCount > 0 ? `${subject.totalCount}人评分` : "暂无评分"}
+				</small>
 			</span>
+			{!preview && subject.description && (
+				<span className="rate-summary">{subject.description}</span>
+			)}
 		</a>
 	);
 }
@@ -267,6 +288,16 @@ export function useInfiniteLoad(load: () => void, enabled: boolean) {
 	}, [load, enabled]);
 	return ref;
 }
+export function Stars({ score }: { score: number }) {
+	const percent = Math.max(0, Math.min(100, (Number(score) || 0) * 10));
+	return (
+		<span className="rate-stars" aria-hidden="true">
+			<span>★★★★★</span>
+			<span style={{ width: `${percent}%` }}>★★★★★</span>
+		</span>
+	);
+}
+
 export function rankStyle(id: number): CSSProperties {
 	return {
 		"--rank-hue": [200, 258, 318, 22, 70, 155][Math.abs(id) % 6],

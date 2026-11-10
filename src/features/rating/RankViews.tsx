@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FiArrowRight, FiPlus, FiRefreshCw } from "react-icons/fi";
+import { FiPlus, FiRefreshCw, FiSearch, FiChevronRight } from "react-icons/fi";
 import { request } from "./api";
+import { ratingCopy } from "./content";
 import {
 	navigate,
 	typeTags,
-	typeLabels,
 	type Rank,
 	type Subject,
 	type Page,
@@ -17,6 +17,7 @@ import {
 	PageHeader,
 	SubjectRow,
 	rankStyle,
+	Cover,
 	useInfiniteLoad,
 } from "./ui";
 
@@ -33,7 +34,9 @@ function RankPreview({ rank, campuses }: { rank: Rank; campuses: string[] }) {
 			sortType: 0,
 		})
 			.then((data) => {
-				if (active) setItems(data.records);
+				if (active) {
+					setItems(data.records);
+				}
 			})
 			.catch((e) => {
 				if (active) setError(e.message);
@@ -45,14 +48,15 @@ function RankPreview({ rank, campuses }: { rank: Rank; campuses: string[] }) {
 	return (
 		<section className="rate-rank-card" style={rankStyle(rank.id)}>
 			<a className="rate-rank-banner" href={`#/ranks/${rank.id}`}>
-				<div>
-					<span className="rate-eyebrow">
-						{typeLabels[rank.subjectType || "general"] || "校园"} · 向北评分
-					</span>
+				<div className="rate-rank-copy">
 					<h2>{rank.title}</h2>
-					<p>{rank.description || "评出你心里的从夯到拉"}</p>
+					<p>{rank.description || ratingCopy.rankFallback}</p>
 				</div>
-				<FiArrowRight aria-hidden="true" />
+				<span className="rate-rank-chevrons" aria-hidden="true">
+					<FiChevronRight />
+					<FiChevronRight />
+					<FiChevronRight />
+				</span>
 			</a>
 			<div className="rate-preview-list">
 				{error ? (
@@ -65,6 +69,7 @@ function RankPreview({ rank, campuses }: { rank: Rank; campuses: string[] }) {
 							key={subject.id}
 							subject={subject}
 							campuses={campuses}
+							preview
 						/>
 					))
 				) : (
@@ -91,14 +96,17 @@ export function Overview({
 		<>
 			<header className="rate-overview-heading">
 				<h1>向北评分榜</h1>
-				<p>评出你心里的从夯到拉</p>
+				<p>{ratingCopy.intro}</p>
 			</header>
 			<nav className="rate-directory" aria-label="全部榜单">
-				<h2>全部榜单</h2>
-				<div className="rate-chips">
+				<div className="rate-directory-tabs">
 					{ranks.map((rank) => (
-						<a key={rank.id} href={`#/ranks/${rank.id}`} className="rate-chip">
-							{rank.title}
+						<a
+							key={rank.id}
+							href={`#/ranks/${rank.id}`}
+							className="rate-directory-item"
+						>
+							<span>{rank.title}</span>
 						</a>
 					))}
 				</div>
@@ -241,7 +249,7 @@ export function RankView({
 	const hasLocation = rank.subjectType && rank.subjectType !== "general";
 	return (
 		<>
-			<PageHeader title={rank.title}>
+			<PageHeader title="评分榜">
 				<button
 					className="rate-icon"
 					aria-label="刷新榜单"
@@ -254,9 +262,12 @@ export function RankView({
 					<FiRefreshCw />
 				</button>
 			</PageHeader>
-			<section className="rate-rank-intro">
-				<h2>{rank.title}</h2>
-				<p>{rank.description || "评出你心里的从夯到拉"}</p>
+			<section className="rate-rank-intro" style={rankStyle(rank.id)}>
+				<Cover src={rank.coverUrl} title={rank.title} />
+				<div>
+					<h2>{rank.title}</h2>
+					<p>{rank.description || ratingCopy.rankFallback}</p>
+				</div>
 			</section>
 			<div className="rate-filters">
 				{locationError && (
@@ -272,6 +283,7 @@ export function RankView({
 						update({ keyword: search.trim() });
 					}}
 				>
+					<FiSearch aria-hidden="true" />
 					<input
 						aria-label="搜索评分对象"
 						placeholder="搜索店铺、地点或课程"
@@ -317,34 +329,25 @@ export function RankView({
 							</label>
 						</>
 					)}
-					<label>
-						排序
-						<select
-							value={sort}
-							onChange={(event) => update({ sortType: event.target.value })}
-						>
-							<option value="0">综合排序</option>
-							<option value="1">按得分排序</option>
-							<option value="2">按人数排序</option>
-						</select>
-					</label>
+
+					{rank.subjectType === "photography" && (
+						<label className="rate-month-filter">
+							拍摄月份
+							<select
+								value={month}
+								onChange={(event) => update({ month: event.target.value })}
+							>
+								<option value="">全年</option>
+								{Array.from({ length: 12 }, (_, i) => (
+									<option key={i} value={i + 1}>
+										{i + 1}月
+									</option>
+								))}
+							</select>
+						</label>
+					)}
 				</div>
-				{rank.subjectType === "photography" && (
-					<label className="rate-month-filter">
-						拍摄月份
-						<select
-							value={month}
-							onChange={(event) => update({ month: event.target.value })}
-						>
-							<option value="">全年</option>
-							{Array.from({ length: 12 }, (_, i) => (
-								<option key={i} value={i + 1}>
-									{i + 1}月
-								</option>
-							))}
-						</select>
-					</label>
-				)}
+
 				{(typeTags[rank.subjectType || "general"] || []).length > 0 && (
 					<div className="rate-chips" aria-label="类型筛选">
 						<button
@@ -365,15 +368,28 @@ export function RankView({
 					</div>
 				)}
 			</div>
-			<p className="rate-result-count">
-				共 {total} 个评分对象
-				{(campus || keyword || tag || month || building) && (
-					<button onClick={() => navigate(`/ranks/${rank.id}`)}>
-						清除筛选
-					</button>
-				)}
-			</p>
-			<section className="rate-full-list">
+			<div className="rate-result-count">
+				<span>
+					<strong>{total}</strong> 个评分对象
+				</span>
+				<div className="rate-result-actions">
+					<select
+						aria-label="排序"
+						value={sort}
+						onChange={(event) => update({ sortType: event.target.value })}
+					>
+						<option value="0">综合排序</option>
+						<option value="1">按得分排序</option>
+						<option value="2">按人数排序</option>
+					</select>
+					{(campus || keyword || tag || month || building) && (
+						<button onClick={() => navigate(`/ranks/${rank.id}`, true)}>
+							清除筛选
+						</button>
+					)}
+				</div>
+			</div>
+			<section className="rate-full-list" style={rankStyle(rank.id)}>
 				{items.map((subject, index) => (
 					<SubjectRow
 						key={subject.id}
@@ -404,13 +420,15 @@ export function RankView({
 					))}
 			</div>
 			{rank.status === 1 && (
-				<button
-					className="rate-floating"
-					onClick={() => navigate(`/create?rankId=${rank.id}`)}
-				>
-					<FiPlus />
-					添加评分对象
-				</button>
+				<div className="rate-actionbar">
+					<button
+						className="rate-floating"
+						onClick={() => navigate(`/create?rankId=${rank.id}`)}
+					>
+						<FiPlus />
+						添加评分对象
+					</button>
+				</div>
 			)}
 		</>
 	);
