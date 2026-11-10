@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
-import { FiEdit3, FiMapPin, FiShare2, FiStar } from "react-icons/fi";
+import {
+	FiEdit3,
+	FiMapPin,
+	FiNavigation,
+	FiShare2,
+	FiStar,
+} from "react-icons/fi";
 import { call, request } from "./api";
+import { ratingCopy } from "./content";
 import { type Rank, type Subject, scoreText, typeLabels } from "./types";
 import {
 	Cover,
@@ -127,9 +134,12 @@ export function SubjectView({
 							<div className="rate-map-row">
 								<span>
 									<FiMapPin />
-									{subject.address || subject.building || "已标记位置"}
+									<span>
+										{subject.address || subject.building || "已标记位置"}
+									</span>
 								</span>
 								<button
+									aria-label="地图导航"
 									onClick={() =>
 										void call<boolean>("openMap", {
 											latitude: subject.latitude,
@@ -151,7 +161,8 @@ export function SubjectView({
 											.catch((e) => setNotice(e.message))
 									}
 								>
-									地图导航 ↗
+									<FiNavigation aria-hidden="true" />
+									{ratingCopy.detail.navigation}
 								</button>
 							</div>
 						)}
@@ -159,33 +170,40 @@ export function SubjectView({
 					<section className="rate-rating-panel" aria-label="评分概况">
 						<div className="rate-rating-overview">
 							<div className="rate-detail-score">
-								<span className="rate-score-label">向北评分</span>
-								<b>
-									{subject.totalCount > 0 ? scoreText(subject.avgScore) : "—"}
-								</b>
-								<small>
-									{subject.totalCount > 0
-										? `${subject.totalCount}人评分`
-										: "暂无评分"}
-								</small>
+								<span className="rate-score-label">
+									{ratingCopy.detail.scoreLabel}
+								</span>
+								<div className="rate-score-value">
+									<b>
+										{subject.totalCount > 0 ? scoreText(subject.avgScore) : "—"}
+									</b>
+									{subject.totalCount > 0 && <span>/ 10</span>}
+								</div>
 							</div>
 							<div className="rate-rating-stars">
 								<Stars score={subject.totalCount > 0 ? subject.avgScore : 0} />
 								<span>
 									{subject.totalCount > 0
-										? "同学们的综合评分"
-										: "来分享第一份体验"}
+										? `${subject.totalCount}人评分`
+										: "暂无评分 · 来分享第一份体验"}
 								</span>
 							</div>
 						</div>
 						{!readOnly && (
 							<div className="rate-quick-rating">
-								<span>
-									{subject.myComment
-										? `我的评分 ${subject.myComment.score}分`
-										: "立即评分"}
-								</span>
-								<div aria-label="选择我的评分">
+								<div className="rate-quick-label">
+									<strong>
+										{subject.myComment
+											? `我的评分 ${subject.myComment.score}分`
+											: ratingCopy.detail.myRating}
+									</strong>
+									<span>
+										{subject.myComment
+											? ratingCopy.detail.editPrompt
+											: ratingCopy.detail.ratePrompt}
+									</span>
+								</div>
+								<div className="rate-quick-stars" aria-label="选择我的评分">
 									{[1, 2, 3, 4, 5].map((star) => (
 										<button
 											key={star}
@@ -206,7 +224,7 @@ export function SubjectView({
 												)
 											}
 										>
-											<FiStar />
+											<FiStar aria-hidden="true" />
 										</button>
 									))}
 								</div>
@@ -215,14 +233,18 @@ export function SubjectView({
 					</section>
 					{!!subject.products?.length && (
 						<section className="rate-products">
-							<h2>招牌单品</h2>
-							<p className="rate-muted rate-small">
-								价格仅供参考，以店内实际价格为准
-							</p>
+							<header>
+								<h2>招牌单品</h2>
+								<p>{ratingCopy.detail.productsHint}</p>
+							</header>
 							{subject.products.map((product, index) => (
 								<div key={`${product.name}-${index}`}>
 									<strong>{product.name}</strong>
-									<span>
+									<span
+										className={
+											product.price == null ? "rate-price-empty" : "rate-price"
+										}
+									>
 										{product.price == null
 											? "价格待补充"
 											: `¥${Number(product.price).toFixed(2)}`}
@@ -249,7 +271,7 @@ export function SubjectView({
 				readOnly={readOnly}
 			/>
 			{!replyRoot && !readOnly && (
-				<div className="rate-actionbar">
+				<div className="rate-actionbar rate-detail-actionbar">
 					<button
 						className="rate-comment-entry"
 						onClick={() =>

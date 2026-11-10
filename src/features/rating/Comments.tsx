@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FiHeart, FiMessageCircle } from "react-icons/fi";
 import { call, request } from "./api";
+import { ratingCopy } from "./content";
 import { buildCommentBody } from "./comment-form";
 import { type Comment, type CursorPage, type Upload } from "./types";
 import {
@@ -443,16 +444,22 @@ export function Comments({
 		<section className="rate-comments">
 			<div className="rate-section-heading">
 				<h2>
-					{replyRoot ? "全部回复" : `全部评价${total ? ` · ${total}` : ""}`}
+					{replyRoot ? "全部回复" : "全部评价"}
+					{total > 0 && <span className="rate-comment-count">{total}</span>}
 				</h2>
-				<select
-					aria-label="评论排序"
-					value={sort}
-					onChange={(event) => setSort(event.target.value)}
-				>
-					<option value="createTime">最新发布</option>
-					<option value="likeCount">最多点赞</option>
-				</select>
+				<div className="rate-sort-options" role="group" aria-label="评论排序">
+					{ratingCopy.commentSortOptions.map((option) => (
+						<button
+							key={option.value}
+							className={sort === option.value ? "selected" : ""}
+							aria-pressed={sort === option.value}
+							aria-label={option.accessibleLabel}
+							onClick={() => setSort(option.value)}
+						>
+							{option.label}
+						</button>
+					))}
+				</div>
 			</div>
 			{items.map((comment) => (
 				<CommentCard
