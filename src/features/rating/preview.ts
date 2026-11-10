@@ -54,26 +54,46 @@ const campuses = [
 ];
 export function createPreviewTransport() {
 	let nextId = 100;
+	const previewImage = (file: string) =>
+		new URL(`/rating/${file}.webp`, location.origin).href;
+	const subjectImages = [
+		["preview-apple-dessert", "preview-bakery", "preview-ice-cream"],
+		["emoji-wow"],
+		["emoji-fighting"],
+		["emoji-studying"],
+		["emoji-hello"],
+	];
 	const subjects: Subject[] = ranks.flatMap((rank) =>
 		[0, 1, 2].map((index) => ({
 			id: rank.id * 10 + index,
 			rankListId: rank.id,
 			title:
-				[
-					"日新楼面馆",
-					"中心图书馆花廊",
-					"体育馆羽毛球场",
-					"逸夫楼自习室",
-					"文学鉴赏课",
-				][rank.id - 1] + (index ? ` ${index + 1}` : ""),
-			description: [
-				"汤底清爽，出餐很快。同学推荐的校园日常好味道。",
-				"春天来这里看看花，晴天的傍晚尤其适合拍照。",
-				"场地宽敞，记得提前确认开放时间和预约规则。",
-				"灯光明亮，座位安静。请遵守教室使用安排。",
-				"循着文字走进另一种生活，旁听前请征得任课老师同意。",
-			][rank.id - 1],
-			coverUrl: "",
+				rank.id === 1
+					? ["苹果糖", "日新楼外围佳培西点", "日新楼一楼甜啦啦"][index]
+					: [
+							"日新楼面馆",
+							"中心图书馆花廊",
+							"体育馆羽毛球场",
+							"逸夫楼自习室",
+							"文学鉴赏课",
+						][rank.id - 1] + (index ? ` ${index + 1}` : ""),
+			description:
+				rank.id === 1
+					? [
+							"水果和奶油的甜蜜搭配，课后一起吃点甜。",
+							"香气四溢，刚出炉的小点心。",
+							"酸奶味很浓，好香好好吃。",
+						][index]
+					: [
+							"汤底清爽，出餐很快。同学推荐的校园日常好味道。",
+							"春天来这里看看花，晴天的傍晚尤其适合拍照。",
+							"场地宽敞，记得提前确认开放时间和预约规则。",
+							"灯光明亮，座位安静。请遵守教室使用安排。",
+							"循着文字走进另一种生活，旁听前请征得任课老师同意。",
+						][rank.id - 1],
+			coverUrl: previewImage(
+				subjectImages[rank.id - 1][index % subjectImages[rank.id - 1].length],
+			),
 			status: 1,
 			avgScore: 9.2 - index * 0.6,
 			totalCount: 128 - index * 30,
@@ -85,7 +105,10 @@ export function createPreviewTransport() {
 			products:
 				rank.id === 1
 					? [
-							{ name: "招牌牛肉面", price: 15 },
+							{
+								name: ["水果甜点", "招牌西点", "原味冰淇淋"][index],
+								price: 15,
+							},
 							{ name: "时令小菜", price: null },
 						]
 					: [],
@@ -93,6 +116,15 @@ export function createPreviewTransport() {
 	);
 	const withLegacy = new URLSearchParams(location.search).get("legacy") === "1";
 	const visibleRanks = withLegacy ? [...ranks, legacyRank] : ranks;
+	// 单独验证接口有榜单封面时的展示；默认仍沿用旧接口的无封面形式。
+	const displayRanks = visibleRanks.map((rank) => ({
+		...rank,
+		coverUrl:
+			rank.id === 1 &&
+			new URLSearchParams(location.search).get("covers") === "1"
+				? previewImage("preview-bakery")
+				: rank.coverUrl,
+	}));
 	if (withLegacy) {
 		subjects.push({ ...legacySubject });
 		// 同榜新旧对象并存，未补校区的旧对象仍出现在默认列表。
@@ -107,7 +139,7 @@ export function createPreviewTransport() {
 			authorName: "向北同学",
 			userId: 21,
 			authorAvatar: "",
-			content: "最近常来这里，位置很好找。\n推荐试试招牌牛肉面！",
+			content: "最近常来这里，位置很好找。\n甜品爱好者可以试试！",
 			is_anonymous: 0,
 			is_owner: false,
 			score: 10,
@@ -153,7 +185,7 @@ export function createPreviewTransport() {
 		const params = (args.params || {}) as Params;
 		const method = args.method;
 		let data: unknown = null;
-		if (path === "rate/ranks") data = visibleRanks;
+		if (path === "rate/ranks") data = displayRanks;
 		else if (path === "users/campus") data = campuses;
 		else if (/^rate\/subjects\/\d+\/locations$/.test(path))
 			data = [

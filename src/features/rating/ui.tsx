@@ -68,10 +68,12 @@ export function Cover({
 	src,
 	title,
 	className = "",
+	onError,
 }: {
 	src?: string | null;
 	title: string;
 	className?: string;
+	onError?(): void;
 }) {
 	const [failed, setFailed] = useState(false);
 	useEffect(() => setFailed(false), [src]);
@@ -81,7 +83,10 @@ export function Cover({
 			src={safeImage(src)}
 			alt={title}
 			loading="lazy"
-			onError={() => setFailed(true)}
+			onError={() => {
+				setFailed(true);
+				onError?.();
+			}}
 		/>
 	) : (
 		<span

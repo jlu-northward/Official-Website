@@ -116,8 +116,10 @@ export const locationText = (subject: Subject, campuses: string[]) =>
 	]
 		.filter(Boolean)
 		.join(" · ");
-export const safeImage = (value?: string | null) =>
-	value && /^https?:\/\//.test(value) ? value : "";
+export const safeImage = (value?: string | null) => {
+	const url = value?.trim() || "";
+	return /^https?:\/\//i.test(url) ? url : "";
+};
 export function readRoute() {
 	return typeof window === "undefined"
 		? "/"

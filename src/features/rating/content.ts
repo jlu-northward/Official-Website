@@ -7,3 +7,9 @@ export const ratingCopy = {
 		{ value: "2", label: "人数", accessibleLabel: "按人数排序" },
 	],
 };
+
+// 沿用原 App 评分页的本地素材。
+export const ratingImages = {
+	rankMascot: "/rating/emoji-right.webp",
+	empty: "/rating/empty.webp",
+};

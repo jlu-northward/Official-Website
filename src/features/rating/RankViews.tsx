@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FiPlus, FiRefreshCw, FiSearch, FiChevronRight } from "react-icons/fi";
 import { request } from "./api";
-import { ratingCopy } from "./content";
+import { ratingCopy, ratingImages } from "./content";
 import {
 	navigate,
 	typeTags,
@@ -9,6 +9,7 @@ import {
 	type Subject,
 	type Page,
 	type Params,
+	safeImage,
 } from "./types";
 import {
 	ErrorMessage,
@@ -24,6 +25,9 @@ function RankPreview({ rank, campuses }: { rank: Rank; campuses: string[] }) {
 	const [items, setItems] = useState<Subject[] | null>(null);
 	const [error, setError] = useState("");
 	const [retry, setRetry] = useState(0);
+	const [failedCover, setFailedCover] = useState("");
+	const cover = safeImage(rank.coverUrl);
+	const hasCover = Boolean(cover && cover !== failedCover);
 	useEffect(() => {
 		let active = true;
 		setError("");
@@ -45,8 +49,20 @@ function RankPreview({ rank, campuses }: { rank: Rank; campuses: string[] }) {
 		};
 	}, [rank.id, retry]);
 	return (
-		<section className="rate-rank-card" style={rankStyle(rank.id)}>
+		<section
+			className={`rate-rank-card ${hasCover ? "has-cover" : ""}`}
+			style={rankStyle(rank.id)}
+		>
 			<a className="rate-rank-banner" href={`#/ranks/${rank.id}`}>
+				{hasCover && (
+					<img
+						className="rate-rank-cover"
+						src={cover}
+						alt={`${rank.title}封面`}
+						loading="lazy"
+						onError={() => setFailedCover(cover)}
+					/>
+				)}
 				<div className="rate-rank-copy">
 					<h2>{rank.title}</h2>
 					<p>{rank.description || ratingCopy.rankFallback}</p>
@@ -149,6 +165,8 @@ export function RankView({
 	const [total, setTotal] = useState(0);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
+	const [failedCover, setFailedCover] = useState("");
+	const cover = safeImage(rank.coverUrl);
 	const busy = useRef(false);
 	const version = useRef(0);
 	const filters: Params = {
@@ -241,11 +259,24 @@ export function RankView({
 				</button>
 			</PageHeader>
 			<section className="rate-rank-intro" style={rankStyle(rank.id)}>
-				<Cover src={rank.coverUrl} title={rank.title} />
+				{cover && cover !== failedCover && (
+					<Cover
+						src={cover}
+						title={rank.title}
+						onError={() => setFailedCover(cover)}
+					/>
+				)}
 				<div>
 					<h2>{rank.title}</h2>
 					<p>{rank.description || ratingCopy.rankFallback}</p>
 				</div>
+				<img
+					className="rate-rank-mascot"
+					src={ratingImages.rankMascot}
+					alt=""
+					width={56}
+					height={56}
+				/>
 			</section>
 			<div className="rate-filters">
 				<form
@@ -379,7 +410,16 @@ export function RankView({
 			)}
 			{loading && <Loading />}
 			{!loading && !error && !items.length && (
-				<p className="rate-empty">没有符合条件的对象，试试其他筛选</p>
+				<div className="rate-empty">
+					<img
+						className="rate-empty-image"
+						src={ratingImages.empty}
+						alt=""
+						width={112}
+						height={112}
+					/>
+					<p>没有符合条件的对象，试试其他筛选</p>
+				</div>
 			)}
 			<div ref={sentinel} className="rate-footer">
 				{!loading &&
