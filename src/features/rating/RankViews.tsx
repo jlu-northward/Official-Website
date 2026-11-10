@@ -1,5 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { FiPlus, FiRefreshCw, FiSearch, FiChevronRight } from "react-icons/fi";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { LayoutGroup, motion, useReducedMotion } from "framer-motion";
+import {
+	FiPlus,
+	FiRefreshCw,
+	FiSearch,
+	FiChevronRight,
+	FiX,
+} from "react-icons/fi";
 import { request } from "./api";
 import { ratingCopy, ratingImages } from "./content";
 import {
@@ -20,6 +27,19 @@ import {
 	Cover,
 	useInfiniteLoad,
 } from "./ui";
+
+function FilterIndicator({ id }: { id: string }) {
+	const reduceMotion = useReducedMotion();
+	return (
+		<motion.span
+			className="rate-filter-indicator"
+			aria-hidden="true"
+			layoutId={reduceMotion ? undefined : id}
+			initial={false}
+			transition={{ type: "spring", bounce: 0, duration: 0.28 }}
+		/>
+	);
+}
 
 function RankPreview({ rank, campuses }: { rank: Rank; campuses: string[] }) {
 	const [items, setItems] = useState<Subject[] | null>(null);
@@ -159,6 +179,8 @@ export function RankView({
 	const tag = values.get("tag") || "";
 	const month = values.get("month") || "";
 	const [search, setSearch] = useState(keyword);
+	const searchInput = useRef<HTMLInputElement>(null);
+	const filterScope = useId();
 	const [items, setItems] = useState<Subject[]>([]);
 	const [page, setPage] = useState(0);
 	const [pages, setPages] = useState(1);
@@ -261,7 +283,7 @@ export function RankView({
 		}
 	}, [campus, campuses.length, rank.id, hasLocation]);
 	return (
-		<>
+		<LayoutGroup id={filterScope}>
 			<PageHeader title="评分榜">
 				<button
 					className="rate-icon"
@@ -304,6 +326,7 @@ export function RankView({
 				>
 					<FiSearch aria-hidden="true" />
 					<input
+						ref={searchInput}
 						aria-label="搜索评分对象"
 						placeholder={ratingCopy.searchPlaceholder}
 						enterKeyHint="search"
@@ -311,11 +334,28 @@ export function RankView({
 						value={search}
 						onChange={(event) => setSearch(event.target.value)}
 					/>
-					<button type="submit">搜索</button>
+					{search && (
+						<button
+							className="rate-search-clear"
+							type="button"
+							aria-label="清空搜索"
+							onClick={() => {
+								setSearch("");
+								if (keyword) update({ keyword: "" });
+								searchInput.current?.focus();
+							}}
+						>
+							<FiX aria-hidden="true" />
+						</button>
+					)}
+					<button className="rate-search-submit" type="submit">
+						搜索
+					</button>
 				</form>
 				{hasLocation && (
-					<div
+					<motion.div
 						ref={campusTabs}
+						layoutScroll
 						className="rate-campus-tabs"
 						role="group"
 						aria-label="校区筛选"
@@ -325,6 +365,7 @@ export function RankView({
 							aria-pressed={!campus}
 							onClick={() => update({ campusCode: "" })}
 						>
+							{!campus && <FilterIndicator id="campus" />}
 							全部校区
 						</button>
 						{campuses.map((name, code) => (
@@ -334,10 +375,11 @@ export function RankView({
 								aria-pressed={campus === String(code)}
 								onClick={() => update({ campusCode: String(code) })}
 							>
+								{campus === String(code) && <FilterIndicator id="campus" />}
 								{name}
 							</button>
 						))}
-					</div>
+					</motion.div>
 				)}
 				{rank.subjectType === "photography" && (
 					<div className="rate-month-tabs" role="group" aria-label="拍摄月份">
@@ -388,8 +430,9 @@ export function RankView({
 			<div className="rate-result-count">
 				<div className="rate-result-summary">
 					<span className="rate-result-label">
-						{ratingCopy.resultsLabel}
 						<strong>{total}</strong>
+						{ratingCopy.resultsUnit}
+						{ratingCopy.resultsLabel}
 					</span>
 					{(campus || keyword || tag || month) && (
 						<button
@@ -404,7 +447,11 @@ export function RankView({
 						</button>
 					)}
 				</div>
-				<div className="rate-sort-options" role="group" aria-label="排序">
+				<div
+					className="rate-sort-options rate-rank-sort"
+					role="group"
+					aria-label="排序"
+				>
 					{ratingCopy.sortOptions.map((option) => (
 						<button
 							key={option.value}
@@ -413,6 +460,7 @@ export function RankView({
 							aria-label={option.accessibleLabel}
 							onClick={() => update({ sortType: option.value })}
 						>
+							{sort === option.value && <FilterIndicator id="sort" />}
 							{option.label}
 						</button>
 					))}
@@ -468,6 +516,6 @@ export function RankView({
 					</button>
 				</div>
 			)}
-		</>
+		</LayoutGroup>
 	);
 }

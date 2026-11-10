@@ -3,6 +3,7 @@ export const ratingCopy = {
 	rankFallback: "看看大家心里的排名",
 	searchPlaceholder: "搜索店铺、地点、课程",
 	resultsLabel: "评分对象",
+	resultsUnit: "个",
 	detail: {
 		navigation: "导航",
 		scoreLabel: "向北评分",
