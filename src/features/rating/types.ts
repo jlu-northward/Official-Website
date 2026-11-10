@@ -3,8 +3,8 @@ export type SubjectType =
 export interface Rank {
 	id: number;
 	title: string;
-	description: string;
-	coverUrl: string;
+	description: string | null;
+	coverUrl?: string | null;
 	status: number;
 	subjectType?: SubjectType;
 }
@@ -16,20 +16,20 @@ export interface Subject {
 	id: number;
 	rankListId: number;
 	title: string;
-	description: string;
-	coverUrl: string;
+	description: string | null;
+	coverUrl: string | null;
 	status: number;
 	avgScore: number;
 	totalCount: number;
 	creatorUid?: number;
 	campusCode?: number | null;
-	building?: string;
-	address?: string;
+	building?: string | null;
+	address?: string | null;
 	latitude?: number | null;
 	longitude?: number | null;
-	tags?: string[];
-	recommendedMonths?: number[];
-	products?: Product[];
+	tags?: string[] | null;
+	recommendedMonths?: number[] | null;
+	products?: Product[] | null;
 	myComment?: Comment | null;
 }
 export interface Comment {
@@ -40,19 +40,19 @@ export interface Comment {
 	replyToName?: string;
 	reply_to_anonymous?: number;
 	authorName: string;
-	authorAvatar?: string;
-	userId?: number;
+	authorAvatar?: string | null;
+	userId?: number | null;
 	content: string;
 	image_url?: string[];
 	score?: number;
-	user_score?: number;
+	user_score?: number | null;
 	show_rate_badge?: boolean;
 	is_anonymous: number;
 	is_owner: boolean;
 	liked: boolean;
 	likeCount: number;
 	replyCount: number;
-	createTime: string;
+	createTime: string | null;
 	isEdited?: number;
 	replies?: Comment[];
 }

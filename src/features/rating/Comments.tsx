@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FiHeart, FiMessageCircle } from "react-icons/fi";
 import { call, request } from "./api";
+import { buildCommentBody } from "./comment-form";
 import { type Comment, type CursorPage, type Upload } from "./types";
 import {
 	Cover,
@@ -55,12 +56,14 @@ export function Composer({
 		submitting.current = true;
 		setBusy(true);
 		setError("");
-		const body = {
-			content: content.trim(),
-			is_anonymous: anonymous ? 1 : 0,
-			image_url: images.map((item) => item.objectKey),
-			...(!isReply ? { score } : {}),
-		};
+		const body = buildCommentBody({
+			content,
+			score,
+			anonymous,
+			images,
+			editing,
+			isReply,
+		});
 		try {
 			if (editing)
 				await request(
@@ -218,7 +221,11 @@ export function CommentCard({
 		? "匿名同学"
 		: comment.authorName || "向北同学";
 	const root = comment.rootId || comment.rateId;
-	const displayScore = comment.score || comment.user_score;
+	// 与原生页一致：匿名根评分与实名回复不能通过分数关联。
+	const displayScore =
+		comment.show_rate_badge === false
+			? null
+			: (comment.user_score ?? comment.score);
 	return (
 		<article className={`rate-comment ${compact ? "compact" : ""}`}>
 			<button
@@ -231,7 +238,10 @@ export function CommentCard({
 					)
 				}
 			>
-				<Cover src={comment.authorAvatar} title={name} />
+				<Cover
+					src={comment.is_anonymous ? null : comment.authorAvatar}
+					title={name}
+				/>
 			</button>
 			<div className="rate-comment-body">
 				<div className="rate-comment-meta">

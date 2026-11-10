@@ -1,5 +1,6 @@
 // 仅由 import.meta.env.DEV 分支加载，用于不连接生产服务的本地交互验收。
 import type { Comment, Envelope, Params, Rank, Subject } from "./types";
+import { legacyComment, legacyRank, legacySubject } from "./preview-legacy";
 const ranks: Rank[] = [
 	{
 		id: 1,
@@ -90,6 +91,13 @@ export function createPreviewTransport() {
 					: [],
 		})),
 	);
+	const withLegacy = new URLSearchParams(location.search).get("legacy") === "1";
+	const visibleRanks = withLegacy ? [...ranks, legacyRank] : ranks;
+	if (withLegacy) {
+		subjects.push({ ...legacySubject });
+		// 同榜新旧对象并存，未补校区的旧对象仍出现在默认列表。
+		subjects.push({ ...legacySubject, id: 13, rankListId: 1 });
+	}
 	let comments: Comment[] = [
 		{
 			rateId: 1,
@@ -125,6 +133,11 @@ export function createPreviewTransport() {
 			],
 		},
 	];
+	if (withLegacy)
+		comments.push({
+			...legacyComment,
+			image_url: [new URL("/brand/logo.png", location.origin).href],
+		});
 	return async (action: string, args: Params): Promise<unknown> => {
 		if (action === "session") return { uid: 42 };
 		if (action === "upload")
@@ -140,7 +153,7 @@ export function createPreviewTransport() {
 		const params = (args.params || {}) as Params;
 		const method = args.method;
 		let data: unknown = null;
-		if (path === "rate/ranks") data = ranks;
+		if (path === "rate/ranks") data = visibleRanks;
 		else if (path === "users/campus") data = campuses;
 		else if (/^rate\/subjects\/\d+\/locations$/.test(path))
 			data = [
@@ -223,7 +236,12 @@ export function createPreviewTransport() {
 			const id = Number(path.split("/").pop());
 			comments = comments.map((comment) =>
 				comment.rateId === id
-					? ({ ...comment, ...params, isEdited: 1 } as Comment)
+					? ({
+							...comment,
+							...params,
+							...(params.score != null ? { user_score: params.score } : {}),
+							isEdited: 1,
+						} as Comment)
 					: comment,
 			);
 			data = comments.find((comment) => comment.rateId === id);
