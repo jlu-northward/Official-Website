@@ -8,7 +8,6 @@ import {
 	type Rank,
 	type Subject,
 	type Page,
-	type Location,
 	type Params,
 } from "./types";
 import {
@@ -139,15 +138,11 @@ export function RankView({
 }) {
 	const values = new URLSearchParams(query);
 	const campus = values.get("campusCode") || "";
-	const building = values.get("building") || "";
 	const sort = values.get("sortType") || "0";
 	const keyword = values.get("keyword") || "";
 	const tag = values.get("tag") || "";
 	const month = values.get("month") || "";
 	const [search, setSearch] = useState(keyword);
-	const [locations, setLocations] = useState<Location[]>([]);
-	const [locationError, setLocationError] = useState("");
-	const [locationRevision, setLocationRevision] = useState(0);
 	const [items, setItems] = useState<Subject[]>([]);
 	const [page, setPage] = useState(0);
 	const [pages, setPages] = useState(1);
@@ -159,7 +154,6 @@ export function RankView({
 	const filters: Params = {
 		sortType: Number(sort),
 		...(campus !== "" ? { campusCode: Number(campus) } : {}),
-		...(building ? { building } : {}),
 		...(keyword ? { keyword } : {}),
 		...(tag ? { tag } : {}),
 		...(month ? { month: Number(month) } : {}),
@@ -215,22 +209,6 @@ export function RankView({
 			version.current++;
 		};
 	}, [load]);
-	useEffect(() => {
-		let active = true;
-		setLocations([]);
-		setLocationError("");
-		if (rank.subjectType && rank.subjectType !== "general")
-			request<Location[]>(`rate/subjects/${rank.id}/locations`)
-				.then((data) => {
-					if (active) setLocations(data);
-				})
-				.catch(() => {
-					if (active) setLocationError("地点选项加载失败，请重试");
-				});
-		return () => {
-			active = false;
-		};
-	}, [rank.id, rank.subjectType, locationRevision]);
 	const loadMore = useCallback(() => {
 		if (page < pages) void load(page + 1);
 	}, [page, pages, load]);
@@ -240,6 +218,7 @@ export function RankView({
 	);
 	function update(changes: Record<string, string>) {
 		const params = new URLSearchParams(query);
+		params.delete("building");
 		for (const [key, value] of Object.entries(changes)) {
 			if (value === "") params.delete(key);
 			else params.set(key, value);
@@ -255,7 +234,6 @@ export function RankView({
 					aria-label="刷新榜单"
 					onClick={() => {
 						version.current++;
-						setLocationRevision((value) => value + 1);
 						void load(1, true);
 					}}
 				>
@@ -270,12 +248,6 @@ export function RankView({
 				</div>
 			</section>
 			<div className="rate-filters">
-				{locationError && (
-					<ErrorMessage
-						error={locationError}
-						retry={() => setLocationRevision((value) => value + 1)}
-					/>
-				)}
 				<form
 					className="rate-search"
 					onSubmit={(event) => {
@@ -293,65 +265,56 @@ export function RankView({
 					/>
 					<button type="submit">搜索</button>
 				</form>
-				<div className="rate-filter-row">
-					{hasLocation && (
-						<>
-							<label>
-								校区
-								<select
-									value={campus}
-									onChange={(event) =>
-										update({ campusCode: event.target.value, building: "" })
-									}
-								>
-									<option value="">全部校区</option>
-									{campuses.map((name, code) => (
-										<option key={code} value={code}>
-											{name}
-										</option>
-									))}
-								</select>
-							</label>
-							<label>
-								楼栋
-								<select
-									value={building}
-									disabled={!campus}
-									onChange={(event) => update({ building: event.target.value })}
-								>
-									<option value="">全部地点</option>
-									{locations
-										.find((item) => String(item.campusCode) === campus)
-										?.buildings.map((name) => (
-											<option key={name}>{name}</option>
-										))}
-								</select>
-							</label>
-						</>
-					)}
-
-					{rank.subjectType === "photography" && (
-						<label className="rate-month-filter">
-							拍摄月份
-							<select
-								value={month}
-								onChange={(event) => update({ month: event.target.value })}
+				{hasLocation && (
+					<div className="rate-campus-tabs" role="group" aria-label="校区筛选">
+						<button
+							className={!campus ? "selected" : ""}
+							aria-pressed={!campus}
+							onClick={() => update({ campusCode: "" })}
+						>
+							全部校区
+						</button>
+						{campuses.map((name, code) => (
+							<button
+								key={code}
+								className={campus === String(code) ? "selected" : ""}
+								aria-pressed={campus === String(code)}
+								onClick={() => update({ campusCode: String(code) })}
 							>
-								<option value="">全年</option>
-								{Array.from({ length: 12 }, (_, i) => (
-									<option key={i} value={i + 1}>
-										{i + 1}月
-									</option>
-								))}
-							</select>
-						</label>
-					)}
-				</div>
+								{name}
+							</button>
+						))}
+					</div>
+				)}
+				{rank.subjectType === "photography" && (
+					<div className="rate-month-tabs" role="group" aria-label="拍摄月份">
+						<button
+							className={`rate-chip ${!month ? "selected" : ""}`}
+							aria-pressed={!month}
+							onClick={() => update({ month: "" })}
+						>
+							全年
+						</button>
+						{Array.from({ length: 12 }, (_, i) => String(i + 1)).map(
+							(value) => (
+								<button
+									key={value}
+									className={`rate-chip ${month === value ? "selected" : ""}`}
+									aria-pressed={month === value}
+									onClick={() => update({ month: value })}
+								>
+									{value}月
+								</button>
+							),
+						)}
+					</div>
+				)}
 
 				{(typeTags[rank.subjectType || "general"] || []).length > 0 && (
 					<div className="rate-chips" aria-label="类型筛选">
 						<button
 							className={`rate-chip ${!tag ? "selected" : ""}`}
+							aria-pressed={!tag}
 							onClick={() => update({ tag: "" })}
 						>
 							全部类型
@@ -360,6 +323,7 @@ export function RankView({
 							<button
 								key={value}
 								className={`rate-chip ${value === tag ? "selected" : ""}`}
+								aria-pressed={value === tag}
 								onClick={() => update({ tag: value })}
 							>
 								{value}
@@ -369,24 +333,32 @@ export function RankView({
 				)}
 			</div>
 			<div className="rate-result-count">
-				<span>
-					<strong>{total}</strong> 个评分对象
-				</span>
-				<div className="rate-result-actions">
-					<select
-						aria-label="排序"
-						value={sort}
-						onChange={(event) => update({ sortType: event.target.value })}
-					>
-						<option value="0">综合排序</option>
-						<option value="1">按得分排序</option>
-						<option value="2">按人数排序</option>
-					</select>
-					{(campus || keyword || tag || month || building) && (
-						<button onClick={() => navigate(`/ranks/${rank.id}`, true)}>
-							清除筛选
+				<div className="rate-result-summary">
+					<span>
+						<strong>{total}</strong> 个评分对象
+					</span>
+					{(campus || keyword || tag || month) && (
+						<button
+							className="rate-reset"
+							aria-label="清除筛选"
+							onClick={() => navigate(`/ranks/${rank.id}`, true)}
+						>
+							重置
 						</button>
 					)}
+				</div>
+				<div className="rate-sort-options" role="group" aria-label="排序">
+					{ratingCopy.sortOptions.map((option) => (
+						<button
+							key={option.value}
+							className={sort === option.value ? "selected" : ""}
+							aria-pressed={sort === option.value}
+							aria-label={option.accessibleLabel}
+							onClick={() => update({ sortType: option.value })}
+						>
+							{option.label}
+						</button>
+					))}
 				</div>
 			</div>
 			<section className="rate-full-list" style={rankStyle(rank.id)}>
