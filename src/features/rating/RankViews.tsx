@@ -167,6 +167,7 @@ export function RankView({
 	const [error, setError] = useState("");
 	const [failedCover, setFailedCover] = useState("");
 	const cover = safeImage(rank.coverUrl);
+	const campusTabs = useRef<HTMLDivElement>(null);
 	const busy = useRef(false);
 	const version = useRef(0);
 	const filters: Params = {
@@ -244,6 +245,21 @@ export function RankView({
 		navigate(`/ranks/${rank.id}${params.size ? `?${params}` : ""}`, true);
 	}
 	const hasLocation = rank.subjectType && rank.subjectType !== "general";
+	useEffect(() => {
+		const tabs = campusTabs.current;
+		const selected = tabs?.querySelector<HTMLButtonElement>(
+			'[aria-pressed="true"]',
+		);
+		if (!tabs || !selected) return;
+		const bounds = tabs.getBoundingClientRect();
+		const item = selected.getBoundingClientRect();
+		// 仅移动校区横条，避免重置或恢复筛选时把整页滚走。
+		if (item.left < bounds.left + 16) {
+			tabs.scrollLeft += item.left - bounds.left - 16;
+		} else if (item.right > bounds.right - 32) {
+			tabs.scrollLeft += item.right - bounds.right + 32;
+		}
+	}, [campus, campuses.length, rank.id, hasLocation]);
 	return (
 		<>
 			<PageHeader title="评分榜">
@@ -289,7 +305,8 @@ export function RankView({
 					<FiSearch aria-hidden="true" />
 					<input
 						aria-label="搜索评分对象"
-						placeholder="搜索店铺、地点或课程"
+						placeholder={ratingCopy.searchPlaceholder}
+						enterKeyHint="search"
 						maxLength={60}
 						value={search}
 						onChange={(event) => setSearch(event.target.value)}
@@ -297,7 +314,12 @@ export function RankView({
 					<button type="submit">搜索</button>
 				</form>
 				{hasLocation && (
-					<div className="rate-campus-tabs" role="group" aria-label="校区筛选">
+					<div
+						ref={campusTabs}
+						className="rate-campus-tabs"
+						role="group"
+						aria-label="校区筛选"
+					>
 						<button
 							className={!campus ? "selected" : ""}
 							aria-pressed={!campus}
@@ -365,14 +387,18 @@ export function RankView({
 			</div>
 			<div className="rate-result-count">
 				<div className="rate-result-summary">
-					<span>
-						<strong>{total}</strong> 个评分对象
+					<span className="rate-result-label">
+						{ratingCopy.resultsLabel}
+						<strong>{total}</strong>
 					</span>
 					{(campus || keyword || tag || month) && (
 						<button
 							className="rate-reset"
 							aria-label="清除筛选"
-							onClick={() => navigate(`/ranks/${rank.id}`, true)}
+							onClick={() => {
+								campusTabs.current?.scrollTo({ left: 0 });
+								navigate(`/ranks/${rank.id}`, true);
+							}}
 						>
 							重置
 						</button>

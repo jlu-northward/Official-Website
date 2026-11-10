@@ -429,20 +429,34 @@ body:has(.rating-app) {
 .rate-filters {
 	position: relative;
 	display: grid;
-	gap: 10px;
-	margin: -8px -12px 0;
-	padding: 14px 16px 12px;
-	border-radius: 10px 10px 0 0;
+	gap: 4px;
+	margin: -10px -12px 0;
+	padding: 14px 16px 0;
+	border-radius: 18px 18px 0 0;
 	background: var(--rate-card);
 }
 .rate-search {
 	display: flex;
 	align-items: center;
-	gap: 7px;
-	padding-left: 10px;
-	border-radius: 5px;
+	gap: 8px;
+	min-height: 48px;
+	padding: 0 4px 0 12px;
+	border: 1px solid var(--rate-border);
+	border-radius: 13px;
 	background: var(--rate-field);
-	color: var(--rate-muted);
+	color: var(--rate-secondary);
+	transition:
+		border-color 160ms ease,
+		box-shadow 160ms ease;
+}
+.rate-search:focus-within {
+	border-color: var(--rate-accent);
+	box-shadow: 0 0 0 3px var(--rate-tint);
+}
+.rate-search > svg {
+	width: 18px;
+	height: 18px;
+	flex-shrink: 0;
 }
 .rate-search input {
 	flex: 1;
@@ -450,13 +464,36 @@ body:has(.rating-app) {
 	background: transparent !important;
 	border: 0 !important;
 	padding: 8px 0 !important;
-	font-size: 13px !important;
+	font-size: 16px !important;
+}
+.rate-search input::placeholder {
+	color: var(--rate-muted);
+	font-size: 14px;
 }
 .rate-search button {
+	position: relative;
+	isolation: isolate;
 	color: var(--rate-accent);
-	padding: 10px;
+	min-height: 44px;
+	padding: 0 12px;
 	font-size: 13px;
+	font-weight: 650;
 	flex-shrink: 0;
+}
+.rate-search button::before {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset: 5px 0;
+	border: 1px solid var(--rate-border);
+	border-radius: 9px;
+	background: var(--rate-card);
+	box-shadow: 0 1px 3px #00000006;
+}
+.rate-search button:active,
+.rate-campus-tabs button:active,
+.rate-sort-options button:active {
+	opacity: 0.65;
 }
 .rating-app input:not([type="checkbox"]),
 .rating-app textarea,
@@ -493,31 +530,38 @@ body:has(.rating-app) {
 	display: none;
 }
 .rate-campus-tabs {
-	gap: 22px;
+	gap: 4px;
+	scroll-padding-inline: 16px;
+	padding-right: 32px;
+	-webkit-mask-image: linear-gradient(
+		to right,
+		#000 calc(100% - 16px),
+		transparent
+	);
+	mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
 }
 .rate-campus-tabs button {
 	position: relative;
+	isolation: isolate;
 	flex-shrink: 0;
-	min-height: 40px;
-	padding: 6px 0 10px;
+	min-height: 44px;
+	padding: 0 12px;
 	white-space: nowrap;
 	font-size: 14px;
+	font-weight: 500;
 	color: var(--rate-secondary);
 }
 .rate-campus-tabs button.selected {
 	color: var(--rate-accent);
 	font-weight: 700;
 }
-.rate-campus-tabs button.selected::after {
+.rate-campus-tabs button.selected::before {
 	content: "";
 	position: absolute;
-	bottom: 3px;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 18px;
-	height: 3px;
-	border-radius: 2px;
-	background: currentColor;
+	z-index: -1;
+	inset: 5px 0;
+	border-radius: 9px;
+	background: var(--rate-tint);
 }
 .rate-month-tabs .rate-chip {
 	flex-shrink: 0;
@@ -545,25 +589,56 @@ body:has(.rating-app) {
 	background: var(--rate-tint);
 	font-weight: 600;
 }
+.rate-filters .rate-chip {
+	border-radius: 8px;
+}
+.rate-filters > .rate-chips:last-child {
+	padding-bottom: 8px;
+}
 .rate-result-count {
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
 	margin: 0 -12px 10px;
-	padding: 12px 16px 10px;
+	padding: 6px 16px;
 	background: var(--rate-card);
 	font-size: 12px;
 	color: var(--rate-muted);
 }
-.rate-result-count strong {
+.rate-result-count::before {
+	content: "";
+	position: absolute;
+	inset: 0 16px auto;
+	height: 1px;
+	background: var(--rate-border);
+}
+.rate-result-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
 	color: var(--rate-text);
-	font-size: 16px;
+	font-size: 14px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+.rate-result-label strong {
+	min-width: 24px;
+	padding: 2px 6px;
+	border-radius: 6px;
+	background: var(--rate-field);
+	color: var(--rate-secondary);
+	font-size: 11px;
+	font-weight: 650;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
 }
 .rate-result-summary {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 2px 8px;
+	min-width: 0;
 	flex-wrap: wrap;
 }
 .rate-reset {
@@ -572,20 +647,42 @@ body:has(.rating-app) {
 	min-height: 32px;
 }
 .rate-sort-options {
+	position: relative;
+	isolation: isolate;
 	display: flex;
 	align-items: center;
 	flex-shrink: 0;
-	gap: 4px;
+	padding: 0 3px;
+}
+.rate-sort-options::before {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset: 3px 0;
+	border-radius: 10px;
+	background: var(--rate-field);
 }
 .rate-sort-options button {
-	min-height: 36px;
-	padding: 6px 8px;
+	position: relative;
+	isolation: isolate;
+	min-width: 43px;
+	min-height: 44px;
+	padding: 6px 9px;
 	font-size: 12px;
-	color: var(--rate-muted);
+	color: var(--rate-secondary);
 }
 .rate-sort-options button.selected {
 	color: var(--rate-text);
-	font-weight: 700;
+	font-weight: 650;
+}
+.rate-sort-options button.selected::before {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset: 7px 0;
+	border-radius: 7px;
+	background: var(--rate-card);
+	box-shadow: 0 1px 4px #0000000d;
 }
 .rate-full-list:empty {
 	display: none;
