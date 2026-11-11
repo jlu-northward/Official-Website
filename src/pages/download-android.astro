@@ -1,59 +1,162 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import { appInfo } from "../config/appInfo";
+import { androidDownloadCopy, androidStores } from "../config/androidStores";
 
-const targetUrl = appInfo.storeLinks.google;
-const title = `${appInfo.title} - Android 下载`;
+const title = `${appInfo.title} - ${androidDownloadCopy.title}`;
 ---
 
 <Layout title={title} description={appInfo.description} showFooter={false}>
 	<section
-		class="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center"
+		class="flex min-h-screen flex-col items-center justify-center gap-4 px-6 py-12 text-center"
 	>
-		<div class="max-w-md space-y-4">
-			<h1
-				class="animate-fade-up text-3xl font-semibold text-gray-900 dark:text-white"
+		<div class="w-full max-w-md space-y-6">
+			<div class="space-y-4" aria-live="polite">
+				<h1
+					id="download-heading"
+					class="text-3xl font-semibold text-gray-900 dark:text-white"
+				>
+					{androidDownloadCopy.heading}
+				</h1>
+				<p
+					id="download-description"
+					class="text-base leading-relaxed text-gray-600 dark:text-gray-300"
+				>
+					{androidDownloadCopy.description}
+				</p>
+			</div>
+			<a
+				id="download-primary"
+				class="card-lift inline-flex w-full items-center justify-center rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm outline-none hover:shadow-md focus-visible:ring-4 focus-visible:ring-blue-500/25 dark:bg-white dark:text-gray-900"
+				href={appInfo.storeLinks.google}
+				data-store-url
 			>
-				正在跳转到 Android 下载...
-			</h1>
-			<p
-				class="animate-fade-up animate-fade-up-1 text-base text-gray-600 dark:text-gray-300"
-			>
-				如果没有自动跳转，请
+				{androidDownloadCopy.download}
+			</a>
+			<div class="space-y-3">
+				<h2 class="text-sm text-gray-500 dark:text-gray-400">
+					{androidDownloadCopy.stores}
+				</h2>
+				<div class="flex flex-wrap justify-center gap-3">
+					{
+						androidStores.map((store) => (
+							<a
+								class="card-lift inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-900 shadow-sm outline-none hover:shadow-md focus-visible:ring-4 focus-visible:ring-blue-500/25 dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
+								href={store.url}
+								data-store-url
+							>
+								{store.name}
+							</a>
+						))
+					}
+				</div>
+			</div>
+			<div class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
 				<a
 					class="text-blue-600 underline outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30 dark:text-blue-400"
-					href={targetUrl}
-					rel="noreferrer"
-					target="_blank"
+					href={appInfo.storeLinks.google}
+					data-store-url
 				>
-					点击这里直接获取最新 APK
-				</a>
-				。
-			</p>
-			<div
-				class="animate-fade-up animate-fade-up-2 flex flex-col gap-3 sm:flex-row sm:justify-center"
-			>
-				<a
-					class="card-lift inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm outline-none hover:shadow-md focus-visible:ring-4 focus-visible:ring-blue-500/25 active:scale-[0.98] dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
-					href={targetUrl}
-					target="_blank"
-					rel="noreferrer"
-				>
-					立即下载 Android 版本
+					{androidDownloadCopy.apk}
 				</a>
 				<a
-					class="card-lift inline-flex items-center justify-center rounded-xl border border-transparent bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm outline-none hover:shadow-md focus-visible:ring-4 focus-visible:ring-blue-500/25 active:scale-[0.98] dark:bg-white/10 dark:text-white"
+					class="text-blue-600 underline outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30 dark:text-blue-400"
+					href={appInfo.storeLinks.google2}
+					data-store-url
+				>
+					{androidDownloadCopy.backup}
+				</a>
+				<a
+					class="text-gray-600 underline outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30 dark:text-gray-300"
 					href="/"
 				>
-					返回首页
+					{androidDownloadCopy.home}
 				</a>
 			</div>
 		</div>
 	</section>
 
-	<script is:inline define:vars={{ targetUrl }}>
-		setTimeout(() => {
-			window.location.href = targetUrl;
-		}, 400);
+	<script>
+		import { appInfo } from "../config/appInfo";
+		import {
+			androidDownloadCopy,
+			androidStores,
+		} from "../config/androidStores";
+		import { resolveAndroidDownload } from "../lib/androidDownload";
+
+		const heading =
+			document.querySelector<HTMLHeadingElement>("#download-heading")!;
+		const description = document.querySelector<HTMLParagraphElement>(
+			"#download-description",
+		)!;
+		const primary =
+			document.querySelector<HTMLAnchorElement>("#download-primary")!;
+		let autoRedirectCancelled = false;
+		let redirectTimer: number | undefined;
+		// 包括等待 Client Hints 期间的点击，手动选择始终优先。
+		document.addEventListener("click", (event) => {
+			if (event.target instanceof Element && event.target.closest("a[href]")) {
+				autoRedirectCancelled = true;
+				window.clearTimeout(redirectTimer);
+			}
+		});
+
+		async function startDownload() {
+			const userAgent = navigator.userAgent;
+			let { store, isWeChat } = resolveAndroidDownload(
+				userAgent,
+				androidStores,
+			);
+			if (isWeChat) {
+				description.textContent = androidDownloadCopy.wechat;
+				return;
+			}
+
+			// Chrome 可能隐藏 UA 中的机型；补充 Client Hints，超时或拒绝则使用 APK。
+			const userAgentData = (
+				navigator as Navigator & {
+					userAgentData?: {
+						getHighEntropyValues?: (
+							hints: string[],
+						) => Promise<{ model?: string }>;
+					};
+				}
+			).userAgentData;
+			if (
+				!store &&
+				/Android/i.test(userAgent) &&
+				userAgentData?.getHighEntropyValues
+			) {
+				try {
+					const hints = await Promise.race([
+						userAgentData.getHighEntropyValues(["model"]),
+						new Promise<{ model?: string }>((resolve) =>
+							setTimeout(() => resolve({}), 500),
+						),
+					]);
+					({ store } = resolveAndroidDownload(
+						userAgent,
+						androidStores,
+						hints.model,
+					));
+				} catch {
+					// 浏览器不提供机型时，继续使用 APK 入口。
+				}
+			}
+
+			if (autoRedirectCancelled) return;
+			const targetUrl = store?.url ?? appInfo.storeLinks.google;
+			primary.href = targetUrl;
+			if (store) {
+				heading.textContent = `${androidDownloadCopy.opening} ${store.name}…`;
+				primary.textContent = store.name;
+			}
+			redirectTimer = window.setTimeout(
+				() => window.location.replace(targetUrl),
+				400,
+			);
+		}
+
+		void startDownload();
 	</script>
 </Layout>
