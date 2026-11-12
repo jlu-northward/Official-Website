@@ -8,7 +8,8 @@
 		"preview": "astro preview",
 		"timetable": "python3 scripts/import-classrooms.py",
 		"test:timetable": "python3 -m unittest discover -s tests -p 'test_*classrooms*.py'",
-		"test:tools": "node --test tests/tools-*.test.mjs"
+		"test:tools": "node --test tests/tools-*.test.mjs",
+		"test:rating": "node --test tests/rating-*.test.mjs"
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.4.0",
