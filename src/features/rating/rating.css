@@ -1,4 +1,11 @@
 /* Match the native rating palette; rank hues remain stable by rank ID. */
+.rating-app,
+.rate-dialog {
+	/* 显式优先中文字体，避免 WKWebView 的系统 UI 字体回退出现缺字。 */
+	font-family:
+		"PingFang SC", "Heiti SC", -apple-system, BlinkMacSystemFont, "Segoe UI",
+		"Microsoft YaHei", sans-serif;
+}
 .rating-app {
 	--rate-bg: #f5f7fa;
 	--rate-card: #fff;
