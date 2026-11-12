@@ -13,6 +13,26 @@ npm run preview    # 预览构建产物
 
 更多命令约定（提交规范、代码风格、PR 流程）见 [AGENTS.md](./AGENTS.md)。
 
+## iOS 密码自动填充关联
+
+`public/.well-known/apple-app-site-association` 为向北 App 提供 `webcredentials` 关联，构建后保留在 `dist/client/.well-known/`。当前 App ID 为 `88H84N7PBG.zone.northward.app`，依据 App 仓库的 `ios/exportOptions.plist` 团队标识和 Runner Bundle ID；发布前须与实际签名包的 `application-identifier` 核对，不能用课表 Widget 的签名配置替代。
+
+上线顺序：
+
+1. 发布本文件，并应用 `northward-ops/nginx/northward.zone.conf` 中的 AASA 精确路由。当前官网走 Nginx；`vercel.json` 中也为 Vercel 部署配置了 JSON 响应头。HTTPS 地址必须直接返回 `200`、`Content-Type: application/json` 和本文件内容，不可跳转、返回 HTML 或要求登录。现有官网发布流程会一起打包 `.well-known` 目录。
+2. 在 Apple Developer 为 `zone.northward.app` 启用 Associated Domains，更新并同步签名描述文件，再构建包含 `webcredentials:northward.zone` entitlement 的 App。当前 Fastlane `match` 使用 `readonly: true`，CI 不会自动更新描述文件。本仓库改动不修改 Apple 账号或线上配置。
+3. 核对签名包的 `application-identifier` 与 AASA 一致，且 `com.apple.developer.associated-domains` 包含该域名；若 App ID 前缀与团队标识不同，以实际签名值为准。待 Apple 关联缓存更新后，用启用密码自动填充的 iPhone 安装新版，验证登录后的密码保存和下次登录的自动填充。
+
+```bash
+# 不加 -L：直接检查状态、响应头与 JSON，避免隐藏重定向。
+curl -i https://northward.zone/.well-known/apple-app-site-association
+
+# 对实际签名产物执行，检查上述两项 entitlement。
+codesign -d --entitlements :- /实际路径/Runner.app
+```
+
+Flutter 在认证成功后提交保存请求，保存与提示由 iOS 决定；系统可能保存但不弹提示，App 也收不到“用户已保存”的结果回调。验收应以系统“密码”中的完整账号及再次自动填充为准。
+
 ## 在 App 内打开
 
 App 的网页容器在文档启动时注入 `window.northwardTheme`，主题脚本（`src/lib/theme-script.js`）据此给 `<html>` 加上 `data-embedded`。页眉、页脚、面包屑等网页导航用 Tailwind 的 `embedded:hidden` 在 App 内隐藏，首屏绘制前即生效；浏览器打开时不受影响。不要改用网址参数：App 内“在浏览器打开”和复制出的链接会把参数带到浏览器里。新增页面的网页导航同样加上 `embedded:hidden`。
