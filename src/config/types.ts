@@ -22,6 +22,13 @@ export interface StoreLinks {
 	google2: string;
 }
 
+export interface AndroidStore {
+	id: string;
+	name: string;
+	url: string;
+	userAgentPatterns: readonly RegExp[];
+}
+
 export interface SocialLink {
 	url: string;
 	icon: IconType;
