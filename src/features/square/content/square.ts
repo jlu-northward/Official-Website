@@ -16,7 +16,7 @@ export const squareContent = {
 			name: "弹射冰球",
 			description: "拉住、瞄准、松手。把冰球送过中线，先清空自己的半场。",
 			modes: "人机练习 · 在线匹配 · 好友对战",
-			href: "https://games.northward.zone/hockey/",
+			href: "https://games.northward.zone/hockey/?northward=1",
 			cover: "/assets/games/hockey.svg",
 		},
 		{
@@ -24,7 +24,7 @@ export const squareContent = {
 			name: "恰好合拍",
 			description: "移动、旋转、微调。让彩色形状与轮廓，恰好合拍。",
 			modes: "每日挑战 · 无尽连击 · 慢慢拼",
-			href: "https://games.northward.zone/perfect-match/",
+			href: "https://games.northward.zone/perfect-match/?northward=1",
 			cover: "/assets/games/perfect-match.svg",
 		},
 	],
