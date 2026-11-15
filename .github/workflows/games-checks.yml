@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Chlx42/sling-hockey
-          ref: d7967f03ae284793805f713fbb8694eb30946f12
+          ref: ba07dd3b5f2d88302ca9088c2aae78b2285b5068
           path: sling-hockey
           persist-credentials: false
       - uses: actions/setup-node@v4

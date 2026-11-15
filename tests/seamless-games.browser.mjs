@@ -14,6 +14,7 @@ let account = { uid: "42", nickname: "甲同学" },
 	pending = null,
 	codeRequests = 0,
 	exchanges = 0;
+let failStatus = false;
 const mime = (p) =>
 	p.endsWith(".js") || p.endsWith(".mjs")
 		? "application/javascript"
@@ -43,6 +44,8 @@ await context.route("**/*", async (route) => {
 			"主 token 不得交给游戏",
 		);
 		if (url.pathname === "/hockey/northward/session") {
+			if (request.method() === "GET" && failStatus)
+				return reply({ message: "模拟弱网" }, 503);
 			if (request.method() === "GET")
 				return reply({ enabled: true, user: current });
 			if (request.method() === "DELETE") {
@@ -65,7 +68,7 @@ await context.route("**/*", async (route) => {
 				"Set-Cookie":
 					"nw_hockey=" +
 					"f".repeat(64) +
-						"; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=28800",
+					"; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=28800",
 			});
 		}
 		if (url.pathname === "/hockey/northward-login.mjs")
@@ -100,16 +103,14 @@ await context.route("**/*", async (route) => {
 			let data = await fs.readFile(file);
 			if (url.pathname === "/games/launch/")
 				data = Buffer.from(
-					data
-						.toString()
-						.replace(
-							"<head>",
-							"<head><script>window.northwardAuth=" +
-								JSON.stringify({
-									accessToken: account ? "fixture-access" : null,
-								}) +
-								"</script>",
-						),
+					data.toString().replace(
+						"<head>",
+						"<head><script>window.northwardAuth=" +
+							JSON.stringify({
+								accessToken: account ? "fixture-access" : null,
+							}) +
+							"</script>",
+					),
 				);
 			return route.fulfill({ contentType: mime(file), body: data });
 		} catch {
@@ -143,8 +144,22 @@ for (const expected of [
 assert.equal(codeRequests, 2);
 assert.equal(exchanges, 2);
 assert.equal(current, null);
+// 无法确认旧会话时阻止进入；重试必须重新握手，不能只刷新后沿用旧账号。
+current = { uid: "41", nickname: "旧账号" };
+account = { uid: "44", nickname: "重试同学" };
+failStatus = true;
+await page.goto("https://games.northward.zone/hockey/?northward=1");
+await page.getByRole("alert").waitFor();
+assert.equal(await page.getAttribute("body", "data-ready"), null);
+assert.equal(codeRequests, 2);
+failStatus = false;
+await page.getByRole("button", { name: "重新加载" }).click();
+await page.waitForFunction(() => document.body.dataset.ready === "true");
+assert.equal(await page.getAttribute("body", "data-user"), "44");
+assert.equal(codeRequests, 3);
+assert.equal(exchanges, 3);
 console.log(
-	"PASS 浏览器：账号自动进入、换号、游客清理、PKCE/state、片段清除、游戏不获取主 token",
+	"PASS 浏览器：账号自动进入、换号、游客清理、弱网重试、PKCE/state、片段清除、游戏不获取主 token",
 );
 await page.setViewportSize({ width: 1440, height: 1000 });
 await page.goto("https://northward.zone/square/");
