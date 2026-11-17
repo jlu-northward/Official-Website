@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" fill="none">
+  <defs>
+    <linearGradient id="bg" x2="640" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#fae6d7"/><stop offset="1" stop-color="#efd2c1"/></linearGradient>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#c6947c" fill-opacity=".22"/></pattern>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#9c6a55" flood-opacity=".14"/></filter>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h640v360H0z"/>
+  <path fill="url(#dots)" d="M0 0h640v360H0z"/>
+  <g transform="rotate(7 320 180)" filter="url(#shadow)">
+    <rect x="174" y="39" width="292" height="282" rx="26" fill="#fffaf0"/>
+    <rect x="190" y="55" width="260" height="250" rx="15" stroke="#e5d7c2"/>
+    <path d="m224 93 106 0 0 106z" fill="#e6b852"/>
+    <path d="m334 204 0 74-74-74z" fill="#6a9a8f"/>
+    <path d="m224 99 0 100 100 0z" fill="#e99372" fill-opacity=".16" stroke="#cf8062" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="7 6"/>
+    <path d="m338 93 78 78-78 0z" fill="#b4a3d2"/>
+    <path d="m342 178 73 0 0 73z" fill="#d27873"/>
+    <path d="m224 211 27 0 42 42-69 0z" fill="#83aaa0"/>
+  </g>
+  <path d="m158 137 0 104 104 0z" fill="#e78e6e" stroke="#f8b79b" stroke-width="2" stroke-linejoin="round" transform="rotate(-13 210 189)" filter="url(#shadow)"/>
+  <path d="M218 172c13-9 25-12 42-12m-9-7 11 7-10 8" stroke="#b57960" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m487 90 3 10 10 3-10 3-3 10-3-10-10-3 10-3z" fill="#d59f53"/>
+  <circle cx="464" cy="265" r="5" fill="#93ada0"/>
+  <circle cx="145" cy="89" r="4" fill="#c3afd3"/>
+</svg>

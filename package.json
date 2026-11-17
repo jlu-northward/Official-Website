@@ -8,6 +8,7 @@
 		"preview": "astro preview",
 		"timetable": "python3 scripts/import-classrooms.py",
 		"test:timetable": "python3 -m unittest discover -s tests -p 'test_*classrooms*.py'",
+		"test:games": "node tests/seamless-games.browser.mjs",
 		"test:tools": "node --test tests/tools-*.test.mjs"
 	},
 	"dependencies": {
@@ -41,6 +42,7 @@
 		"@types/react": "^19.2.2",
 		"@types/react-dom": "^19.2.2",
 		"baseline-browser-mapping": "^2.11.13",
+		"playwright": "1.65.0",
 		"prettier": "^3.9.6",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.8.1",
