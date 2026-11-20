@@ -93,7 +93,12 @@ export function parseGradeRows(rows: unknown[][]): GradeImport {
 		const score = text(row[columns.score]).normalize("NFKC");
 		const credits = text(row[columns.credits]).normalize("NFKC");
 		const nature = text(row[columns.nature]) || "其他";
-		const term = text(row[columns.term]);
+		const year = text(row[columns.year]).normalize("NFKC");
+		const term =
+			text(row[columns.term]) ||
+			[/^\d{4}$/.test(year) ? `${year}学年` : year, text(row[columns.semester])]
+				.filter(Boolean)
+				.join(" ");
 		if (
 			name.length > 100 ||
 			score.length > 100 ||

@@ -43,7 +43,8 @@ export const gpaImportContent = {
 	noScore: "未出分",
 	scoreLabel: "成绩",
 	importTitle: "用成绩表替换当前课程？",
-	importDescription: "确认后会替换当前清单，并默认计算必修课。",
+	importDescription:
+		"确认后会替换当前清单，按最早学年匹配规则，并默认计算必修课。",
 	confirmImport: "导入并计算",
 	keepCourses: "保留当前课程",
 	expand: "展开全部课程",
@@ -63,7 +64,9 @@ export const gpaImportContent = {
 		score: ["总成绩", "成绩", "课程成绩"],
 		nature: ["课程性质", "课程属性"],
 		credits: ["学分", "课程学分"],
-		term: ["学年学期", "学期"],
+		term: ["学年学期"],
+		year: ["学年"],
+		semester: ["学期"],
 		valid: ["是否有效"],
 	},
 };

@@ -15,7 +15,8 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { gpaTranscriptContent as copy } from "./content/gpa-transcript";
-import type { CourseDraft, GpaScope } from "./gpa";
+import { gpaRules } from "./content/gpa-rules";
+import type { CourseDraft, GpaRule, GpaScope } from "./gpa";
 import type { SkippedGrade } from "./gpa-import";
 import { buildGpaTranscript } from "./gpa-transcript";
 import { track } from "@/lib/analytics";
@@ -24,6 +25,7 @@ interface GpaTranscriptDialogProps {
 	courses: CourseDraft[];
 	skipped: SkippedGrade[];
 	scope: GpaScope;
+	rule: GpaRule;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onCloseAutoFocus?: (event: Event) => void;
@@ -33,6 +35,7 @@ export default function GpaTranscriptDialog({
 	courses,
 	skipped,
 	scope,
+	rule,
 	open,
 	onOpenChange,
 	onCloseAutoFocus,
@@ -41,8 +44,8 @@ export default function GpaTranscriptDialog({
 	const [error, setError] = useState("");
 	const [attempt, setAttempt] = useState(0);
 	const transcript = useMemo(
-		() => (open ? buildGpaTranscript(courses, skipped, scope) : null),
-		[open, courses, skipped, scope],
+		() => (open ? buildGpaTranscript(courses, skipped, scope, rule) : null),
+		[open, courses, skipped, scope, rule],
 	);
 
 	useEffect(() => {
@@ -161,7 +164,8 @@ export default function GpaTranscriptDialog({
 								{copy.accessibleDetails}
 							</summary>
 							<p className="mt-4 text-muted-foreground">
-								{copy.gpaLabel} · {copy.scopeLabels[scope]}：
+								{copy.gpaLabel} · {copy.scopeLabels[scope]} ·{" "}
+								{gpaRules[rule].name}：
 								{transcript.result.gpa?.toFixed(5) ?? copy.notReady}
 							</p>
 							{transcript.groups.map((group) => (
@@ -204,7 +208,7 @@ export default function GpaTranscriptDialog({
 													{course.credits}
 												</td>
 												<td className="break-words py-2 text-right align-top">
-													{course.points?.toFixed(1) ?? "—"}
+													{course.points?.toFixed(2) ?? "—"}
 												</td>
 												<td className="break-words py-2 text-right align-top">
 													{course.score}

@@ -23,6 +23,34 @@ export interface CourseDraft {
 }
 
 export type GpaScope = "required" | "all";
+export type GpaRule = "legacy" | "2026";
+export type GpaRuleChoice = "auto" | GpaRule;
+
+export function earliestAcademicYear(
+	terms: (string | undefined)[],
+): number | null {
+	let earliest: number | null = null;
+	for (const term of terms) {
+		const value = term?.normalize("NFKC").trim();
+		if (!value) continue;
+		// The first year in an academic-year range is its starting year.
+		const match = /(?:^|\D)((?:19|20)\d{2})(?!\d)/.exec(value);
+		if (!match) continue;
+		let year = Number(match[1]);
+		if (/^\s*年?\s*[春夏]/.test(value.slice(match.index + match[0].length)))
+			year--;
+		if (earliest === null || year < earliest) earliest = year;
+	}
+	return earliest;
+}
+
+export function resolveGpaRule(
+	choice: GpaRuleChoice,
+	firstYear: number | null,
+): GpaRule {
+	if (choice !== "auto") return choice;
+	return firstYear !== null && firstYear >= 2026 ? "2026" : "legacy";
+}
 
 export function isRequiredCourse(course: CourseDraft): boolean {
 	return /^(必修|必修课)$/.test(
@@ -33,9 +61,13 @@ export function isRequiredCourse(course: CourseDraft): boolean {
 export const coursesInScope = (courses: CourseDraft[], scope: GpaScope) =>
 	scope === "all" ? courses : courses.filter(isRequiredCourse);
 
-export function gradePoint(score: number): number {
+export function gradePoint(score: number, rule: GpaRule = "legacy"): number {
 	if (!Number.isFinite(score) || score < 0 || score > 100) {
 		throw new RangeError("成绩须在 0–100 之间");
+	}
+	if (rule === "2026") {
+		if (score < 60) return 0;
+		return (Math.min(Math.floor(score), 90) - 50) / 10;
 	}
 	return JLU_GRADE_SCALE.find((range) => score >= range.minimum)!.points;
 }
@@ -47,7 +79,7 @@ function numericInput(value: string): number | null {
 	return Number.isFinite(number) ? number : null;
 }
 
-export function inspectCourse(course: CourseDraft) {
+export function inspectCourse(course: CourseDraft, rule: GpaRule = "legacy") {
 	const empty =
 		!course.name.trim() && !course.score.trim() && !course.credits.trim();
 	const score = numericInput(course.score);
@@ -61,12 +93,14 @@ export function inspectCourse(course: CourseDraft) {
 		scoreValid,
 		creditsValid,
 		valid: scoreValid && creditsValid,
-		points: scoreValid ? gradePoint(score) : null,
+		points: scoreValid ? gradePoint(score, rule) : null,
 	};
 }
 
-export function calculateGpa(courses: CourseDraft[]) {
-	const entered = courses.map(inspectCourse).filter((course) => !course.empty);
+export function calculateGpa(courses: CourseDraft[], rule: GpaRule = "legacy") {
+	const entered = courses
+		.map((course) => inspectCourse(course, rule))
+		.filter((course) => !course.empty);
 	const incomplete = entered.filter((course) => !course.valid).length;
 	if (entered.length === 0 || incomplete > 0) {
 		return {

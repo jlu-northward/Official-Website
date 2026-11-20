@@ -1,4 +1,5 @@
 import { gpaTranscriptContent as copy } from "./content/gpa-transcript.ts";
+import { gpaRules } from "./content/gpa-rules.ts";
 import type { GpaTranscript, TranscriptCourse } from "./gpa-transcript.ts";
 
 const WIDTH = 960;
@@ -198,7 +199,7 @@ export async function renderGpaTranscriptImage(
 	font(ctx, 15);
 	ctx.fillStyle = "#d2e0d4";
 	ctx.fillText(
-		`${copy.gpaLabel} · ${copy.scopeLabels[transcript.scope]}`,
+		`${copy.gpaLabel} · ${copy.scopeLabels[transcript.scope]} · ${gpaRules[transcript.rule].name}`,
 		MARGIN + 28,
 		240,
 	);
@@ -316,7 +317,7 @@ export async function renderGpaTranscriptImage(
 					middle - row.credits.length * 13 + lineIndex * 26,
 				),
 			);
-			ctx.fillText(row.course.points?.toFixed(1) ?? "—", 739, middle - 13);
+			ctx.fillText(row.course.points?.toFixed(2) ?? "—", 739, middle - 13);
 			font(ctx, 27, 600);
 			ctx.fillStyle = row.course.points === 0 ? color.red : color.green;
 			row.score.forEach((value, lineIndex) =>
