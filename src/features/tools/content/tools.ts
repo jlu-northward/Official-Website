@@ -228,7 +228,6 @@ export const toolsContent = {
 	classroomLoading: "正在打开教室查询…",
 	classroomLoadError: "暂时无法打开教室查询，请检查网络后重试。",
 	gpaDetailsTitle: "计算明细与说明",
-	gpaRulesDescription: "百分制成绩按以下区间换算为单科绩点。",
 	gpaDetailsDescription:
 		"各门课程的学分乘以对应绩点，加总后除以总学分。未及格课程以 0 绩点计入，学分同样参与加权。仅供估算，以学校认定为准。",
 	heroDescription:

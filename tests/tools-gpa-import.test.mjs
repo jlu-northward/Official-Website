@@ -163,3 +163,14 @@ test("wrong templates, missing records and too many courses fail without partial
 		/200/,
 	);
 });
+test("separate academic year and semester columns preserve the year for rule matching", () => {
+	const result = parseGradeRows([
+		["学期", "课程名", "成绩", "课程性质", "学分", "学年"],
+		["秋", "数学", 85, "必修", 2, "2026-2027"],
+		["春", "体育", "优秀", "必修", 1, "2025-2026"],
+		["春", "选修课", 80, "选修", 1, 2026],
+	]);
+	assert.equal(result.courses[0].term, "2026-2027 秋");
+	assert.equal(result.skipped[0].term, "2025-2026 春");
+	assert.equal(result.courses[1].term, "2026学年 春");
+});

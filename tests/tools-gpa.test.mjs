@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
 	calculateGpa,
+	earliestAcademicYear,
 	emptyCourses,
 	gradePoint,
 	inspectCourse,
 	isCourseDrafts,
 	JLU_GRADE_SCALE,
+	resolveGpaRule,
 } from "../src/features/tools/gpa.ts";
 
 const course = (score, credits, name = "课程") => ({
@@ -32,6 +34,39 @@ test("out of range and non-finite scores are rejected", () => {
 	[-1, 100.01, NaN, Infinity].forEach((score) =>
 		assert.throws(() => gradePoint(score), RangeError),
 	);
+});
+
+test("2026 continuous points match the conversion table and floor fractional grades", () => {
+	const points = [
+		0, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.1, 2.2, 2.3, 2.4,
+		2.5, 2.6, 2.7, 2.8, 2.9, 3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4,
+	];
+	points.forEach((expected, index) => {
+		assert.equal(gradePoint(59 + index, "2026"), expected);
+		assert.equal(gradePoint(59.99 + index, "2026"), expected);
+	});
+	assert.equal(gradePoint(0, "2026"), 0);
+	assert.equal(gradePoint(100, "2026"), 4);
+	for (const score of [-0.1, 100.01, NaN, Infinity])
+		assert.throws(() => gradePoint(score, "2026"), RangeError);
+});
+
+test("automatic rule uses the earliest academic year, with legacy fallback and manual overrides", () => {
+	const year = earliestAcademicYear([
+		"２０２７－２０２８－１",
+		"2025—2026学年第2学期",
+		"2026 第一学期",
+	]);
+	assert.equal(year, 2025);
+	assert.equal(resolveGpaRule("auto", year), "legacy");
+	assert.equal(resolveGpaRule("2026", year), "2026");
+	assert.equal(earliestAcademicYear(["2026 年春季学期"]), 2025);
+	assert.equal(earliestAcademicYear(["", undefined, "第2学期"]), null);
+	assert.equal(resolveGpaRule("auto", null), "legacy");
+	for (const firstYear of [2026, 2027]) {
+		assert.equal(resolveGpaRule("auto", firstYear), "2026");
+		assert.equal(resolveGpaRule("legacy", firstYear), "legacy");
+	}
 });
 
 test("weighted GPA matches the reference example, with five-decimal display", () => {
