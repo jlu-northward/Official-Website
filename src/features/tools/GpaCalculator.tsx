@@ -478,9 +478,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 										: gpaRuleCopy.matched(firstYear, ruleInfo.name)
 									: `${ruleInfo.name}，适用于${ruleInfo.cohort}。`}
 							</span>
-							{ruleChoice === "auto" && (
-								<CalculationRules rule={rule} iconOnly />
-							)}
+							<CalculationRules rule={rule} iconOnly />
 						</p>
 					</div>
 					<div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border/60 bg-background/40 px-4 py-3 sm:px-5">
