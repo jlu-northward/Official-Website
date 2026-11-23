@@ -17,13 +17,13 @@ const WeChatGuide = memo(({ openOnLoad = true }: WeChatGuideProps) => {
 	useEffect(() => {
 		if (!isWeChat) return;
 
-		// 拦截安卓下载入口，iOS 链接继续跳转到 App Store。
+		// 在微信里点击 iOS 或安卓下载入口时显示浏览器指引。
 		const handler = (e: MouseEvent) => {
 			const target = (e.target as HTMLElement).closest("a[href]");
 			if (!target) return;
 			const href = target.getAttribute("href") || "";
 			if (
-				/\/download-android|\/api\/android-download/.test(href) ||
+				/\/download-(android|ios)|\/api\/android-download/.test(href) ||
 				target.hasAttribute("data-store-url")
 			) {
 				e.preventDefault();
