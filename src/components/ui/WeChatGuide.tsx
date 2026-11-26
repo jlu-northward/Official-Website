@@ -23,7 +23,7 @@ const WeChatGuide = memo(({ openOnLoad = true }: WeChatGuideProps) => {
 			if (!target) return;
 			const href = target.getAttribute("href") || "";
 			if (
-				/\/download-(android|ios)|\/api\/android-download/.test(href) ||
+				/\/download-(android|ios)/.test(href) ||
 				target.hasAttribute("data-store-url")
 			) {
 				e.preventDefault();

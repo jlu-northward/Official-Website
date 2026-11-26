@@ -1,0 +1,73 @@
+---
+import { renderInline } from "../content";
+import type { SharePoll } from "../types";
+
+interface Props {
+	poll: SharePoll | null;
+}
+
+const { poll } = Astro.props;
+const validPoll = poll && poll.options && poll.options.length > 0 ? poll : null;
+const totalVotes = validPoll ? Math.max(validPoll.totalVotes || 0, 0) : 0;
+---
+
+{
+	validPoll && (
+		<section
+			class="order-3 mt-5 rounded-[10px] border bg-muted/70 p-3"
+			aria-label="投票"
+		>
+			<div class="flex items-center gap-1.5">
+				<svg
+					class="size-[17px] shrink-0 text-primary"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<path d="m9 12 2 2 4-4" />
+					<path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z" />
+					<path d="M22 19H2" />
+				</svg>
+				<span class="text-[13px] font-bold">投票</span>
+				<span class="ml-auto text-xs text-muted-foreground">
+					已有{totalVotes}人参与
+				</span>
+			</div>
+			<ul class="mt-2.5 space-y-1.5">
+				{validPoll.options.map((choice) => {
+					const votes = Math.max(choice.votes || 0, 0);
+					const percent =
+						totalVotes === 0 ? 0 : Math.min(100, (votes * 100) / totalVotes);
+					const label = `${percent.toFixed(1)}%`;
+					return (
+						<li class="relative h-[38px] overflow-hidden rounded-md border bg-card">
+							<progress
+								class="share-poll-fill absolute inset-0"
+								max="1000"
+								value={Math.round(percent * 10)}
+								aria-hidden="true"
+							/>
+							<div class="relative flex h-full items-center gap-2 px-3">
+								<span
+									class="min-w-0 flex-1 truncate text-sm text-muted-foreground"
+									set:html={renderInline(choice.text?.trim() || "选项")}
+								/>
+								<span class="shrink-0 text-xs font-semibold tabular-nums text-foreground/60">
+									{label}
+								</span>
+								<span class="shrink-0 text-[11px] tabular-nums text-muted-foreground">
+									({votes})
+								</span>
+							</div>
+						</li>
+					);
+				})}
+			</ul>
+			<p class="mt-2.5 text-xs text-muted-foreground">在 App 内参与投票</p>
+		</section>
+	)
+}

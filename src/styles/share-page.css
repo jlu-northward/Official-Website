@@ -1,0 +1,217 @@
+/*
+ * 公开帖子分享页样式：中性色调带一点蓝，跟随系统深浅色。
+ * 作用域限定在 .share-page，不影响官网其他页面的主题变量。
+ */
+.share-page {
+	--background: 0 0% 100%;
+	--foreground: 222 26% 14%;
+	--card: 0 0% 100%;
+	--card-foreground: 222 26% 14%;
+	--primary: 217 72% 50%;
+	--primary-foreground: 0 0% 100%;
+	--secondary: 216 60% 96%;
+	--secondary-foreground: 217 55% 38%;
+	--muted: 220 24% 96%;
+	--muted-foreground: 220 9% 44%;
+	--border: 220 16% 90%;
+	--brand-start: 222 36% 17%;
+	--brand-end: 220 52% 31%;
+	--brand-foreground: 0 0% 100%;
+	color-scheme: light;
+	-webkit-text-size-adjust: 100%;
+	-webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+	.share-page {
+		--background: 222 26% 7%;
+		--foreground: 220 18% 92%;
+		--card: 222 20% 11%;
+		--card-foreground: 220 18% 92%;
+		--primary: 214 85% 70%;
+		--primary-foreground: 222 40% 10%;
+		--secondary: 220 26% 16%;
+		--secondary-foreground: 214 75% 82%;
+		--muted: 222 16% 12%;
+		--muted-foreground: 220 9% 62%;
+		--border: 222 13% 19%;
+		--brand-start: 214 60% 93%;
+		--brand-end: 215 75% 83%;
+		--brand-foreground: 222 40% 12%;
+		color-scheme: dark;
+	}
+}
+
+.share-page *,
+.share-page *::before,
+.share-page *::after {
+	border-color: hsl(var(--border));
+}
+
+.share-page ::selection {
+	background: hsl(var(--primary) / 0.18);
+}
+
+/* 帖子正文（服务端 Markdown 渲染结果） */
+.share-content {
+	font-size: 16px;
+	line-height: 1.75;
+	color: hsl(var(--foreground) / 0.9);
+	overflow-wrap: anywhere;
+}
+
+.share-content > * + * {
+	margin-top: 0.75em;
+}
+
+.share-content a {
+	color: hsl(var(--primary));
+	text-underline-offset: 2px;
+}
+
+.share-content a:hover {
+	text-decoration: underline;
+}
+
+.share-content strong {
+	font-weight: 600;
+	color: hsl(var(--foreground));
+}
+
+.share-content em {
+	font-style: italic;
+}
+
+.share-content del {
+	opacity: 0.65;
+}
+
+.share-content h1,
+.share-content h2,
+.share-content h3,
+.share-content h4,
+.share-content h5,
+.share-content h6 {
+	font-weight: 600;
+	line-height: 1.45;
+	color: hsl(var(--foreground));
+}
+
+.share-content h1,
+.share-content h2 {
+	font-size: 1.15em;
+}
+
+.share-content h3 {
+	font-size: 1.05em;
+}
+
+.share-content ul {
+	list-style: disc;
+	padding-left: 1.25em;
+}
+
+.share-content ol {
+	list-style: decimal;
+	padding-left: 1.4em;
+}
+
+.share-content li + li {
+	margin-top: 0.25em;
+}
+
+.share-content li::marker {
+	color: hsl(var(--muted-foreground));
+}
+
+.share-content blockquote {
+	border-left: 3px solid hsl(var(--border));
+	padding-left: 0.875em;
+	color: hsl(var(--muted-foreground));
+}
+
+.share-content code {
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 0.875em;
+	background: hsl(var(--muted));
+	border-radius: 0.3em;
+	padding: 0.1em 0.35em;
+}
+
+.share-content pre {
+	background: hsl(var(--muted));
+	border-radius: 0.5rem;
+	padding: 0.75em 1em;
+	overflow-x: auto;
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.share-content pre code {
+	background: none;
+	padding: 0;
+	font-size: inherit;
+}
+
+.share-content hr {
+	border-top-width: 1px;
+}
+
+.share-content img:not(.share-emoji) {
+	max-width: 100%;
+	max-height: 24rem;
+	border-radius: 0.5rem;
+}
+
+.share-content table {
+	display: block;
+	overflow-x: auto;
+	border-collapse: collapse;
+	font-size: 0.875em;
+}
+
+.share-content th,
+.share-content td {
+	border-width: 1px;
+	padding: 0.375em 0.625em;
+}
+
+.share-content th {
+	background: hsl(var(--muted));
+	font-weight: 600;
+}
+
+/* App 表情：跟随文字大小 */
+.share-emoji {
+	display: inline-block;
+	width: 1.4em;
+	height: 1.4em;
+	margin: 0 0.05em;
+	vertical-align: -0.32em;
+}
+
+/* 投票选项的比例填充 */
+.share-poll-fill {
+	-webkit-appearance: none;
+	appearance: none;
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	background: transparent;
+	color: hsl(var(--muted-foreground) / 0.16);
+}
+
+.share-poll-fill::-webkit-progress-bar {
+	background: transparent;
+}
+
+.share-poll-fill::-webkit-progress-value {
+	background: hsl(var(--muted-foreground) / 0.16);
+	border-radius: 5px;
+}
+
+.share-poll-fill::-moz-progress-bar {
+	background: hsl(var(--muted-foreground) / 0.16);
+	border-radius: 5px;
+}

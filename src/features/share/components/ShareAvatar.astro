@@ -1,0 +1,30 @@
+---
+import { safeUrl } from "../content";
+
+interface Props {
+	url: string | null | undefined;
+	sizeClass: string;
+}
+
+const { url, sizeClass } = Astro.props;
+const avatarUrl = safeUrl(url);
+---
+
+{
+	avatarUrl ? (
+		<img
+			class={`${sizeClass} shrink-0 rounded-full bg-muted object-cover`}
+			src={avatarUrl}
+			alt=""
+			loading="lazy"
+			decoding="async"
+			referrerpolicy="no-referrer"
+		/>
+	) : (
+		<div
+			class={`${sizeClass} flex shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium text-secondary-foreground`}
+		>
+			北
+		</div>
+	)
+}
