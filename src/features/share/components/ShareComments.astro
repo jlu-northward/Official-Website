@@ -1,22 +1,42 @@
 ---
-import { formatShareDate, renderInline, safeUrl } from "../content";
-import type { ShareFloor } from "../types";
+import {
+	extractMusicRefs,
+	formatShareDate,
+	musicRefKey,
+	renderCommentText,
+	safeUrl,
+} from "../content";
+import type { MusicCard, ShareFloor } from "../types";
 import ShareAvatar from "./ShareAvatar.astro";
+import ShareMusicCards from "./ShareMusicCards.astro";
 
 interface Props {
 	floors: ShareFloor[];
 	totalFloors: number;
 	commentCount: number;
+	musicCardMap?: ReadonlyMap<string, MusicCard>;
 }
 
 const MAX_COMMENT_IMAGES = 3;
-const { floors, totalFloors, commentCount } = Astro.props;
+const MAX_COMMENT_MUSIC = 3;
+const {
+	floors,
+	totalFloors,
+	commentCount,
+	musicCardMap = new Map<string, MusicCard>(),
+} = Astro.props;
 const shownComments = floors.reduce(
 	(sum, floor) => sum + 1 + (floor.replies ? floor.replies.length : 0),
 	0,
 );
 const hasHiddenComments =
 	totalFloors > floors.length || commentCount > shownComments;
+
+function resolveMusicCards(text: string | null | undefined): MusicCard[] {
+	return extractMusicRefs(text, MAX_COMMENT_MUSIC).map(
+		(ref) => musicCardMap.get(musicRefKey(ref)) ?? { ref, track: null },
+	);
+}
 ---
 
 <section class="px-5 pt-5">
@@ -36,13 +56,21 @@ const hasHiddenComments =
 				<ol class="divide-y divide-border/70">
 					{floors.map((floor) => {
 						const first = floor.first;
+						const firstTextHtml = renderCommentText(first.text);
+						const firstMusicCards = resolveMusicCards(first.text);
 						const firstImages = (first.imageUrls || [])
 							.map((u) => safeUrl(u))
 							.filter((u): u is string => u !== null)
 							.slice(0, MAX_COMMENT_IMAGES);
 						return (
 							<li class="flex gap-3 py-4">
-								<ShareAvatar url={first.authorAvatarUrl} sizeClass="size-8" />
+								<ShareAvatar
+									url={first.authorAvatarUrl}
+									anonymous={first.anonymous}
+									authorName={first.authorName}
+									sizeClass="size-8"
+									size={32}
+								/>
 								<div class="min-w-0 flex-1">
 									<div class="flex items-baseline gap-2">
 										<span class="min-w-0 truncate text-[13px] font-medium text-foreground/80">
@@ -52,22 +80,29 @@ const hasHiddenComments =
 											{formatShareDate(first.createTime)}
 										</span>
 									</div>
-									{first.text?.trim() && (
+									{firstTextHtml && (
 										<p
 											class="mt-1 whitespace-pre-wrap break-words text-[15px] leading-relaxed"
-											set:html={renderInline(first.text)}
+											set:html={firstTextHtml}
+										/>
+									)}
+									{firstMusicCards.length > 0 && (
+										<ShareMusicCards
+											cards={firstMusicCards}
+											compact
+											class="mt-2 space-y-1.5"
 										/>
 									)}
 									{firstImages.length > 0 && (
 										<div class="mt-2 grid w-2/3 grid-cols-3 gap-1">
 											{firstImages.map((url) => (
 												<a
-													class="block overflow-hidden rounded-md bg-muted"
+													class="block aspect-square overflow-hidden rounded-md bg-muted"
 													href={url}
 													data-lightbox
 												>
 													<img
-														class="aspect-square w-full object-cover"
+														class="size-full object-cover"
 														src={url}
 														alt="评论图片"
 														loading="lazy"
@@ -80,25 +115,48 @@ const hasHiddenComments =
 									)}
 									{floor.replies && floor.replies.length > 0 && (
 										<div class="mt-2.5 space-y-1.5 rounded-lg bg-muted/70 px-3 py-2">
-											{floor.replies.map((reply) => (
-												<p class="whitespace-pre-wrap break-words text-[13px] leading-relaxed text-foreground/80">
-													<span class="font-medium text-foreground">
-														{reply.authorName?.trim() || "匿名用户"}
-													</span>
-													{reply.replyName?.trim() && (
-														<>
-															<span class="text-muted-foreground"> 回复 </span>
+											{floor.replies.map((reply) => {
+												const replyTextHtml = renderCommentText(reply.text);
+												const replyMusicCards = resolveMusicCards(reply.text);
+												return (
+													<div>
+														<p class="break-words text-[13px] leading-relaxed text-foreground/80">
 															<span class="font-medium text-foreground">
-																{reply.replyName}
+																{reply.authorName?.trim() || "匿名用户"}
 															</span>
-														</>
-													)}
-													<span class="text-muted-foreground">：</span>
-													{reply.text?.trim() && (
-														<Fragment set:html={renderInline(reply.text)} />
-													)}
-												</p>
-											))}
+															{reply.replyName?.trim() && (
+																<>
+																	<span class="text-muted-foreground">
+																		{" "}
+																		回复{" "}
+																	</span>
+																	<span class="font-medium text-foreground">
+																		{reply.replyName}
+																	</span>
+																</>
+															)}
+															{(replyTextHtml ||
+																replyMusicCards.length === 0) && (
+																<span class="text-muted-foreground">：</span>
+															)}
+															{replyTextHtml && (
+																<span
+																	class="whitespace-pre-wrap"
+																	set:html={replyTextHtml}
+																/>
+															)}
+														</p>
+														{replyMusicCards.length > 0 && (
+															<ShareMusicCards
+																cards={replyMusicCards}
+																compact
+																surface="card"
+																class="mt-1.5 space-y-1.5"
+															/>
+														)}
+													</div>
+												);
+											})}
 										</div>
 									)}
 								</div>

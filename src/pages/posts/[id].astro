@@ -1,5 +1,5 @@
 ---
-import "../../styles/share-page.css";
+import shareStyles from "../../styles/share-page.css?inline";
 import { fetchSharedPost } from "../../features/share/api";
 import ShareAvatar from "../../features/share/components/ShareAvatar.astro";
 import ShareComments from "../../features/share/components/ShareComments.astro";
@@ -8,8 +8,10 @@ import ShareOverlays from "../../features/share/components/ShareOverlays.astro";
 import SharePoll from "../../features/share/components/SharePoll.astro";
 import {
 	buildDescription,
+	collectShareMusicRefs,
 	extractMusicRefs,
 	formatShareDate,
+	musicRefKey,
 	renderInline,
 	renderMarkdown,
 	safeUrl,
@@ -22,6 +24,7 @@ import type {
 
 export const prerender = false;
 
+const inlineShareStyles = shareStyles.replace(/<\/style>/gi, "<\\/style>");
 const SITE_NAME = "向北";
 const SITE_URL = (Astro.site?.toString() || "https://northward.zone").replace(
 	/\/$/,
@@ -37,16 +40,23 @@ const validId = /^\d+$/.test(rawId);
 let status: "ok" | "not_found" | "error" = "not_found";
 let page: PublicPostSharePage | null = null;
 let musicCards: MusicCard[] = [];
+const musicCardMap = new Map<string, MusicCard>();
 
 if (validId) {
 	const result = await fetchSharedPost(rawId);
 	if (result.status === "ok") {
 		status = "ok";
 		page = result.page;
-		const refs = extractMusicRefs(page.content, 3);
-		if (refs.length > 0) {
-			musicCards = await lookupMusicCards(refs);
+		const allRefs = collectShareMusicRefs(page);
+		if (allRefs.length > 0) {
+			const resolvedCards = await lookupMusicCards(allRefs);
+			for (const card of resolvedCards) {
+				musicCardMap.set(musicRefKey(card.ref), card);
+			}
 		}
+		musicCards = extractMusicRefs(page.content, 3).map(
+			(ref) => musicCardMap.get(musicRefKey(ref)) ?? { ref, track: null },
+		);
 	} else {
 		status = result.status;
 	}
@@ -155,6 +165,7 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 		<meta itemprop="description" content={description} />
 		{shareImage && <meta itemprop="image" content={shareImage} />}
 		<link rel="icon" href="/favicon.ico" />
+		<style is:inline set:html={inlineShareStyles}></style>
 	</head>
 	<body
 		class="min-h-screen bg-background font-sans text-foreground antialiased"
@@ -164,7 +175,13 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 		>
 			<div class="mx-auto flex max-w-2xl items-center gap-2.5 px-5 py-2.5">
 				<a class="flex min-w-0 items-center gap-2.5" href="/">
-					<img class="size-7 rounded-lg" src="/brand/logo.png" alt="" />
+					<img
+						class="size-7 rounded-lg"
+						src="/brand/logo.png"
+						width="28"
+						height="28"
+						alt=""
+					/>
 					<span class="text-[15px] font-semibold">向北</span>
 					<span class="truncate text-xs text-muted-foreground">
 						吉大人自己的校园社区
@@ -183,12 +200,12 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 								<div class="order-2 mt-4 grid grid-cols-3 gap-1">
 									{galleryImages.map((img) => (
 										<a
-											class="block overflow-hidden rounded-md bg-muted"
+											class="block aspect-square overflow-hidden rounded-md bg-muted"
 											href={img.url}
 											data-lightbox
 										>
 											<img
-												class="aspect-square w-full object-cover"
+												class="size-full object-cover"
 												src={img.url}
 												alt={img.alt}
 												fetchpriority={img.isFirst ? "high" : undefined}
@@ -203,7 +220,14 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 
 							<div class="order-first">
 								<div class="flex items-center gap-3">
-									<ShareAvatar url={page.authorAvatarUrl} sizeClass="size-10" />
+									<ShareAvatar
+										url={page.authorAvatarUrl}
+										anonymous={page.anonymous}
+										authorName={page.authorName}
+										sizeClass="size-10"
+										size={40}
+										eager
+									/>
 									<div class="min-w-0">
 										<p class="truncate text-[15px] font-medium">
 											{page.authorName?.trim() || "匿名用户"}
@@ -228,7 +252,7 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 								)}
 							</div>
 
-							<ShareMusicCards cards={musicCards} />
+							<ShareMusicCards cards={musicCards} eager />
 							<SharePoll poll={page.poll} />
 
 							<div class="order-last mt-5 flex items-center gap-5 pb-5 text-[13px] text-muted-foreground">
@@ -238,6 +262,8 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 								>
 									<svg
 										class="size-4 shrink-0"
+										width="16"
+										height="16"
 										viewBox="0 0 24 24"
 										fill="none"
 										stroke="currentColor"
@@ -256,6 +282,8 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 								>
 									<svg
 										class="size-4 shrink-0"
+										width="16"
+										height="16"
 										viewBox="0 0 24 24"
 										fill="none"
 										stroke="currentColor"
@@ -274,6 +302,8 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 								>
 									<svg
 										class="size-4 shrink-0"
+										width="16"
+										height="16"
 										viewBox="0 0 24 24"
 										fill="none"
 										stroke="currentColor"
@@ -296,6 +326,7 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 							floors={page.floors || []}
 							totalFloors={page.totalFloors}
 							commentCount={page.commentCount}
+							musicCardMap={musicCardMap}
 						/>
 					</>
 				) : (
@@ -303,6 +334,8 @@ const contentHtml = page ? renderMarkdown(page.content) : "";
 						<div class="mx-auto flex size-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
 							<svg
 								class="size-6 shrink-0"
+								width="24"
+								height="24"
 								viewBox="0 0 24 24"
 								fill="none"
 								stroke="currentColor"

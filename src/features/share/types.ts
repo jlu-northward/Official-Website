@@ -34,6 +34,7 @@ export interface ShareComment {
 	position: number | null;
 	createTime: string | null;
 	imageUrls: string[];
+	anonymous?: boolean;
 }
 
 export interface ShareFloor {
@@ -57,4 +58,5 @@ export interface PublicPostSharePage {
 	totalFloors: number;
 	essence: boolean;
 	poll: SharePoll | null;
+	anonymous?: boolean;
 }

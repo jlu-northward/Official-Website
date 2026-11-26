@@ -1,30 +1,34 @@
 ---
-import { safeUrl } from "../content";
+import { resolveShareAvatarUrl } from "../content";
 
 interface Props {
 	url: string | null | undefined;
+	anonymous?: boolean;
+	authorName?: string | null;
 	sizeClass: string;
+	size?: number;
+	eager?: boolean;
 }
 
-const { url, sizeClass } = Astro.props;
-const avatarUrl = safeUrl(url);
+const {
+	url,
+	anonymous,
+	authorName,
+	sizeClass,
+	size,
+	eager = false,
+} = Astro.props;
+const avatarUrl = resolveShareAvatarUrl(url, anonymous, authorName);
+const isExternal = avatarUrl.startsWith("http");
 ---
 
-{
-	avatarUrl ? (
-		<img
-			class={`${sizeClass} shrink-0 rounded-full bg-muted object-cover`}
-			src={avatarUrl}
-			alt=""
-			loading="lazy"
-			decoding="async"
-			referrerpolicy="no-referrer"
-		/>
-	) : (
-		<div
-			class={`${sizeClass} flex shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium text-secondary-foreground`}
-		>
-			北
-		</div>
-	)
-}
+<img
+	class={`${sizeClass} shrink-0 rounded-full bg-muted object-cover ring-1 ring-border/50`}
+	src={avatarUrl}
+	width={size}
+	height={size}
+	alt=""
+	loading={eager ? undefined : "lazy"}
+	decoding={eager ? undefined : "async"}
+	referrerpolicy={isExternal ? "no-referrer" : undefined}
+/>
