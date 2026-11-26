@@ -102,6 +102,29 @@ test("legacy/manual drafts keep working; empty placeholders do not appear in the
 	assert.equal(buildGpaTranscript(emptyCourses(), [], "all").groups.length, 0);
 });
 
+test("shared course points, semester GPAs and total use the chosen rule across academic years", () => {
+	const terms = [
+		{ ...courses[0], score: "85.99", term: "2026-2027-1" },
+		{ ...courses[1], score: "89.9", term: "2027-2028-2" },
+	];
+	for (const [rule, expected, gpa] of [
+		["legacy", [3.3, 3.7], "3.54000"],
+		["2026", [3.5, 3.9], "3.74000"],
+	]) {
+		const transcript = buildGpaTranscript(terms, [], "all", rule);
+		assert.equal(transcript.rule, rule);
+		assert.deepEqual(
+			transcript.groups.map((group) => group.courses[0].points),
+			expected,
+		);
+		assert.deepEqual(
+			transcript.groups.map((group) => group.result.gpa.toFixed(5)),
+			expected.map((points) => points.toFixed(5)),
+		);
+		assert.equal(transcript.result.gpa.toFixed(5), gpa);
+	}
+});
+
 test("unselected invalid courses remain visible while preserving the selected GPA", () => {
 	const transcript = buildGpaTranscript(
 		[

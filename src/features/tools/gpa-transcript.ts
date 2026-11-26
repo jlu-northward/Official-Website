@@ -5,6 +5,7 @@ import {
 	inspectCourse,
 	isRequiredCourse,
 	type CourseDraft,
+	type GpaRule,
 	type GpaScope,
 } from "./gpa.ts";
 import type { SkippedGrade } from "./gpa-import.ts";
@@ -28,6 +29,7 @@ export interface TranscriptGroup {
 
 export interface GpaTranscript {
 	scope: GpaScope;
+	rule: GpaRule;
 	groups: TranscriptGroup[];
 	count: number;
 	calculatedCount: number;
@@ -40,6 +42,7 @@ export function buildGpaTranscript(
 	courses: CourseDraft[],
 	skipped: SkippedGrade[],
 	scope: GpaScope,
+	rule: GpaRule = "legacy",
 ): GpaTranscript {
 	const entered = courses.filter((course) => !inspectCourse(course).empty);
 	const grouped = new Map<
@@ -55,7 +58,7 @@ export function buildGpaTranscript(
 		return grouped.get(key)!;
 	};
 	for (const [index, course] of entered.entries()) {
-		const inspection = inspectCourse(course);
+		const inspection = inspectCourse(course, rule);
 		const selected = scope === "all" || isRequiredCourse(course);
 		const group = groupFor(course.term);
 		const excelRow = /^excel-row-(\d+)$/.exec(course.id);
@@ -105,11 +108,12 @@ export function buildGpaTranscript(
 			courses: group.entries
 				.sort((a, b) => a.order - b.order)
 				.map((entry) => entry.course),
-			result: calculateGpa(coursesInScope(group.numeric, scope)),
+			result: calculateGpa(coursesInScope(group.numeric, scope), rule),
 		}));
-	const result = calculateGpa(coursesInScope(entered, scope));
+	const result = calculateGpa(coursesInScope(entered, scope), rule);
 	return {
 		scope,
+		rule,
 		groups,
 		count: entered.length + skipped.length,
 		calculatedCount: result.count,

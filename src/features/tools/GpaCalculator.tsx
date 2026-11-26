@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { toolsContent } from "./content/tools";
+import { gpaRuleCopy, gpaRules } from "./content/gpa-rules";
 import { gpaImportContent as importCopy } from "./content/gpa-import";
 import { gpaTranscriptContent as transcriptCopy } from "./content/gpa-transcript";
 import GpaExcelImport from "./GpaExcelImport";
@@ -38,12 +39,15 @@ import { buildGradeRecords } from "./gpa-records";
 import {
 	calculateGpa,
 	coursesInScope,
+	earliestAcademicYear,
 	emptyCourses,
 	inspectCourse,
 	isRequiredCourse,
 	isCourseDrafts,
-	JLU_GRADE_SCALE,
+	resolveGpaRule,
 	type CourseDraft,
+	type GpaRule,
+	type GpaRuleChoice,
 	type GpaScope,
 } from "./gpa";
 import { track } from "@/lib/analytics";
@@ -51,23 +55,39 @@ import { track } from "@/lib/analytics";
 const GpaTranscriptDialog = lazy(() => import("./GpaTranscriptDialog"));
 const EMPTY_SKIPPED: SkippedGrade[] = [];
 
-function CalculationRules() {
+function CalculationRules({
+	rule,
+	iconOnly = false,
+}: {
+	rule: GpaRule;
+	iconOnly?: boolean;
+}) {
+	const info = gpaRules[rule];
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
 				<Button
+					type="button"
 					variant="ghost"
-					className="h-9 gap-1.5 px-2 text-xs text-muted-foreground"
+					aria-label="计算规则"
+					className={cn(
+						"text-muted-foreground",
+						iconOnly
+							? "h-6 w-6 rounded-full p-0 align-middle [&_svg]:size-3.5"
+							: "h-9 gap-1.5 px-2 text-xs",
+					)}
 				>
-					<FiHelpCircle className="h-3.5 w-3.5" />
-					计算规则
+					<FiHelpCircle aria-hidden="true" className="h-3.5 w-3.5" />
+					{!iconOnly && "计算规则"}
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="max-h-[85svh] max-w-lg overflow-y-auto rounded-2xl p-6">
 				<DialogHeader>
-					<DialogTitle>吉大绩点计算规则</DialogTitle>
+					<DialogTitle>
+						{gpaRuleCopy.choices[rule]} · {info.name}
+					</DialogTitle>
 					<DialogDescription className="pt-1 text-xs leading-6">
-						{toolsContent.gpaRulesDescription}
+						适用于{info.cohort}。{info.conversion}
 					</DialogDescription>
 				</DialogHeader>
 				<div className="overflow-hidden rounded-xl border">
@@ -75,7 +95,7 @@ function CalculationRules() {
 						<thead className="bg-muted">
 							<tr>
 								<th scope="col" className="px-4 py-2.5 font-medium">
-									百分制成绩
+									{rule === "2026" ? "取整后成绩" : "百分制成绩"}
 								</th>
 								<th scope="col" className="px-4 py-2.5 text-right font-medium">
 									单科绩点
@@ -83,15 +103,13 @@ function CalculationRules() {
 							</tr>
 						</thead>
 						<tbody>
-							{JLU_GRADE_SCALE.map((range, index) => (
-								<tr key={range.minimum} className="border-t">
+							{info.rows.map(([scores, points]) => (
+								<tr key={scores} className="border-t">
 									<td className="px-4 py-2 font-mono text-xs text-muted-foreground">
-										{index === 0
-											? "90 ≤ 成绩 ≤ 100"
-											: `${range.minimum} ≤ 成绩 < ${JLU_GRADE_SCALE[index - 1].minimum}`}
+										{scores}
 									</td>
 									<td className="px-4 py-2 text-right font-mono text-xs font-medium text-primary">
-										{range.points.toFixed(1)}
+										{points}
 									</td>
 								</tr>
 							))}
@@ -126,6 +144,7 @@ const formatNumber = (value: number) => Number(value.toFixed(3)).toString();
 export default function GpaCalculator({ active }: { active: boolean }) {
 	const [courses, setCourses] = useState<CourseDraft[]>(emptyCourses);
 	const [scope, setScope] = useState<GpaScope>("required");
+	const [ruleChoice, setRuleChoice] = useState<GpaRuleChoice>("auto");
 	const [expanded, setExpanded] = useState(false);
 	const [importInfo, setImportInfo] = useState<GradeImportInfo | null>(null);
 	const [shareOpen, setShareOpen] = useState(false);
@@ -160,6 +179,11 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 					isCourseDrafts(parsed.courses)
 				) {
 					setCourses(parsed.courses);
+					if (
+						"ruleChoice" in parsed &&
+						(parsed.ruleChoice === "legacy" || parsed.ruleChoice === "2026")
+					)
+						setRuleChoice(parsed.ruleChoice);
 					if ("importInfo" in parsed && isGradeImportInfo(parsed.importInfo))
 						setImportInfo(parsed.importInfo);
 				} else
@@ -178,14 +202,14 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 		try {
 			localStorage.setItem(
 				toolsContent.storageKey,
-				JSON.stringify({ courses, importInfo }),
+				JSON.stringify({ courses, importInfo, ruleChoice }),
 			);
 			localStorage.setItem(toolsContent.gpaScopeStorageKey, scope);
 			setStorageStatus("saved");
 		} catch {
 			setStorageStatus("unavailable");
 		}
-	}, [courses, importInfo, scope, loaded]);
+	}, [courses, importInfo, ruleChoice, scope, loaded]);
 
 	useEffect(() => {
 		if (!focusAfterAdd.current) return;
@@ -210,7 +234,12 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 	const requiredCount = enteredRecords.filter((record) =>
 		isRequiredCourse(record.course),
 	).length;
-	const result = calculateGpa(scopedCourses);
+	const firstYear = earliestAcademicYear(
+		enteredRecords.map(({ course }) => course.term),
+	);
+	const rule = resolveGpaRule(ruleChoice, firstYear);
+	const ruleInfo = gpaRules[rule];
+	const result = calculateGpa(scopedCourses, rule);
 	const hasData =
 		enteredCourses.length > 0 || Boolean(importInfo?.skipped.length);
 	const openShare = (event: { currentTarget: HTMLButtonElement }) => {
@@ -258,6 +287,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 		]);
 	};
 	const replaceCourses = (action: "clear" | "example") => {
+		if (action === "clear") setRuleChoice("auto");
 		setCourses(action === "clear" ? emptyCourses() : exampleCourses());
 		setTouched(new Set());
 		setPending(null);
@@ -267,6 +297,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 		setExpanded(false);
 	};
 	const commitImport = (value: GradeImport, fileName: string) => {
+		setRuleChoice("auto");
 		setCourses(value.courses);
 		setImportInfo({ fileName, total: value.total, skipped: value.skipped });
 		setScope("required");
@@ -309,7 +340,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							4.0 分制
 						</span>
 					</div>
-					<CalculationRules />
+					<CalculationRules rule={rule} />
 				</div>
 				<p className="mt-1 text-xs leading-6 text-muted-foreground sm:text-[13px]">
 					{importCopy.calculatorDescription}
@@ -415,6 +446,43 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 					</div>
 					<div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border/60 bg-background/40 px-4 py-3 sm:px-5">
 						<p className="text-[11px] text-muted-foreground">
+							{gpaRuleCopy.title}
+						</p>
+						<div
+							role="group"
+							aria-label={gpaRuleCopy.title}
+							className="flex rounded-lg border border-border/60 bg-card p-0.5"
+						>
+							{(["auto", "2026", "legacy"] as const).map((choice) => (
+								<button
+									key={choice}
+									type="button"
+									aria-pressed={ruleChoice === choice}
+									onClick={() => setRuleChoice(choice)}
+									className={cn(
+										"h-8 rounded-md px-2.5 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-3",
+										ruleChoice === choice
+											? "bg-secondary font-medium text-primary"
+											: "text-muted-foreground hover:text-foreground",
+									)}
+								>
+									{gpaRuleCopy.choices[choice]}
+								</button>
+							))}
+						</div>
+						<p className="w-full text-[11px] leading-5 text-muted-foreground">
+							<span role="status">
+								{ruleChoice === "auto"
+									? firstYear === null
+										? gpaRuleCopy.noYear
+										: gpaRuleCopy.matched(firstYear, ruleInfo.name)
+									: `${ruleInfo.name}，适用于${ruleInfo.cohort}。`}
+							</span>
+							<CalculationRules rule={rule} iconOnly />
+						</p>
+					</div>
+					<div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border/60 bg-background/40 px-4 py-3 sm:px-5">
+						<p className="text-[11px] text-muted-foreground">
 							{importCopy.scopeTitle}
 						</p>
 						<div
@@ -471,7 +539,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 					</div>
 					<div ref={courseList}>
 						{visibleRecords.map(({ course, reason }, index) => {
-							const inspection = inspectCourse(course);
+							const inspection = inspectCourse(course, rule);
 							const points = reason ? null : inspection.points;
 							const excludedNote = reason
 								? importCopy.skippedReasons[reason]
@@ -670,7 +738,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 														: "bg-secondary/70 font-medium text-primary",
 												)}
 											>
-												{points === null ? "—" : points.toFixed(1)}
+												{points === null ? "—" : points.toFixed(2)}
 											</output>
 										</div>
 										<Button
@@ -803,7 +871,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							</h3>
 							<span className="flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-1 text-[9px] text-[#d5e8d9]">
 								<span className="h-1 w-1 rounded-full bg-[#c2dcb0]" />
-								自动计算
+								{ruleInfo.name}
 							</span>
 						</div>
 						<div
@@ -857,7 +925,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							<FiChevronRight className="h-3.5 w-3.5 transition-transform group-open:rotate-90" />
 						</summary>
 						<p className="mt-3 text-xs leading-6 text-muted-foreground">
-							{toolsContent.gpaDetailsDescription}
+							{ruleInfo.conversion} {toolsContent.gpaDetailsDescription}
 						</p>
 						<p className="mt-3 rounded-lg bg-background px-3 py-2.5 font-mono text-xs text-muted-foreground">
 							{complete
@@ -871,6 +939,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 							怎么算出来的？
 						</div>
 						<p className="text-[12px] leading-6 text-muted-foreground">
+							{ruleInfo.conversion}{" "}
 							将每门课的学分乘以对应绩点，相加后除以总学分。
 						</p>
 						<div className="mt-4 flex items-center justify-between rounded-lg bg-background px-3 py-2.5 font-mono text-xs">
@@ -906,7 +975,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 						<div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
 							<div>
 								<p className="text-[10px] text-muted-foreground">
-									当前加权平均绩点
+									当前加权平均绩点 · {ruleInfo.name}
 								</p>
 								<p
 									className={cn(
@@ -965,6 +1034,7 @@ export default function GpaCalculator({ active }: { active: boolean }) {
 						courses={courses}
 						skipped={importInfo?.skipped ?? EMPTY_SKIPPED}
 						scope={scope}
+						rule={rule}
 						open={shareOpen}
 						onOpenChange={setShareOpen}
 						onCloseAutoFocus={(event) => {
