@@ -7,6 +7,7 @@ on:
       - "src/features/games/**"
       - "src/features/square/**"
       - "src/pages/games/**"
+      - "src/pages/square.astro"
       - "tests/seamless-games.browser.mjs"
       - "package*.json"
   push:
@@ -20,6 +21,11 @@ jobs:
   browser:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      matrix:
+        games: ["false", "true"]
+    env:
+      SQUARE_GAMES_ENABLED: ${{ matrix.games }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,7 +56,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: square-games-browser-evidence
+          name: square-games-browser-evidence-${{ matrix.games }}
           path: site/docs/screenshots/seamless-games/
           if-no-files-found: ignore
           retention-days: 7

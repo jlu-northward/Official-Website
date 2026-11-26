@@ -2,11 +2,14 @@
 import SquarePage from "../features/square/SquarePage";
 import ReactPageLayout from "@layouts/ReactPageLayout.astro";
 import { squareContent } from "../features/square/content/square";
+const gamesEnabled = import.meta.env.SQUARE_GAMES_ENABLED === "true";
 ---
 
 <ReactPageLayout
 	title={squareContent.title}
-	description={squareContent.description}
+	description={gamesEnabled
+		? squareContent.description
+		: squareContent.pending.description}
 >
-	<SquarePage client:load />
+	<SquarePage client:load gamesEnabled={gamesEnabled} />
 </ReactPageLayout>

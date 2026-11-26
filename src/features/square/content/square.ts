@@ -5,6 +5,12 @@ export const squareContent = {
 	eyebrow: "NORTHWARD · SQUARE",
 	heading: "课间，来点好玩的。",
 	body: "和朋友来一局，或安静拼一会儿。",
+	pending: {
+		description:
+			"向北广场正在建设中，这里会是吉大同学交流与分享的新去处。现在可以先用校园工具箱：绩点计算、空教室查询和校园网站导航。",
+		heading: "广场正在搭建",
+		body: "这里会是向北的新去处。\n更多内容还在准备，敬请期待。",
+	},
 	backHome: "返回官网",
 	gamesHeading: "玩一会儿",
 	gamesNote: "即点即玩",

@@ -22,7 +22,12 @@ const featureIcons: Record<string, IconType> = {
 const enter =
 	"motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-3 motion-safe:fill-mode-backwards motion-safe:duration-500";
 
-export default function SquarePage() {
+export default function SquarePage({
+	gamesEnabled = false,
+}: {
+	gamesEnabled?: boolean;
+}) {
+	const intro = gamesEnabled ? squareContent : squareContent.pending;
 	return (
 		<div className="flex min-h-svh flex-col">
 			<header className="border-b border-border/65 bg-background/90 embedded:hidden">
@@ -84,75 +89,77 @@ export default function SquarePage() {
 						id="square-title"
 						className="mt-5 text-[28px] font-semibold leading-tight tracking-[-0.04em] sm:text-4xl"
 					>
-						{squareContent.heading}
+						{intro.heading}
 					</h1>
 					<p className="mt-3 whitespace-pre-line text-sm leading-7 text-muted-foreground">
-						{squareContent.body}
+						{intro.body}
 					</p>
 				</section>
 
-				<section
-					className={cn("mt-8 sm:mt-10", enter)}
-					aria-labelledby="games-title"
-				>
-					<div className="mb-4 flex items-center justify-between gap-3">
-						<h2
-							id="games-title"
-							className="text-base font-semibold tracking-tight"
-						>
-							{squareContent.gamesHeading}
-						</h2>
-						<p className="text-xs text-muted-foreground">
-							{squareContent.gamesNote}
-						</p>
-					</div>
-					<div className="grid gap-5 sm:grid-cols-2">
-						{squareContent.games.map((game) => (
-							<a
-								key={game.id}
-								href={game.href}
-								aria-labelledby={`${game.id}-title`}
-								aria-describedby={`${game.id}-description`}
-								className="group flex flex-col overflow-hidden rounded-[24px] border border-border/70 bg-card outline-none transition-shadow hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background motion-safe:transition-[box-shadow,transform] motion-safe:active:scale-[0.99]"
+				{gamesEnabled && (
+					<section
+						className={cn("mt-8 sm:mt-10", enter)}
+						aria-labelledby="games-title"
+					>
+						<div className="mb-4 flex items-center justify-between gap-3">
+							<h2
+								id="games-title"
+								className="text-base font-semibold tracking-tight"
 							>
-								<img
-									src={game.cover}
-									alt=""
-									width="640"
-									height="360"
-									className="aspect-[16/9] w-full object-cover"
-								/>
-								<div className="flex flex-1 flex-col p-5 sm:p-6">
-									<h3
-										id={`${game.id}-title`}
-										className="text-xl font-semibold tracking-tight"
-									>
-										{game.name}
-									</h3>
-									<p
-										id={`${game.id}-description`}
-										className="mt-2 text-sm leading-6 text-muted-foreground"
-									>
-										{game.description}
-									</p>
-									<p className="mb-5 mt-3 text-[11px] leading-5 text-muted-foreground">
-										{game.modes}
-									</p>
-									<span className="mt-auto flex items-center justify-between border-t border-border/65 pt-4 text-sm font-medium text-primary">
-										<span className="inline-flex items-center gap-2">
-											<FiPlay className="h-3.5 w-3.5" aria-hidden="true" />
-											{squareContent.play}
+								{squareContent.gamesHeading}
+							</h2>
+							<p className="text-xs text-muted-foreground">
+								{squareContent.gamesNote}
+							</p>
+						</div>
+						<div className="grid gap-5 sm:grid-cols-2">
+							{squareContent.games.map((game) => (
+								<a
+									key={game.id}
+									href={game.href}
+									aria-labelledby={`${game.id}-title`}
+									aria-describedby={`${game.id}-description`}
+									className="group flex flex-col overflow-hidden rounded-[24px] border border-border/70 bg-card outline-none transition-shadow hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background motion-safe:transition-[box-shadow,transform] motion-safe:active:scale-[0.99]"
+								>
+									<img
+										src={game.cover}
+										alt=""
+										width="640"
+										height="360"
+										className="aspect-[16/9] w-full object-cover"
+									/>
+									<div className="flex flex-1 flex-col p-5 sm:p-6">
+										<h3
+											id={`${game.id}-title`}
+											className="text-xl font-semibold tracking-tight"
+										>
+											{game.name}
+										</h3>
+										<p
+											id={`${game.id}-description`}
+											className="mt-2 text-sm leading-6 text-muted-foreground"
+										>
+											{game.description}
+										</p>
+										<p className="mb-5 mt-3 text-[11px] leading-5 text-muted-foreground">
+											{game.modes}
+										</p>
+										<span className="mt-auto flex items-center justify-between border-t border-border/65 pt-4 text-sm font-medium text-primary">
+											<span className="inline-flex items-center gap-2">
+												<FiPlay className="h-3.5 w-3.5" aria-hidden="true" />
+												{squareContent.play}
+											</span>
+											<FiArrowRight
+												className="h-4 w-4 motion-safe:transition-transform motion-safe:group-hover:translate-x-1"
+												aria-hidden="true"
+											/>
 										</span>
-										<FiArrowRight
-											className="h-4 w-4 motion-safe:transition-transform motion-safe:group-hover:translate-x-1"
-											aria-hidden="true"
-										/>
-									</span>
-								</div>
-							</a>
-						))}
-					</div>
-				</section>
+									</div>
+								</a>
+							))}
+						</div>
+					</section>
+				)}
 
 				<section
 					className={cn("mt-9 sm:mt-10", enter)}

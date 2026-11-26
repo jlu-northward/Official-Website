@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 const root = process.env.GAMES_TEST_ROOT || path.resolve("..");
 const dist = path.resolve("dist/client");
 const screenshots = path.resolve("docs/screenshots/seamless-games");
+const gamesEnabled = process.env.SQUARE_GAMES_ENABLED === "true";
 await fs.mkdir(screenshots, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext();
@@ -164,9 +165,21 @@ console.log(
 await page.setViewportSize({ width: 1440, height: 1000 });
 await page.goto("https://northward.zone/square/");
 await page.waitForTimeout(600);
-assert.equal(await page.locator('a[href*="games.northward.zone"]').count(), 2);
+assert.equal(
+	await page.locator('a[href*="games.northward.zone"]').count(),
+	gamesEnabled ? 2 : 0,
+);
+await page
+	.getByRole("heading", {
+		name: gamesEnabled ? "课间，来点好玩的。" : "广场正在搭建",
+	})
+	.waitFor();
+assert.equal(await page.locator('a[href="/tools/"]').count(), 1);
 await page.screenshot({
-	path: path.join(screenshots, "square-desktop.png"),
+	path: path.join(
+		screenshots,
+		gamesEnabled ? "square-desktop.png" : "square-disabled-desktop.png",
+	),
 	fullPage: true,
 });
 await page.setViewportSize({ width: 320, height: 850 });
@@ -176,9 +189,14 @@ assert.equal(
 	false,
 );
 await page.screenshot({
-	path: path.join(screenshots, "square-mobile.png"),
+	path: path.join(
+		screenshots,
+		gamesEnabled ? "square-mobile.png" : "square-disabled-mobile.png",
+	),
 	fullPage: true,
 });
 assert.deepEqual(errors, []);
-console.log("PASS 广场：两个入口、桌面与 320px 布局、无脚本错误；截图已保存");
+console.log(
+	`PASS 广场：${gamesEnabled ? "公开两个入口" : "默认隐藏游戏入口且保留工具箱"}、桌面与 320px 布局、无脚本错误；截图已保存`,
+);
 await browser.close();
