@@ -12,7 +12,7 @@ export default defineConfig({
 		react(),
 		sitemap({
 			filter: (page) =>
-				!/^\/(content(?:\/|$)|api(?:\/|$)|post(?:\/|$)|download-(?:android|ios)(?:\/|$))/.test(
+				!/^\/(games(?:\/|$)|content(?:\/|$)|api(?:\/|$)|post(?:\/|$)|download-(?:android|ios)(?:\/|$))/.test(
 					new URL(page).pathname,
 				),
 		}),

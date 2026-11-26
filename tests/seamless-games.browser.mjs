@@ -4,7 +4,11 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
 const root = process.env.GAMES_TEST_ROOT || path.resolve("..");
-const dist = path.resolve("dist/client");
+// 官网移除 SSR 路由后输出到 dist；同时兼容带 SSR 的候选版本。
+const dist = await fs.access(path.resolve("dist/client/index.html")).then(
+	() => path.resolve("dist/client"),
+	() => path.resolve("dist"),
+);
 const screenshots = path.resolve("docs/screenshots/seamless-games");
 const gamesEnabled = process.env.SQUARE_GAMES_ENABLED === "true";
 await fs.mkdir(screenshots, { recursive: true });
@@ -15,7 +19,24 @@ let account = { uid: "42", nickname: "甲同学" },
 	pending = null,
 	codeRequests = 0,
 	exchanges = 0;
+const games = [
+	{
+		id: "hockey",
+		module: "client/northward-login.mjs",
+		repo: "sling-hockey",
+		script: "northward-login.mjs",
+	},
+	{
+		id: "perfect-match",
+		module: "src/northward-login.js",
+		repo: "perfect-match",
+		script: "src/northward-login.js",
+	},
+];
+let activeGame = games[0];
 let failStatus = false;
+let failCode = false;
+let injectAuth = true;
 const mime = (p) =>
 	p.endsWith(".js") || p.endsWith(".mjs")
 		? "application/javascript"
@@ -44,7 +65,7 @@ await context.route("**/*", async (route) => {
 			undefined,
 			"主 token 不得交给游戏",
 		);
-		if (url.pathname === "/hockey/northward/session") {
+		if (url.pathname === `/${activeGame.id}/northward/session`) {
 			if (request.method() === "GET" && failStatus)
 				return reply({ message: "模拟弱网" }, 503);
 			if (request.method() === "GET")
@@ -72,24 +93,25 @@ await context.route("**/*", async (route) => {
 					"; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=28800",
 			});
 		}
-		if (url.pathname === "/hockey/northward-login.mjs")
+		if (url.pathname === `/${activeGame.id}/${activeGame.script}`)
 			return route.fulfill({
 				contentType: "application/javascript",
 				body: await fs.readFile(
-					path.join(root, "sling-hockey/client/northward-login.mjs"),
+					path.join(root, activeGame.repo, activeGame.module),
 					"utf8",
 				),
 			});
 		return route.fulfill({
 			contentType: "text/html",
-			body: `<!doctype html><html><body><script type="module">import {prepareNorthward} from './northward-login.mjs';const user=await prepareNorthward('hockey','/hockey/northward/session');document.body.dataset.user=user?.uid||'guest';document.body.dataset.ready='true';document.body.textContent=user?.nickname||'游客';</script></body></html>`,
+			body: `<!doctype html><html><body><script type="module">import {prepareNorthward} from './${activeGame.script}';const user=await prepareNorthward('${activeGame.id}','/${activeGame.id}/northward/session');document.body.dataset.user=user?.uid||'guest';document.body.dataset.ready='true';document.body.textContent=user?.nickname||'游客';</script></body></html>`,
 		});
 	}
 	if (url.host === "northward.zone") {
 		if (url.pathname === "/games/session/code") {
+			if (failCode) return reply({ success: false }, 503);
 			assert.equal(request.headers().authorization, "Bearer fixture-access");
 			const body = request.postDataJSON();
-			assert.equal(body.game, "hockey");
+			assert.equal(body.game, activeGame.id);
 			pending = { state: body.state, challenge: body.codeChallenge };
 			codeRequests++;
 			return reply({
@@ -102,7 +124,7 @@ await context.route("**/*", async (route) => {
 		if (url.pathname.endsWith("/")) file = path.join(file, "index.html");
 		try {
 			let data = await fs.readFile(file);
-			if (url.pathname === "/games/launch/")
+			if (url.pathname === "/games/launch/" && injectAuth)
 				data = Buffer.from(
 					data.toString().replace(
 						"<head>",
@@ -123,45 +145,105 @@ await context.route("**/*", async (route) => {
 const page = await context.newPage();
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
-for (const expected of [
-	{ uid: "42", nickname: "甲同学" },
-	{ uid: "43", nickname: "乙同学" },
-	null,
-]) {
-	account = expected;
-	await page.goto("https://games.northward.zone/hockey/?northward=1");
-	await page.waitForFunction(() => document.body.dataset.ready === "true");
-	assert.equal(
-		await page.getAttribute("body", "data-user"),
-		expected?.uid || "guest",
-	);
-	assert.equal(await page.evaluate(() => location.hash), "");
-	assert.equal(
-		await page.evaluate(() => sessionStorage.getItem("northward-login:hockey")),
+for (activeGame of games) {
+	current = null;
+	codeRequests = 0;
+	exchanges = 0;
+	for (const expected of [
+		{ uid: "42", nickname: "甲同学" },
+		{ uid: "43", nickname: "乙同学" },
 		null,
+	]) {
+		account = expected;
+		await page.goto(
+			`https://games.northward.zone/${activeGame.id}/?northward=1&room=fixture`,
+		);
+		await page.waitForFunction(() => document.body.dataset.ready === "true");
+		assert.equal(
+			await page.getAttribute("body", "data-user"),
+			expected?.uid || "guest",
+		);
+		assert.equal(await page.evaluate(() => location.hash), "");
+		assert.equal(
+			await page.evaluate(() =>
+				new URL(location.href).searchParams.get("room"),
+			),
+			"fixture",
+		);
+		assert.equal(
+			await page.evaluate(
+				(id) => sessionStorage.getItem(`northward-login:${id}`),
+				activeGame.id,
+			),
+			null,
+		);
+		assert.equal(await page.evaluate(() => window.northwardAuth), undefined);
+	}
+	assert.equal(codeRequests, 2);
+	assert.equal(exchanges, 2);
+	assert.equal(current, null);
+	// 无法确认旧会话时阻止进入；重试必须重新握手，不能只刷新后沿用旧账号。
+	current = { uid: "41", nickname: "旧账号" };
+	account = { uid: "44", nickname: "重试同学" };
+	failStatus = true;
+	await page.goto(
+		`https://games.northward.zone/${activeGame.id}/?northward=1&room=fixture`,
 	);
-	assert.equal(await page.evaluate(() => window.northwardAuth), undefined);
+	await page.getByRole("alert").waitFor();
+	assert.equal(await page.getAttribute("body", "data-ready"), null);
+	assert.equal(codeRequests, 2);
+	failStatus = false;
+	await page.getByRole("button", { name: "重新加载" }).click();
+	await page.waitForFunction(() => document.body.dataset.ready === "true");
+	assert.equal(await page.getAttribute("body", "data-user"), "44");
+	assert.equal(codeRequests, 3);
+	assert.equal(exchanges, 3);
+	console.log(
+		`PASS ${activeGame.id} 浏览器：账号自动进入、换号、游客清理、弱网重试、PKCE/state、片段清除、保留房间参数、游戏不获取主 token`,
+	);
+	// 有登录态但签发失败时不能静默记为游客，重试成功后仍归当前账号。
+	failCode = true;
+	await page.goto(`https://games.northward.zone/${activeGame.id}/?northward=1`);
+	await page.getByRole("button", { name: "重新进入", exact: true }).waitFor();
+	assert.equal(new URL(page.url()).host, "northward.zone");
+	assert.equal(current, null);
+	failCode = false;
+	await page.getByRole("button", { name: "重新进入", exact: true }).click();
+	await page.waitForFunction(() => document.body.dataset.ready === "true");
+	assert.equal(await page.getAttribute("body", "data-user"), "44");
+	assert.equal(exchanges, 4);
+	// 独立浏览器无原生注入，直接以游客进入，不等认证超时。
+	injectAuth = false;
+	await page.goto(`https://games.northward.zone/${activeGame.id}/?northward=1`);
+	await page.waitForFunction(() => document.body.dataset.ready === "true");
+	assert.equal(await page.getAttribute("body", "data-user"), "guest");
+	injectAuth = true;
+	// 错误 state / 过期回调必须清除现存账号，不能继续沿用。
+	for (const expired of [false, true]) {
+		current = { uid: "99", nickname: "旧身份" };
+		await page.evaluate(
+			({ id, expired }) => {
+				sessionStorage.setItem(
+					`northward-login:${id}`,
+					JSON.stringify({
+						state: "s".repeat(43),
+						verifier: "v".repeat(43),
+						startedAt: Date.now() - (expired ? 121000 : 0),
+					}),
+				);
+			},
+			{ id: activeGame.id, expired },
+		);
+		const state = (expired ? "s" : "x").repeat(43);
+		await page.goto(
+			`https://games.northward.zone/${activeGame.id}/#nw_state=${state}&nw_code=${"c".repeat(43)}`,
+		);
+		await page.waitForFunction(() => document.body.dataset.ready === "true");
+		assert.equal(await page.getAttribute("body", "data-user"), "guest");
+		assert.equal(current, null);
+		assert.equal(exchanges, 4);
+	}
 }
-assert.equal(codeRequests, 2);
-assert.equal(exchanges, 2);
-assert.equal(current, null);
-// 无法确认旧会话时阻止进入；重试必须重新握手，不能只刷新后沿用旧账号。
-current = { uid: "41", nickname: "旧账号" };
-account = { uid: "44", nickname: "重试同学" };
-failStatus = true;
-await page.goto("https://games.northward.zone/hockey/?northward=1");
-await page.getByRole("alert").waitFor();
-assert.equal(await page.getAttribute("body", "data-ready"), null);
-assert.equal(codeRequests, 2);
-failStatus = false;
-await page.getByRole("button", { name: "重新加载" }).click();
-await page.waitForFunction(() => document.body.dataset.ready === "true");
-assert.equal(await page.getAttribute("body", "data-user"), "44");
-assert.equal(codeRequests, 3);
-assert.equal(exchanges, 3);
-console.log(
-	"PASS 浏览器：账号自动进入、换号、游客清理、弱网重试、PKCE/state、片段清除、游戏不获取主 token",
-);
 await page.setViewportSize({ width: 1440, height: 1000 });
 await page.goto("https://northward.zone/square/");
 await page.waitForTimeout(600);

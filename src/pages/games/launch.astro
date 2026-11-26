@@ -35,12 +35,16 @@
 		<main role="status" aria-live="polite">
 			<h1>正在进入游戏…</h1>
 			<p id="message">请稍候</p>
+			<button id="retry" type="button" hidden>重新进入</button>
 		</main>
 		<script>
 			import { launchGame } from "../../features/games/launch";
+			const retry = document.getElementById("retry")!;
+			retry.addEventListener("click", () => location.reload());
 			launchGame().catch(() => {
 				document.getElementById("message")!.textContent =
-					"暂时无法进入，请返回广场重试";
+					"登录信息暂时无法确认，请重试；仍失败时请返回广场重新进入";
+				retry.hidden = false;
 			});
 		</script>
 	</body>
