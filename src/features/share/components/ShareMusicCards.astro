@@ -1,0 +1,84 @@
+---
+import { musicPlatformName, musicWebUrl, safeUrl } from "../content";
+import type { MusicCard } from "../types";
+
+interface Props {
+	cards: MusicCard[];
+}
+
+const { cards } = Astro.props;
+---
+
+{
+	cards.length > 0 && (
+		<div class="order-1 mt-4 space-y-2">
+			{cards.map((card) => {
+				const track = card.track;
+				const cover = safeUrl(track?.coverUrl);
+				const platformName = musicPlatformName(card.ref.platform);
+				const name = track ? track.name : `${platformName}单曲`;
+				const subtitle = !track
+					? "点击收听"
+					: track.artists
+						? `${track.artists} · ${platformName}`
+						: platformName;
+				return (
+					<a
+						class="flex items-center gap-3 rounded-xl bg-muted/70 p-2 pr-3"
+						href={musicWebUrl(card.ref)}
+						target="_blank"
+						rel="nofollow noopener noreferrer"
+					>
+						{cover ? (
+							<img
+								class="size-12 shrink-0 rounded-lg bg-secondary object-cover"
+								src={cover}
+								alt=""
+								loading="lazy"
+								decoding="async"
+								referrerpolicy="no-referrer"
+							/>
+						) : (
+							<span class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
+								<svg
+									class="size-5 shrink-0"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									aria-hidden="true"
+								>
+									<path d="M9 18V5l12-2v13" />
+									<circle cx="6" cy="18" r="3" />
+									<circle cx="18" cy="16" r="3" />
+								</svg>
+							</span>
+						)}
+						<span class="min-w-0 flex-1">
+							<span class="block truncate text-sm font-medium">{name}</span>
+							<span class="mt-0.5 block truncate text-xs text-muted-foreground">
+								{subtitle}
+							</span>
+						</span>
+						<span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-background text-primary shadow-sm">
+							<svg
+								class="size-3.5 shrink-0 translate-x-px fill-current"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								aria-hidden="true"
+							>
+								<polygon points="6 3 20 12 6 21 6 3" />
+							</svg>
+						</span>
+					</a>
+				);
+			})}
+		</div>
+	)
+}
