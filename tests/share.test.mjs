@@ -1,12 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+	ANONYMOUS_AVATAR_URL,
+	DEFAULT_AVATAR_URL,
 	buildDescription,
+	collectShareMusicRefs,
 	extractMusicRefs,
 	formatShareDate,
+	musicRefKey,
 	plainText,
+	renderCommentText,
 	renderInline,
 	renderMarkdown,
+	resolveShareAvatarUrl,
 	safeUrl,
 } from "../src/features/share/content.ts";
 import {
@@ -85,6 +91,66 @@ test("extractMusicRefs deduplicates in order and respects limit", () => {
 	]);
 });
 
+test("renderCommentText strips music tokens cleanly while keeping emojis and escaping", () => {
+	assert.equal(renderCommentText("[netease_music:1824020871]"), "");
+	assert.equal(renderCommentText("  [netease_music:1] [qq_music:abc]  "), "");
+	assert.equal(
+		renderCommentText("好听[乐]\n[netease_music:1824020871]"),
+		'好听<img class="share-emoji" src="/emojis/emoji_happy.png" alt="[乐]">',
+	);
+	assert.equal(
+		renderCommentText("上面\n[netease_music:1]\n下面"),
+		"上面\n下面",
+	);
+	assert.equal(
+		renderCommentText("上面\n\n[netease_music:1]\n\n下面"),
+		"上面\n\n下面",
+	);
+	assert.equal(
+		renderCommentText("听[qq_music:abc]<b>好听</b>[poll_tag]"),
+		"听&lt;b&gt;好听&lt;/b&gt;",
+	);
+});
+
+test("collectShareMusicRefs prioritizes post content, includes comments and replies, deduplicates, and caps total", () => {
+	const refs = collectShareMusicRefs(
+		{
+			content: "正文 [netease_music:1] [qq_music:a1]",
+			floors: [
+				{
+					first: {
+						authorName: "甲",
+						authorAvatarUrl: null,
+						replyName: null,
+						text: "评论 [netease_music:1] [netease_music:2]",
+						position: 1,
+						createTime: null,
+						imageUrls: [],
+					},
+					replies: [
+						{
+							authorName: "乙",
+							authorAvatarUrl: null,
+							replyName: "甲",
+							text: "回复 [qq_music:b2] [netease_music:3]",
+							position: 1,
+							createTime: null,
+							imageUrls: [],
+						},
+					],
+				},
+			],
+		},
+		{ maxPost: 3, maxComment: 3, maxTotal: 4 },
+	);
+	assert.deepEqual(refs.map(musicRefKey), [
+		"netease_music:1",
+		"qq_music:a1",
+		"netease_music:2",
+		"qq_music:b2",
+	]);
+});
+
 test("formatShareDate shows year only for non-current years in Asia/Shanghai", () => {
 	const now2026 = new Date("2026-11-26T12:00:00Z");
 	assert.equal(
@@ -111,6 +177,42 @@ test("safeUrl allows only http(s)", () => {
 	assert.equal(safeUrl("javascript:alert(1)"), null);
 	assert.equal(safeUrl("data:image/png;base64,AAA"), null);
 	assert.equal(safeUrl(""), null);
+});
+
+test("resolveShareAvatarUrl distinguishes user, anonymous, and default avatars", () => {
+	assert.equal(
+		resolveShareAvatarUrl("https://cdn.example/u.jpg", false, "张三"),
+		"https://cdn.example/u.jpg",
+	);
+	assert.equal(
+		resolveShareAvatarUrl("https://cdn.example/u.jpg", true, "张三"),
+		ANONYMOUS_AVATAR_URL,
+	);
+	assert.equal(
+		resolveShareAvatarUrl(null, true, "匿名1号"),
+		ANONYMOUS_AVATAR_URL,
+	);
+	assert.equal(
+		resolveShareAvatarUrl(null, false, "匿名用户"),
+		DEFAULT_AVATAR_URL,
+	);
+	assert.equal(
+		resolveShareAvatarUrl(null, false, "未设头像同学"),
+		DEFAULT_AVATAR_URL,
+	);
+	// 兼容旧后端未返回 anonymous 字段的情况
+	assert.equal(
+		resolveShareAvatarUrl(null, undefined, "匿名用户"),
+		ANONYMOUS_AVATAR_URL,
+	);
+	assert.equal(
+		resolveShareAvatarUrl(null, undefined, "匿名12号"),
+		ANONYMOUS_AVATAR_URL,
+	);
+	assert.equal(
+		resolveShareAvatarUrl(null, undefined, "普通同学"),
+		DEFAULT_AVATAR_URL,
+	);
 });
 
 test("music lookup parses Netease & QQ responses and caches results", async () => {

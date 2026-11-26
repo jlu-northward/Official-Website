@@ -15,7 +15,13 @@ const CTA_LABEL = "去向北 App，查看更多内容";
 		data-open-app
 		href={`northward://app/?postId=${postId}`}
 	>
-		<img class="size-9 shrink-0 rounded-[10px]" src="/brand/logo.png" alt="" />
+		<img
+			class="size-9 shrink-0 rounded-[10px]"
+			src="/brand/logo.png"
+			width="36"
+			height="36"
+			alt=""
+		/>
 		<span
 			class="min-w-0 flex-1 truncate text-center text-base font-semibold tracking-wide"
 		>
@@ -26,6 +32,8 @@ const CTA_LABEL = "去向北 App，查看更多内容";
 		>
 			<svg
 				class="size-4 shrink-0"
+				width="16"
+				height="16"
 				viewBox="0 0 24 24"
 				fill="none"
 				stroke="currentColor"
@@ -47,6 +55,7 @@ const CTA_LABEL = "去向北 App，查看更多内容";
 	role="dialog"
 	aria-modal="true"
 	aria-label="查看图片"
+	hidden
 >
 	<img
 		class="max-h-full max-w-full rounded-md object-contain"
@@ -61,10 +70,13 @@ const CTA_LABEL = "去向北 App，查看更多内容";
 	role="dialog"
 	aria-modal="true"
 	aria-labelledby="wechat-guide-title"
+	hidden
 >
 	<div class="absolute right-5 top-4 flex flex-col items-end text-white">
 		<svg
 			class="size-10 animate-bounce"
+			width="40"
+			height="40"
 			viewBox="0 0 40 40"
 			fill="none"
 			stroke="currentColor"
@@ -118,6 +130,7 @@ const CTA_LABEL = "去向北 App，查看更多内容";
 		var big = box && box.querySelector("img");
 		function toggle(el, show) {
 			if (!el) return;
+			el.hidden = !show;
 			el.classList.toggle("hidden", !show);
 			el.classList.toggle("flex", show);
 			document.body.style.overflow = show ? "hidden" : "";

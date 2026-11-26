@@ -1,6 +1,6 @@
 import { Marked, type Tokens } from "marked";
 import { EMOJI_MAP } from "./emojis.ts";
-import type { MusicPlatform, MusicRef } from "./types.ts";
+import type { MusicPlatform, MusicRef, PublicPostSharePage } from "./types.ts";
 
 export { EMOJI_MAP };
 
@@ -11,6 +11,9 @@ const MUSIC_PATTERN =
 	"\\[(netease_music):(\\d{1,20})\\]|\\[(qq_music):([A-Za-z0-9]{1,32})\\]";
 const DROPPED_PATTERN = "\\[poll_tag\\]|\\[essence_tag(?::[^\\]\\n]{0,20})?\\]";
 const MUSIC_TOKEN_RE = new RegExp(MUSIC_PATTERN, "g");
+const MUSIC_LINE_ONLY_RE = new RegExp(
+	`^[ \\t]*(?:${MUSIC_PATTERN})(?:[ \\t]*(?:${MUSIC_PATTERN}))*[ \\t]*$`,
+);
 const DROPPED_TOKEN_RE = new RegExp(`^(?:${DROPPED_PATTERN})$`);
 const DROPPED_TOKEN_GLOBAL_RE = new RegExp(DROPPED_PATTERN, "g");
 const ANY_TOKEN_RE = new RegExp(
@@ -20,6 +23,10 @@ const ANY_TOKEN_RE = new RegExp(
 
 const SAFE_LINK_RE = /^(https?:\/\/|mailto:)/i;
 const SAFE_IMAGE_RE = /^https?:\/\//i;
+const ANONYMOUS_NAME_RE = /^(?:匿名(?:用户|\d+号)?)$/;
+
+export const ANONYMOUS_AVATAR_URL = "/avatars/anonymous.png";
+export const DEFAULT_AVATAR_URL = "/avatars/default.png";
 
 export function escapeHtml(value: string | null | undefined): string {
 	if (!value) return "";
@@ -37,6 +44,37 @@ export function safeUrl(url: string | null | undefined): string | null {
 	return SAFE_IMAGE_RE.test(trimmed) ? trimmed : null;
 }
 
+export function isAnonymousAuthorName(
+	authorName: string | null | undefined,
+): boolean {
+	const trimmed = authorName?.trim() ?? "";
+	return !trimmed || ANONYMOUS_NAME_RE.test(trimmed);
+}
+
+/**
+ * 解析分享页头像地址：
+ * 1. 显式匿名始终使用本站匿名头像；
+ * 2. 有合法头像地址则使用用户头像；
+ * 3. 缺省头像时，若未返回 anonymous 字段则按匿名昵称规则兼容推断，否则使用本站默认头像。
+ */
+export function resolveShareAvatarUrl(
+	avatarUrl: string | null | undefined,
+	anonymous?: boolean | null,
+	authorName?: string | null,
+): string {
+	if (anonymous === true) {
+		return ANONYMOUS_AVATAR_URL;
+	}
+	const safe = safeUrl(avatarUrl);
+	if (safe) {
+		return safe;
+	}
+	if (anonymous == null && isAnonymousAuthorName(authorName)) {
+		return ANONYMOUS_AVATAR_URL;
+	}
+	return DEFAULT_AVATAR_URL;
+}
+
 export function musicWebUrl(ref: MusicRef): string {
 	return ref.platform === "netease_music"
 		? `https://music.163.com/song?id=${ref.id}`
@@ -45,6 +83,10 @@ export function musicWebUrl(ref: MusicRef): string {
 
 export function musicPlatformName(platform: MusicPlatform): string {
 	return platform === "netease_music" ? "网易云音乐" : "QQ 音乐";
+}
+
+export function musicRefKey(ref: MusicRef): string {
+	return `${ref.platform}:${ref.id}`;
 }
 
 /** 按出现顺序去重，最多取 max 首。 */
@@ -67,6 +109,55 @@ export function extractMusicRefs(
 		}
 	}
 	return refs;
+}
+
+/** 汇总帖子正文与评论区的所有音乐引用（正文优先，全页去重并限制查询总数）。 */
+export function collectShareMusicRefs(
+	page: Pick<PublicPostSharePage, "content" | "floors">,
+	options: { maxPost?: number; maxComment?: number; maxTotal?: number } = {},
+): MusicRef[] {
+	const maxPost = options.maxPost ?? 3;
+	const maxComment = options.maxComment ?? 3;
+	const maxTotal = options.maxTotal ?? 12;
+	const refs: MusicRef[] = [];
+	const seen = new Set<string>();
+
+	const append = (text: string | null | undefined, limit: number) => {
+		if (refs.length >= maxTotal) return;
+		for (const ref of extractMusicRefs(text, limit)) {
+			if (refs.length >= maxTotal) break;
+			const key = musicRefKey(ref);
+			if (!seen.has(key)) {
+				seen.add(key);
+				refs.push(ref);
+			}
+		}
+	};
+
+	append(page.content, maxPost);
+	for (const floor of page.floors || []) {
+		append(floor.first?.text, maxComment);
+		for (const reply of floor.replies || []) {
+			append(reply.text, maxComment);
+		}
+	}
+	return refs;
+}
+
+function stripMusicTokens(text: string): string {
+	if (!text) return "";
+	const lines = text.replace(/\r\n?/g, "\n").split("\n");
+	const kept: string[] = [];
+	for (const line of lines) {
+		if (MUSIC_LINE_ONLY_RE.test(line)) {
+			continue;
+		}
+		kept.push(line.replace(new RegExp(MUSIC_TOKEN_RE.source, "g"), ""));
+	}
+	return kept
+		.join("\n")
+		.replace(/\n{3,}/g, "\n\n")
+		.trim();
 }
 
 function emojiHtml(code: string): string {
@@ -179,10 +270,18 @@ export function renderMarkdown(content: string | null | undefined): string {
 	return typeof html === "string" ? html.trim() : "";
 }
 
-/** 标题、评论、投票选项等纯文本：转义后只替换表情，音乐标记换成「♪ 平台」文字，其余标记去掉。 */
+/** 标题、投票选项等纯文本：转义后只替换表情，音乐标记换成「♪ 平台」文字，其余标记去掉。 */
 export function renderInline(text: string | null | undefined): string {
 	if (!text) return "";
 	return renderTextTokens(text, "inline");
+}
+
+/** 评论纯文本：转义并替换表情，移除已单独渲染为音乐卡片的音乐标记及多余空行。 */
+export function renderCommentText(text: string | null | undefined): string {
+	if (!text) return "";
+	const stripped = stripMusicTokens(text);
+	if (!stripped) return "";
+	return renderTextTokens(stripped, "markdown").trim();
 }
 
 function extractPlainTextFromTokens(

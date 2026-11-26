@@ -8,7 +8,7 @@ export default defineConfig({
 	site: "https://northward.zone",
 	adapter: node({ mode: "standalone" }),
 	integrations: [
-		tailwind(),
+		tailwind({ applyBaseStyles: false }),
 		react(),
 		sitemap({
 			filter: (page) =>
