@@ -1,0 +1,64 @@
+name: square-games-checks
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/games-checks.yml"
+      - "src/features/games/**"
+      - "src/features/square/**"
+      - "src/pages/games/**"
+      - "src/pages/square.astro"
+      - "astro.config.mjs"
+      - "tests/seamless-games.browser.mjs"
+      - "package*.json"
+  push:
+    branches: ["codex/seamless-square-games"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        games: ["false", "true"]
+    env:
+      SQUARE_GAMES_ENABLED: ${{ matrix.games }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: site
+      - uses: actions/checkout@v4
+        with:
+          repository: Chlx42/sling-hockey
+          ref: 0a4032d4cc8a43b25ebacb8ae13b9928fd250448
+          path: sling-hockey
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: 安装与构建
+        working-directory: site
+        run: |
+          npm ci --include=dev
+          npx --no-install astro check
+          npm run build
+          npx --no-install playwright install --with-deps chromium
+      - name: 验证无感账号交接与广场布局
+        working-directory: site
+        env:
+          GAMES_TEST_ROOT: ${{ github.workspace }}
+          GAMES_TEST_GAME_IDS: hockey
+        run: npm run test:games
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: square-games-browser-evidence-${{ matrix.games }}
+          path: site/docs/screenshots/seamless-games/
+          if-no-files-found: ignore
+          retention-days: 7

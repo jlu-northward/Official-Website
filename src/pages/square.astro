@@ -2,11 +2,15 @@
 import SquarePage from "../features/square/SquarePage";
 import ReactPageLayout from "@layouts/ReactPageLayout.astro";
 import { squareContent } from "../features/square/content/square";
+// 此页面预渲染为静态 HTML，开关从构建进程读取并固化到产物中。
+const gamesEnabled = process.env.SQUARE_GAMES_ENABLED === "true";
 ---
 
 <ReactPageLayout
 	title={squareContent.title}
-	description={squareContent.description}
+	description={gamesEnabled
+		? squareContent.description
+		: squareContent.pending.description}
 >
-	<SquarePage client:load />
+	<SquarePage client:load gamesEnabled={gamesEnabled} />
 </ReactPageLayout>
