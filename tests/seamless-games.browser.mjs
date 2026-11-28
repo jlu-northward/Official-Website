@@ -233,6 +233,11 @@ for (activeGame of games) {
 	injectAuth = true;
 	// 错误 state / 过期回调必须清除现存账号，不能继续沿用。
 	for (const expired of [false, true]) {
+		// 回调来自官网的跨页面跳转；仅改同页 hash 不会重新执行登录模块。
+		await page.goto(
+			`https://games.northward.zone/${activeGame.id}/?fixture=callback-setup`,
+		);
+		await page.waitForFunction(() => document.body.dataset.ready === "true");
 		current = { uid: "99", nickname: "旧身份" };
 		await page.evaluate(
 			({ id, expired }) => {
