@@ -38,6 +38,11 @@ module.exports = {
 					DEFAULT: "hsl(var(--card))",
 					foreground: "hsl(var(--card-foreground))",
 				},
+				brand: {
+					start: "hsl(var(--brand-start))",
+					end: "hsl(var(--brand-end))",
+					foreground: "hsl(var(--brand-foreground))",
+				},
 			},
 			fontFamily: {
 				sans: [

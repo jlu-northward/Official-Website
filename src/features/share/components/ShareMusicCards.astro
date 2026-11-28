@@ -1,0 +1,118 @@
+---
+import { musicPlatformName, musicWebUrl, safeUrl } from "../content";
+import type { MusicCard } from "../types";
+
+interface Props {
+	cards: MusicCard[];
+	class?: string;
+	compact?: boolean;
+	surface?: "muted" | "card";
+	eager?: boolean;
+}
+
+const {
+	cards,
+	class: containerClass = "order-1 mt-4 space-y-2",
+	compact = false,
+	surface = "muted",
+	eager = false,
+} = Astro.props;
+
+const cardSurfaceClass =
+	surface === "card" ? "border border-border/60 bg-card" : "bg-muted/70";
+const cardLayoutClass = compact
+	? "flex items-center gap-2.5 rounded-lg p-1.5 pr-2.5"
+	: "flex items-center gap-3 rounded-xl p-2 pr-3";
+const coverSizeClass = compact ? "size-10" : "size-12";
+const coverPx = compact ? 40 : 48;
+const titleClass = compact
+	? "block truncate text-[13px] font-medium"
+	: "block truncate text-sm font-medium";
+const subtitleClass = compact
+	? "mt-0.5 block truncate text-[11px] text-muted-foreground"
+	: "mt-0.5 block truncate text-xs text-muted-foreground";
+const playBtnClass = compact ? "size-7" : "size-8";
+const playIconClass = compact ? "size-3" : "size-3.5";
+---
+
+{
+	cards.length > 0 && (
+		<div class={containerClass}>
+			{cards.map((card) => {
+				const track = card.track;
+				const cover = safeUrl(track?.coverUrl);
+				const platformName = musicPlatformName(card.ref.platform);
+				const name = track ? track.name : `${platformName}单曲`;
+				const subtitle = !track
+					? "点击收听"
+					: track.artists
+						? `${track.artists} · ${platformName}`
+						: platformName;
+				return (
+					<a
+						class={`${cardLayoutClass} ${cardSurfaceClass}`}
+						href={musicWebUrl(card.ref)}
+						target="_blank"
+						rel="nofollow noopener noreferrer"
+					>
+						{cover ? (
+							<img
+								class={`${coverSizeClass} shrink-0 rounded-lg bg-secondary object-cover`}
+								src={cover}
+								width={coverPx}
+								height={coverPx}
+								alt=""
+								loading={eager ? undefined : "lazy"}
+								decoding={eager ? undefined : "async"}
+								referrerpolicy="no-referrer"
+							/>
+						) : (
+							<span
+								class={`flex ${coverSizeClass} shrink-0 items-center justify-center rounded-lg bg-secondary text-secondary-foreground`}
+							>
+								<svg
+									class={compact ? "size-4 shrink-0" : "size-5 shrink-0"}
+									width={compact ? 16 : 20}
+									height={compact ? 16 : 20}
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									aria-hidden="true"
+								>
+									<path d="M9 18V5l12-2v13" />
+									<circle cx="6" cy="18" r="3" />
+									<circle cx="18" cy="16" r="3" />
+								</svg>
+							</span>
+						)}
+						<span class="min-w-0 flex-1">
+							<span class={titleClass}>{name}</span>
+							<span class={subtitleClass}>{subtitle}</span>
+						</span>
+						<span
+							class={`flex ${playBtnClass} shrink-0 items-center justify-center rounded-full bg-background text-primary shadow-sm`}
+						>
+							<svg
+								class={`${playIconClass} shrink-0 translate-x-px fill-current`}
+								width={compact ? 12 : 14}
+								height={compact ? 12 : 14}
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								aria-hidden="true"
+							>
+								<polygon points="6 3 20 12 6 21 6 3" />
+							</svg>
+						</span>
+					</a>
+				);
+			})}
+		</div>
+	)
+}

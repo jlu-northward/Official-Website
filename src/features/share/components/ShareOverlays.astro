@@ -1,0 +1,184 @@
+---
+interface Props {
+	postId: string;
+}
+
+const { postId } = Astro.props;
+const CTA_LABEL = "去向北 App，查看更多内容";
+---
+
+<div
+	class="pointer-events-none fixed inset-x-0 bottom-0 bg-gradient-to-t from-background via-background/90 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-10"
+>
+	<a
+		class="pointer-events-auto mx-auto flex h-14 max-w-md items-center gap-3 rounded-2xl bg-gradient-to-r from-brand-start to-brand-end pl-2.5 pr-4 text-brand-foreground shadow-xl shadow-brand-start/25 ring-1 ring-inset ring-white/10 transition-transform active:scale-[0.98]"
+		data-open-app
+		href={`northward://app/?postId=${postId}`}
+	>
+		<img
+			class="size-9 shrink-0 rounded-[10px]"
+			src="/brand/logo.png"
+			width="36"
+			height="36"
+			alt=""
+		/>
+		<span
+			class="min-w-0 flex-1 truncate text-center text-base font-semibold tracking-wide"
+		>
+			{CTA_LABEL}
+		</span>
+		<span
+			class="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/15"
+		>
+			<svg
+				class="size-4 shrink-0"
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<path d="M7 7h10v10"></path>
+				<path d="M7 17 17 7"></path>
+			</svg>
+		</span>
+	</a>
+</div>
+
+<div
+	id="lightbox"
+	class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 p-4"
+	role="dialog"
+	aria-modal="true"
+	aria-label="查看图片"
+	hidden
+>
+	<img
+		class="max-h-full max-w-full rounded-md object-contain"
+		alt=""
+		referrerpolicy="no-referrer"
+	/>
+</div>
+
+<div
+	id="wechat-guide"
+	class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-black/75 px-6"
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="wechat-guide-title"
+	hidden
+>
+	<div class="absolute right-5 top-4 flex flex-col items-end text-white">
+		<svg
+			class="size-10 animate-bounce"
+			width="40"
+			height="40"
+			viewBox="0 0 40 40"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="3.5"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			aria-hidden="true"
+		>
+			<path d="M8 32 32 8M32 8H14M32 8v18"></path>
+		</svg>
+		<p class="mt-1 text-right text-xs leading-5 text-white/75">
+			点击右上角 ···<br />选择「在浏览器打开」
+		</p>
+	</div>
+	<div
+		class="w-full max-w-xs rounded-2xl bg-card p-6 text-center text-card-foreground shadow-2xl"
+	>
+		<h2 id="wechat-guide-title" class="text-base font-semibold tracking-tight">
+			请在浏览器中打开
+		</h2>
+		<p class="mt-3 text-sm leading-6 text-muted-foreground">
+			微信内无法直接打开向北 App。请点击右上角
+			<span
+				class="mx-1 rounded bg-muted px-1.5 py-0.5 font-mono text-xs font-semibold text-foreground"
+			>
+				···
+			</span>
+			选择「在浏览器打开」，再点底部按钮即可。
+		</p>
+		<button
+			type="button"
+			class="mt-5 h-11 w-full rounded-xl bg-gradient-to-r from-brand-start to-brand-end text-sm font-semibold text-brand-foreground active:scale-[0.98]"
+			data-close-guide
+		>
+			我知道了
+		</button>
+	</div>
+</div>
+
+<script is:inline>
+	(function () {
+		var ua = navigator.userAgent.toLowerCase();
+		var wechat = /micromessenger/.test(ua);
+		var fallback = /iphone|ipad|ipod/.test(ua)
+			? "/download-ios/"
+			: /android/.test(ua)
+				? "/download-android/"
+				: "/#download";
+		var guide = document.getElementById("wechat-guide");
+		var box = document.getElementById("lightbox");
+		var big = box && box.querySelector("img");
+		function toggle(el, show) {
+			if (!el) return;
+			el.hidden = !show;
+			el.classList.toggle("hidden", !show);
+			el.classList.toggle("flex", show);
+			document.body.style.overflow = show ? "hidden" : "";
+		}
+		if (guide) {
+			guide.addEventListener("click", function (e) {
+				if (
+					e.target === guide ||
+					(e.target &&
+						e.target.closest &&
+						e.target.closest("[data-close-guide]"))
+				) {
+					toggle(guide, false);
+				}
+			});
+		}
+		if (box && big) {
+			box.addEventListener("click", function () {
+				toggle(box, false);
+				big.removeAttribute("src");
+			});
+			document.addEventListener("click", function (e) {
+				var t =
+					e.target && e.target.closest && e.target.closest("[data-lightbox]");
+				if (!t) return;
+				e.preventDefault();
+				big.src = t.href;
+				toggle(box, true);
+			});
+		}
+		document.querySelectorAll("[data-open-app]").forEach(function (a) {
+			a.addEventListener("click", function (e) {
+				e.preventDefault();
+				if (wechat) {
+					toggle(guide, true);
+					return;
+				}
+				var left = false;
+				var mark = function () {
+					left = true;
+				};
+				document.addEventListener("visibilitychange", mark, { once: true });
+				window.addEventListener("pagehide", mark, { once: true });
+				window.location.href = a.getAttribute("href");
+				setTimeout(function () {
+					if (!left) window.location.href = fallback;
+				}, 900);
+			});
+		});
+	})();
+</script>

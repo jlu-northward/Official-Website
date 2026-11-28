@@ -1,0 +1,374 @@
+---
+import shareStyles from "../../styles/share-page.css?inline";
+import { fetchSharedPost } from "../../features/share/api";
+import ShareAvatar from "../../features/share/components/ShareAvatar.astro";
+import ShareComments from "../../features/share/components/ShareComments.astro";
+import ShareMusicCards from "../../features/share/components/ShareMusicCards.astro";
+import ShareOverlays from "../../features/share/components/ShareOverlays.astro";
+import SharePoll from "../../features/share/components/SharePoll.astro";
+import {
+	buildDescription,
+	collectShareMusicRefs,
+	extractMusicRefs,
+	formatShareDate,
+	musicRefKey,
+	renderInline,
+	renderMarkdown,
+	safeUrl,
+} from "../../features/share/content";
+import { lookupMusicCards } from "../../features/share/music";
+import type {
+	MusicCard,
+	PublicPostSharePage,
+} from "../../features/share/types";
+
+export const prerender = false;
+
+const inlineShareStyles = shareStyles.replace(/<\/style>/gi, "<\\/style>");
+const SITE_NAME = "向北";
+const SITE_URL = (Astro.site?.toString() || "https://northward.zone").replace(
+	/\/$/,
+	"",
+);
+const DEFAULT_DESCRIPTION =
+	"这篇帖子暂时无法查看，去向北 App 发现更多校园讨论。";
+const MAX_POST_IMAGES = 9;
+
+const rawId = Astro.params.id ?? "";
+const validId = /^\d+$/.test(rawId);
+
+let status: "ok" | "not_found" | "error" = "not_found";
+let page: PublicPostSharePage | null = null;
+let musicCards: MusicCard[] = [];
+const musicCardMap = new Map<string, MusicCard>();
+
+if (validId) {
+	const result = await fetchSharedPost(rawId);
+	if (result.status === "ok") {
+		status = "ok";
+		page = result.page;
+		const allRefs = collectShareMusicRefs(page);
+		if (allRefs.length > 0) {
+			const resolvedCards = await lookupMusicCards(allRefs);
+			for (const card of resolvedCards) {
+				musicCardMap.set(musicRefKey(card.ref), card);
+			}
+		}
+		musicCards = extractMusicRefs(page.content, 3).map(
+			(ref) => musicCardMap.get(musicRefKey(ref)) ?? { ref, track: null },
+		);
+	} else {
+		status = result.status;
+	}
+}
+
+const postIdNum = validId ? rawId : "0";
+const canonical = `${SITE_URL}/posts/${postIdNum}`;
+
+if (status === "ok") {
+	Astro.response.status = 200;
+	Astro.response.headers.set("Cache-Control", "public, max-age=60");
+} else if (status === "error") {
+	Astro.response.status = 502;
+	Astro.response.headers.set("Cache-Control", "no-store");
+} else {
+	Astro.response.status = 404;
+	Astro.response.headers.set("Cache-Control", "public, max-age=60");
+}
+Astro.response.headers.set("X-Robots-Tag", "noindex, nofollow");
+Astro.response.headers.set(
+	"Referrer-Policy",
+	"strict-origin-when-cross-origin",
+);
+
+const rawTitle = page?.title?.trim() || "向北帖子";
+const docTitle =
+	status === "ok"
+		? `${rawTitle}｜${SITE_NAME}`
+		: status === "error"
+			? `服务暂时不可用｜${SITE_NAME}`
+			: `帖子暂时无法查看｜${SITE_NAME}`;
+const description =
+	status === "ok" && page
+		? buildDescription(page.content, rawTitle)
+		: DEFAULT_DESCRIPTION;
+const ogType = status === "ok" ? "article" : "website";
+const shareImage = status === "ok" && page ? safeUrl(page.coverUrl) : null;
+const shareImageAlt = shareImage ? `${rawTitle}的帖子封面` : null;
+
+const galleryImages: Array<{ url: string; alt: string; isFirst: boolean }> = [];
+if (page) {
+	const cover = safeUrl(page.coverUrl);
+	if (cover) {
+		galleryImages.push({ url: cover, alt: "帖子封面", isFirst: true });
+	}
+	for (const rawImg of page.imageUrls || []) {
+		if (galleryImages.length >= MAX_POST_IMAGES) break;
+		const url = safeUrl(rawImg);
+		if (url) {
+			galleryImages.push({
+				url,
+				alt: "帖子图片",
+				isFirst: galleryImages.length === 0,
+			});
+		}
+	}
+}
+
+const titleHtml = renderInline(rawTitle);
+const contentHtml = page ? renderMarkdown(page.content) : "";
+---
+
+<!doctype html>
+<html lang="zh-CN" class="share-page">
+	<head>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width,initial-scale=1,viewport-fit=cover"
+		/>
+		<title>{docTitle}</title>
+		<meta name="description" content={description} />
+		<meta name="robots" content="noindex,nofollow" />
+		<meta
+			name="theme-color"
+			content="#ffffff"
+			media="(prefers-color-scheme: light)"
+		/>
+		<meta
+			name="theme-color"
+			content="#0d1017"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<link rel="canonical" href={canonical} />
+		<meta property="og:site_name" content={SITE_NAME} />
+		<meta property="og:type" content={ogType} />
+		<meta property="og:title" content={docTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		{
+			shareImage && (
+				<>
+					<meta property="og:image" content={shareImage} />
+					<meta property="og:image:alt" content={shareImageAlt ?? ""} />
+				</>
+			)
+		}
+		<meta
+			name="twitter:card"
+			content={shareImage ? "summary_large_image" : "summary"}
+		/>
+		<meta name="twitter:title" content={docTitle} />
+		<meta name="twitter:description" content={description} />
+		{shareImage && <meta name="twitter:image" content={shareImage} />}
+		<meta itemprop="name" content={docTitle} />
+		<meta itemprop="description" content={description} />
+		{shareImage && <meta itemprop="image" content={shareImage} />}
+		<link rel="icon" href="/favicon.ico" />
+		<style is:inline set:html={inlineShareStyles}></style>
+	</head>
+	<body
+		class="min-h-screen bg-background font-sans text-foreground antialiased"
+	>
+		<header
+			class="sticky top-0 z-10 border-b border-border/70 bg-background/95"
+		>
+			<div class="mx-auto flex max-w-2xl items-center gap-2.5 px-5 py-2.5">
+				<a class="flex min-w-0 items-center gap-2.5" href="/">
+					<img
+						class="size-7 rounded-lg"
+						src="/brand/logo.png"
+						width="28"
+						height="28"
+						alt=""
+					/>
+					<span class="text-[15px] font-semibold">向北</span>
+					<span class="truncate text-xs text-muted-foreground">
+						吉大人自己的校园社区
+					</span>
+				</a>
+			</div>
+		</header>
+
+		<main class="mx-auto max-w-2xl pb-40">
+			{
+				status === "ok" && page ? (
+					<>
+						<article class="flex flex-col px-5 pt-5">
+							{/* 图集在 DOM 排最前以保证微信优先抓封面图，视觉上通过 order 排在正文和音乐下方 */}
+							{galleryImages.length > 0 && (
+								<div class="order-2 mt-4 grid grid-cols-3 gap-1">
+									{galleryImages.map((img) => (
+										<a
+											class="block aspect-square overflow-hidden rounded-md bg-muted"
+											href={img.url}
+											data-lightbox
+										>
+											<img
+												class="size-full object-cover"
+												src={img.url}
+												alt={img.alt}
+												fetchpriority={img.isFirst ? "high" : undefined}
+												loading={img.isFirst ? undefined : "lazy"}
+												decoding={img.isFirst ? undefined : "async"}
+												referrerpolicy="no-referrer"
+											/>
+										</a>
+									))}
+								</div>
+							)}
+
+							<div class="order-first">
+								<div class="flex items-center gap-3">
+									<ShareAvatar
+										url={page.authorAvatarUrl}
+										anonymous={page.anonymous}
+										authorName={page.authorName}
+										sizeClass="size-10"
+										size={40}
+										eager
+									/>
+									<div class="min-w-0">
+										<p class="truncate text-[15px] font-medium">
+											{page.authorName?.trim() || "匿名用户"}
+										</p>
+										<p class="mt-0.5 text-xs text-muted-foreground">
+											{formatShareDate(page.createTime)}
+										</p>
+									</div>
+								</div>
+
+								<h1 class="mt-4 break-words text-[21px] font-semibold leading-snug tracking-tight">
+									{page.essence && (
+										<span class="mr-1.5 inline-block rounded bg-secondary px-1.5 py-1 align-[3px] text-xs font-medium leading-none tracking-normal text-secondary-foreground">
+											精华
+										</span>
+									)}
+									<Fragment set:html={titleHtml} />
+								</h1>
+
+								{contentHtml && (
+									<div class="share-content mt-3" set:html={contentHtml} />
+								)}
+							</div>
+
+							<ShareMusicCards cards={musicCards} eager />
+							<SharePoll poll={page.poll} />
+
+							<div class="order-last mt-5 flex items-center gap-5 pb-5 text-[13px] text-muted-foreground">
+								<span
+									class="inline-flex items-center gap-1.5"
+									aria-label={`点赞 ${page.likeCount}`}
+								>
+									<svg
+										class="size-4 shrink-0"
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+									</svg>
+									<span class="tabular-nums">{page.likeCount}</span>
+								</span>
+								<span
+									class="inline-flex items-center gap-1.5"
+									aria-label={`评论 ${page.commentCount}`}
+								>
+									<svg
+										class="size-4 shrink-0"
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+									</svg>
+									<span class="tabular-nums">{page.commentCount}</span>
+								</span>
+								<span
+									class="inline-flex items-center gap-1.5"
+									aria-label={`浏览 ${page.pv}`}
+								>
+									<svg
+										class="size-4 shrink-0"
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+										<circle cx="12" cy="12" r="3" />
+									</svg>
+									<span class="tabular-nums">{page.pv}</span>
+								</span>
+							</div>
+						</article>
+
+						<div class="h-2 bg-muted/70" />
+
+						<ShareComments
+							floors={page.floors || []}
+							totalFloors={page.totalFloors}
+							commentCount={page.commentCount}
+							musicCardMap={musicCardMap}
+						/>
+					</>
+				) : (
+					<section class="px-6 py-24 text-center">
+						<div class="mx-auto flex size-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
+							<svg
+								class="size-6 shrink-0"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								aria-hidden="true"
+							>
+								<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+								<path d="M14 2v4a2 2 0 0 0 2 2h4" />
+								<path d="m14.5 12.5-5 5" />
+								<path d="m9.5 12.5 5 5" />
+							</svg>
+						</div>
+						<h1 class="mt-5 text-lg font-semibold tracking-tight">
+							{status === "error" ? "帖子加载失败" : "帖子暂时无法查看"}
+						</h1>
+						<p class="mt-2 text-sm leading-6 text-muted-foreground">
+							{status === "error"
+								? "服务暂时繁忙，请稍后再试或前往向北 App 查看。"
+								: "内容可能已删除、设为私密，或链接有误。"}
+						</p>
+						<a
+							class="mt-6 inline-flex h-9 items-center justify-center rounded-full border px-5 text-sm font-medium"
+							href="/"
+						>
+							看看向北
+						</a>
+					</section>
+				)
+			}
+		</main>
+
+		<ShareOverlays postId={postIdNum} />
+	</body>
+</html>

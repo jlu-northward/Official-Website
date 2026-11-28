@@ -1,18 +1,18 @@
+import node from "@astrojs/node";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
-import vercel from "@astrojs/vercel";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
 	site: "https://northward.zone",
-	adapter: vercel(),
+	adapter: node({ mode: "standalone" }),
 	integrations: [
-		tailwind(),
+		tailwind({ applyBaseStyles: false }),
 		react(),
 		sitemap({
 			filter: (page) =>
-				!/^\/(games(?:\/|$)|content(?:\/|$)|api(?:\/|$)|post(?:\/|$)|download-(?:android|ios)(?:\/|$))/.test(
+				!/^\/(games(?:\/|$)|content(?:\/|$)|api(?:\/|$)|posts?(?:\/|$)|healthz(?:\/|$)|download-(?:android|ios)(?:\/|$))/.test(
 					new URL(page).pathname,
 				),
 		}),
