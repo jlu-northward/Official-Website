@@ -70,8 +70,59 @@ export default function SquarePage({
 				</div>
 			</header>
 			<main className="mx-auto w-full max-w-4xl flex-1 px-5 pb-12 pt-8 sm:px-7 sm:pb-16 sm:pt-12">
+				<section className={enter} aria-labelledby="tools-title">
+					<h2
+						id="tools-title"
+						className="mb-4 text-base font-semibold tracking-tight"
+					>
+						{squareContent.toolsHeading}
+					</h2>
+
+					<a
+						href={squareContent.toolbox.href}
+						className={cn(
+							"group relative isolate block overflow-hidden rounded-[24px] bg-[#244e43] p-6 text-white outline-none transition-[box-shadow,transform] hover:shadow-[0_18px_40px_-20px_rgba(36,78,67,0.75)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background motion-safe:active:scale-[0.99] sm:p-7",
+							enter,
+						)}
+					>
+						<div className="tools-dot-grid pointer-events-none absolute inset-0 -z-10 text-white/10" />
+						<div className="pointer-events-none absolute -right-14 -top-20 -z-10 h-64 w-64 rounded-full border border-white/[0.07]" />
+						<div className="pointer-events-none absolute -right-3 -top-8 -z-10 h-44 w-44 rounded-full border border-white/[0.08]" />
+						<div className="pointer-events-none absolute -bottom-24 -left-16 -z-10 h-56 w-56 rounded-full bg-[#3b7a68]/40 blur-3xl" />
+						<span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-2.5 py-1 text-[11px] tracking-wide text-[#d5e8d9]">
+							<FiTool className="h-3 w-3" aria-hidden="true" />
+							{squareContent.toolbox.name}
+						</span>
+						<span className="mt-4 block whitespace-pre-line text-[24px] font-medium leading-snug tracking-tight sm:text-[28px]">
+							{squareContent.toolbox.tagline}
+						</span>
+						<span className="mt-7 flex items-end justify-between gap-4">
+							<span className="flex flex-wrap gap-1.5">
+								{squareContent.toolbox.features.map((feature) => {
+									const Icon = featureIcons[feature.icon] ?? FiGrid;
+									return (
+										<span
+											key={feature.name}
+											className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/85"
+										>
+											<Icon
+												className="h-3 w-3 text-[#d7ebc2]"
+												aria-hidden="true"
+											/>
+											{feature.name}
+										</span>
+									);
+								})}
+							</span>
+							<span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/30 transition-colors group-hover:bg-white/10">
+								<FiArrowUpRight className="h-4 w-4" aria-hidden="true" />
+							</span>
+						</span>
+					</a>
+				</section>
+
 				<section
-					className={cn("relative isolate", enter)}
+					className={cn("relative isolate mt-10 sm:mt-12", enter)}
 					aria-labelledby="square-title"
 				>
 					{/* 宽度不超过视口：iOS WebKit 不会用 body 的 overflow-x 拦住横向拖动，超宽会让整页可被横移。 */}
@@ -160,60 +211,6 @@ export default function SquarePage({
 						</div>
 					</section>
 				)}
-
-				<section
-					className={cn("mt-9 sm:mt-10", enter)}
-					aria-labelledby="tools-title"
-				>
-					<h2
-						id="tools-title"
-						className="mb-4 text-base font-semibold tracking-tight"
-					>
-						{squareContent.toolsHeading}
-					</h2>
-
-					<a
-						href={squareContent.toolbox.href}
-						className={cn(
-							"group relative isolate block overflow-hidden rounded-[24px] bg-[#244e43] p-6 text-white outline-none transition-[box-shadow,transform] [animation-delay:100ms] hover:shadow-[0_18px_40px_-20px_rgba(36,78,67,0.75)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background motion-safe:active:scale-[0.99] sm:p-7",
-							enter,
-						)}
-					>
-						<div className="tools-dot-grid pointer-events-none absolute inset-0 -z-10 text-white/10" />
-						<div className="pointer-events-none absolute -right-14 -top-20 -z-10 h-64 w-64 rounded-full border border-white/[0.07]" />
-						<div className="pointer-events-none absolute -right-3 -top-8 -z-10 h-44 w-44 rounded-full border border-white/[0.08]" />
-						<div className="pointer-events-none absolute -bottom-24 -left-16 -z-10 h-56 w-56 rounded-full bg-[#3b7a68]/40 blur-3xl" />
-						<span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-2.5 py-1 text-[11px] tracking-wide text-[#d5e8d9]">
-							<FiTool className="h-3 w-3" aria-hidden="true" />
-							{squareContent.toolbox.name}
-						</span>
-						<span className="mt-4 block whitespace-pre-line text-[24px] font-medium leading-snug tracking-tight sm:text-[28px]">
-							{squareContent.toolbox.tagline}
-						</span>
-						<span className="mt-7 flex items-end justify-between gap-4">
-							<span className="flex flex-wrap gap-1.5">
-								{squareContent.toolbox.features.map((feature) => {
-									const Icon = featureIcons[feature.icon] ?? FiGrid;
-									return (
-										<span
-											key={feature.name}
-											className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/85"
-										>
-											<Icon
-												className="h-3 w-3 text-[#d7ebc2]"
-												aria-hidden="true"
-											/>
-											{feature.name}
-										</span>
-									);
-								})}
-							</span>
-							<span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/30 transition-colors group-hover:bg-white/10">
-								<FiArrowUpRight className="h-4 w-4" aria-hidden="true" />
-							</span>
-						</span>
-					</a>
-				</section>
 			</main>
 		</div>
 	);
