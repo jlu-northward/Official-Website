@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { zhCN } from "react-day-picker/locale";
 import {
 	FiCalendar,
 	FiHeart,
@@ -7,7 +8,12 @@ import {
 	FiSearch,
 } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { classroomContent as copy } from "./content/classrooms";
 import {
@@ -38,6 +44,62 @@ const todayInChina = () =>
 		month: "2-digit",
 		day: "2-digit",
 	}).format(new Date());
+
+const dateFromValue = (value: string) => {
+	const [year, month, day] = value.split("-").map(Number);
+	return new Date(year, month - 1, day);
+};
+
+const dateValue = (value: Date) =>
+	`${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+
+function DatePicker({
+	id,
+	value,
+	onChange,
+}: {
+	id: string;
+	value: string;
+	onChange: (value: string) => void;
+}) {
+	const selected = dateFromValue(value);
+	const [open, setOpen] = useState(false);
+	const label = new Intl.DateTimeFormat("zh-CN", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	}).format(selected);
+
+	return (
+		<Popover open={open} onOpenChange={setOpen}>
+			<PopoverTrigger asChild>
+				<Button
+					id={id}
+					type="button"
+					variant="outline"
+					className="mt-2 h-11 w-full max-w-sm justify-start rounded-xl bg-card px-3 text-left font-normal"
+				>
+					<FiCalendar className="mr-2 h-4 w-4 text-muted-foreground" />
+					{label}
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent align="start" className="w-auto p-0">
+				<Calendar
+					mode="single"
+					locale={zhCN}
+					selected={selected}
+					defaultMonth={selected}
+					fixedWeeks
+					onSelect={(day) => {
+						if (!day) return;
+						onChange(dateValue(day));
+						setOpen(false);
+					}}
+				/>
+			</PopoverContent>
+		</Popover>
+	);
+}
 
 export default function EmptyClassroomFinder({ active }: { active: boolean }) {
 	const [index, setIndex] = useState<ClassroomIndex | null>(null);
@@ -336,13 +398,11 @@ export default function EmptyClassroomFinder({ active }: { active: boolean }) {
 						>
 							查询日期
 						</label>
-						<Input
+						<DatePicker
 							id="classroom-date"
-							type="date"
-							className="mt-2 block h-11 w-full min-w-0 max-w-full appearance-none rounded-xl sm:max-w-sm"
 							value={date}
-							onChange={(event) => {
-								setDate(event.target.value);
+							onChange={(value) => {
+								setDate(value);
 								clearResult();
 							}}
 						/>

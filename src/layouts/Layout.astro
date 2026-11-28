@@ -1,4 +1,5 @@
 ---
+import "../styles/global.css";
 import Footer from "@components/sections/Footer";
 import EasterEggToast from "@components/ui/EasterEggToast";
 import WeChatGuide from "@components/ui/WeChatGuide";
@@ -34,13 +35,13 @@ const {
 	publishedTime,
 	robots,
 	analytics = true,
-	wechatGuideOpenOnLoad = true,
+	wechatGuideOpenOnLoad = false,
 } = Astro.props;
 const siteUrl = Astro.site ?? new URL("https://northward.zone");
 const canonicalUrl = canonical
 	? new URL(canonical, siteUrl)
 	: new URL(Astro.url.pathname, siteUrl);
-const shareImageUrl = new URL(shareImage ?? "/brand/og-cover-v2.png", siteUrl);
+const shareImageUrl = new URL(shareImage ?? "/brand/og-cover.png", siteUrl);
 const usesDefaultShareImage = !shareImage;
 const shareImageExtension = shareImageUrl.pathname
 	.split(".")
