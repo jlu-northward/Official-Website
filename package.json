@@ -9,6 +9,7 @@
 		"timetable": "python3 scripts/import-classrooms.py",
 		"test:timetable": "python3 -m unittest discover -s tests -p 'test_*classrooms*.py'",
 		"test:tools": "node --test tests/tools-*.test.mjs",
+		"test:rating": "node --test tests/rating-*.test.mjs",
 		"test:share": "node --test tests/share.test.mjs"
 	},
 	"dependencies": {
