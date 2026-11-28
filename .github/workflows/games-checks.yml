@@ -37,12 +37,6 @@ jobs:
           ref: 0a4032d4cc8a43b25ebacb8ae13b9928fd250448
           path: sling-hockey
           persist-credentials: false
-      - uses: actions/checkout@v4
-        with:
-          repository: Chlx42/perfect-match
-          ref: ec33a5dfaf70faf9bb328649a8573ee33efce08f
-          path: perfect-match
-          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -59,6 +53,7 @@ jobs:
         working-directory: site
         env:
           GAMES_TEST_ROOT: ${{ github.workspace }}
+          GAMES_TEST_GAME_IDS: hockey
         run: npm run test:games
       - uses: actions/upload-artifact@v4
         if: always()

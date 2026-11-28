@@ -12,14 +12,12 @@ const dist = await fs.access(path.resolve("dist/client/index.html")).then(
 const screenshots = path.resolve("docs/screenshots/seamless-games");
 const gamesEnabled = process.env.SQUARE_GAMES_ENABLED === "true";
 await fs.mkdir(screenshots, { recursive: true });
-const browser = await chromium.launch({ headless: true });
-const context = await browser.newContext();
 let account = { uid: "42", nickname: "甲同学" },
 	current = null,
 	pending = null,
 	codeRequests = 0,
 	exchanges = 0;
-const games = [
+const availableGames = [
 	{
 		id: "hockey",
 		module: "client/northward-login.mjs",
@@ -33,10 +31,22 @@ const games = [
 		script: "src/northward-login.js",
 	},
 ];
+const requestedGames = process.env.GAMES_TEST_GAME_IDS?.split(",");
+assert.ok(
+	!requestedGames ||
+		requestedGames.every((id) => availableGames.some((game) => game.id === id)),
+	"GAMES_TEST_GAME_IDS 包含未知游戏",
+);
+const games = availableGames.filter(
+	(game) => !requestedGames || requestedGames.includes(game.id),
+);
+const browser = await chromium.launch({ headless: true });
+const context = await browser.newContext();
 let activeGame = games[0];
 let failStatus = false;
 let failCode = false;
 let injectAuth = true;
+let nativePending = false;
 const mime = (p) =>
 	p.endsWith(".js") || p.endsWith(".mjs")
 		? "application/javascript"
@@ -124,14 +134,17 @@ await context.route("**/*", async (route) => {
 		if (url.pathname.endsWith("/")) file = path.join(file, "index.html");
 		try {
 			let data = await fs.readFile(file);
-			if (url.pathname === "/games/launch/" && injectAuth)
+			if (url.pathname === "/games/launch/" && (injectAuth || nativePending))
 				data = Buffer.from(
 					data.toString().replace(
 						"<head>",
-						"<head><script>window.northwardAuth=" +
-							JSON.stringify({
-								accessToken: account ? "fixture-access" : null,
-							}) +
+						"<head><script>" +
+							(injectAuth
+								? "window.northwardAuth=" +
+									JSON.stringify({
+										accessToken: account ? "fixture-access" : null,
+									})
+								: "window.northwardTheme={}") +
 							"</script>",
 					),
 				);
@@ -243,6 +256,46 @@ for (activeGame of games) {
 		assert.equal(current, null);
 		assert.equal(exchanges, 4);
 	}
+	// App 先注入主题，认证随后到达；等待期间不能跳成游客。
+	injectAuth = false;
+	nativePending = true;
+	account = { uid: "45", nickname: "延迟登录同学" };
+	const beforeDelayed = codeRequests;
+	await page.goto(`https://games.northward.zone/${activeGame.id}/?northward=1`);
+	await page.waitForURL("https://northward.zone/games/launch/**");
+	await page.waitForLoadState("load");
+	assert.equal(await page.evaluate(() => window.northwardAuth), undefined);
+	assert.equal(await page.locator("#message").textContent(), "请稍候");
+	assert.equal(codeRequests, beforeDelayed);
+	await page.evaluate(() => {
+		const auth = { accessToken: "fixture-access" };
+		window.northwardAuth = auth;
+		window.dispatchEvent(
+			new CustomEvent("northwardAuthChanged", { detail: auth }),
+		);
+	});
+	await page.waitForFunction(() => document.body.dataset.ready === "true");
+	assert.equal(await page.getAttribute("body", "data-user"), "45");
+	assert.equal(codeRequests, beforeDelayed + 1);
+	// 真实等待 45 秒超时分支：保持在启动页，显示重试，不能创建游客成绩。
+	const beforeTimeout = codeRequests;
+	const timeoutStart = Date.now();
+	await page.goto(`https://games.northward.zone/${activeGame.id}/?northward=1`);
+	await page
+		.getByRole("button", { name: "重新进入", exact: true })
+		.waitFor({ timeout: 55000 });
+	assert.ok(Date.now() - timeoutStart >= 44000, "必须实际经过原生认证等待超时");
+	assert.equal(new URL(page.url()).host, "northward.zone");
+	assert.equal(current, null);
+	assert.equal(codeRequests, beforeTimeout);
+	injectAuth = true;
+	nativePending = false;
+	await page.getByRole("button", { name: "重新进入", exact: true }).click();
+	await page.waitForFunction(() => document.body.dataset.ready === "true");
+	assert.equal(await page.getAttribute("body", "data-user"), "45");
+	console.log(
+		`PASS ${activeGame.id} 原生延迟登录、45 秒超时保持阻断、重新进入恢复账号`,
+	);
 }
 await page.setViewportSize({ width: 1440, height: 1000 });
 await page.goto("https://northward.zone/square/");
